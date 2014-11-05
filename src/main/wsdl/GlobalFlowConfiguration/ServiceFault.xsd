@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                xmlns:spf="urn:generic.com:Global:Fault" 
+                targetNamespace="urn:generic.com:Global:Fault" 
+                xmlns="http://schemas.xmlsoap.org/wsdl/" 
+                elementFormDefault="qualified">
+  
+    <xsd:element name="Error">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="errorCode" type="xsd:string"/>
+                <xsd:element name="errorDescription" type="xsd:string"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+  
+    
+</xsd:schema>

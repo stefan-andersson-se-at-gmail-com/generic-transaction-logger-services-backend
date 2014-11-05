@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                xmlns:tns="urn:generic.com:Global:TransactionLogger" 
+                targetNamespace="urn:generic.com:Global:TransactionLogger" 
+                xmlns="http://schemas.xmlsoap.org/wsdl/" 
+                elementFormDefault="qualified">
+    <xsd:element name="Transactions">
+        <xsd:complexType>
+            <xsd:sequence minOccurs="1" maxOccurs="1">
+                <xsd:element name="Transaction" maxOccurs="unbounded">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="UTCLocalTimeStamp" maxOccurs="1" minOccurs="1" nillable="false" type="xsd:dateTime"/>
+                            <xsd:element name="UTCLocalTimeStampNanoSeconds" type="xsd:positiveInteger"/>
+                            <xsd:element name="TransactionReferenceID" maxOccurs="1" minOccurs="1" nillable="false">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string">
+                                        <xsd:minLength value="1"/>
+                                        <xsd:whiteSpace value="collapse"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                            <xsd:element name="ApplicationName" maxOccurs="1" minOccurs="1">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string">
+                                        <xsd:minLength value="1"/>
+                                        <xsd:whiteSpace value="collapse"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                            <xsd:element name="IsError" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="false"></xsd:element>
+                            <xsd:element name="ExpiryDate" minOccurs="0" type="xsd:date"/>
+                            <xsd:element name="TransactionLogData" minOccurs="0" maxOccurs="unbounded" >
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="ContentLabel" maxOccurs="1" minOccurs="1">
+                                            <xsd:simpleType>
+                                                <xsd:restriction base="xsd:string">
+                                                    <xsd:minLength value="1"/>
+                                                    <xsd:whiteSpace value="collapse"/>
+                                                </xsd:restriction>
+                                            </xsd:simpleType>
+                                        </xsd:element>
+                                        <xsd:element name="ContentMimeType" maxOccurs="1" minOccurs="1" default="text/plain">
+                                            <xsd:simpleType>
+                                                <xsd:restriction base="xsd:string">
+                                                    <xsd:minLength value="1"/>
+                                                    <xsd:whiteSpace value="collapse"/>
+                                                </xsd:restriction>
+                                            </xsd:simpleType>
+                                        </xsd:element>
+                                        <xsd:element name="Content" maxOccurs="1" minOccurs="1">
+                                            <xsd:simpleType>
+                                                <xsd:restriction base="xsd:string">
+                                                    <xsd:whiteSpace value="collapse"/>
+                                                </xsd:restriction>
+                                            </xsd:simpleType>
+                                        </xsd:element>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="TransactionLogPointInfo" minOccurs="0" >
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element maxOccurs="1" minOccurs="1" name="FlowName" >
+                                            <xsd:simpleType>
+                                                <xsd:restriction base="xsd:string">
+                                                    <xsd:minLength value="1"/>
+                                                    <xsd:whiteSpace value="collapse"/>
+                                                </xsd:restriction>
+                                            </xsd:simpleType>
+                                        </xsd:element>
+                                        <xsd:element name="FlowPointName" maxOccurs="1" minOccurs="1">
+                                            <xsd:simpleType>
+                                                <xsd:restriction base="xsd:string">
+                                                    <xsd:minLength value="1"/>
+                                                    <xsd:whiteSpace value="collapse"/>
+                                                </xsd:restriction>
+                                            </xsd:simpleType>
+                                        </xsd:element>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+
+    <xsd:element name="Response" type="tns:Response"/>
+     
+    <xsd:complexType name="Response">
+        <xsd:sequence>
+            <xsd:element name="Return" type="xsd:boolean"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>
