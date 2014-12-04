@@ -17,9 +17,8 @@
 package com.erbjuder.logger.server.rest.services;
 
 import com.erbjuder.logger.server.rest.services.dao.LoggerSchema;
+import com.erbjuder.logger.server.rest.util.ResultSetConverter;
 import java.util.List;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -58,7 +57,8 @@ public class TransactionLogRestService_V1 {
               
           
          LoggerSchema loggerSchema = new LoggerSchema();
-            JSONArray jsonResult = loggerSchema.search_logMessageList(
+         ResultSetConverter converter = new ResultSetConverter();
+         JSONArray jsonResult = converter.toJSONArray(loggerSchema.search_logMessageList(
                     fromDate, 
                     toDate, 
                     transactionReferenceId, 
@@ -68,7 +68,9 @@ public class TransactionLogRestService_V1 {
                     flowPointName, 
                     freeTextSearchList, 
                     dataBaseSearchList
-            );
+            ));
+          
+            
             return Response.ok(jsonResult.toString()).build();
             
             

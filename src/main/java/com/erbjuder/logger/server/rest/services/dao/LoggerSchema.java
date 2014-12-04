@@ -17,15 +17,11 @@
 package com.erbjuder.logger.server.rest.services.dao;
 
 import com.erbjuder.logger.server.rest.helper.SQLPrepareStatementHelper;
-import com.erbjuder.logger.server.rest.util.ToJSON;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import org.json.simple.JSONArray;
-//import org.codehaus.jettison.json.JSONArray;
 
 /**
  *
@@ -33,7 +29,7 @@ import org.json.simple.JSONArray;
  */
 public class LoggerSchema extends MysqlConnection {
 
-    public JSONArray search_logMessageList(
+    public ResultSet search_logMessageList(
             String fromDate,
             String toDate,
             String transactionReferenceId,
@@ -44,10 +40,8 @@ public class LoggerSchema extends MysqlConnection {
             List<String> freeTextSearchList,
             List<String> dataPartitionList) throws Exception {
 
-        PreparedStatement query = null;
+        ResultSet rs = null;
         Connection conn = null;
-        ToJSON converter = new ToJSON();
-        JSONArray json = new JSONArray();
         try {
             conn = MysqlConnection();
 
@@ -93,32 +87,161 @@ public class LoggerSchema extends MysqlConnection {
             // Free text search
             if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
                     && dataPartitionList != null && !dataPartitionList.isEmpty()) {
-                for (String freeText : freeTextSearchList) {
 
-                    for (String databasePartition : dataPartitionList) {
+                prepStatement.append("AND ( ");
+                int size = dataPartitionList.size();
+                for (int i = 0; i < size; i++) {
 
+                    String logMessageDataPartition = dataPartitionList.get(i);
+                    StringBuilder partitionBuilder = this.search_LogMessageIdsFromPartition(
+                            fromDate,
+                            toDate,
+                            "ID",
+                            logMessageDataPartition,
+                            freeTextSearchList
+                    );
+
+                    prepStatement.append("ID IN ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                    if (i < size - 1) {
+                        prepStatement.append("OR ");
                     }
+
                 }
+
+                prepStatement.append(") ");
             }
 
-            System.err.println(prepStatement.toString());
             CallableStatement stmt = conn.prepareCall(prepStatement.toString());
-            json = converter.toJSONArray(stmt.executeQuery());
-            conn.close(); //close connection
+            rs = stmt.executeQuery();
+            conn.close();
 
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
-            return json;
+            return rs;
         } catch (Exception e) {
             e.printStackTrace();
-            return json;
+            return rs;
 
         } finally {
             if (conn != null) {
                 conn.close();
             }
         }
-        return json;
+        return rs;
+
+    }
+
+    private StringBuilder search_LogMessageIdsFromPartition(
+            String fromDate,
+            String toDate,
+            String logMessageId,
+            String logMessageDataPartition,
+            List<String> freeTextSearchList
+    ) {
+
+        StringBuilder prepStatement = new StringBuilder();
+        String partitionID = logMessageDataPartition + "_ID";
+
+        prepStatement.append("SELECT ");
+        prepStatement.append("DISTINCT ( ID ) as ").append(partitionID);
+        prepStatement.append("FROM ").append(SQLPrepareStatementHelper.toSQLValue(logMessageDataPartition)).append("WHERE ");
+
+        // Between date
+        prepStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        prepStatement.append("AND ");
+        prepStatement.append(partitionID).append(" = ").append(logMessageId);
+
+        int size = freeTextSearchList.size();
+        if (size > 0) {
+            prepStatement.append("AND ( ");
+
+            for (int i = 0; i < size; i++) {
+
+                String freeText = SQLPrepareStatementHelper.toSQLStartsWithValue(freeTextSearchList.get(i));
+                prepStatement.append("LABEL ").append(freeText);
+                prepStatement.append("OR ");
+                prepStatement.append("CONTENT ").append(freeText);
+
+                if (i < size - 1) {
+                    prepStatement.append("OR ");
+                }
+            }
+
+            prepStatement.append(") ");
+
+        }
+
+        return prepStatement;
+
+    }
+
+    public ResultSet search_LogMessageDataPartition(
+            String fromDate,
+            String toDate,
+            String logMessageId,
+            String logMessageDataPartition,
+            List<String> freeTextSearchList
+    ) throws Exception {
+
+        ResultSet rs = null;
+        Connection conn = null;
+
+        try {
+            conn = MysqlConnection();
+
+            StringBuilder prepStatement = new StringBuilder();
+            prepStatement.append("SELECT ");
+            prepStatement.append("ID, LABEL, CONTENT, MIMETYPE, CONTENTSIZE, MODIFIED");
+            prepStatement.append("SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOG_MESSAGE_ID ");
+            prepStatement.append("FROM ").append(SQLPrepareStatementHelper.toSQLValue(logMessageDataPartition)).append("WHERE ");
+
+            // Between date
+            prepStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+
+            if (logMessageId != null && !logMessageId.isEmpty()) {
+                prepStatement.append("AND ");
+                prepStatement.append("ID = ").append(logMessageId);
+            }
+
+            int size = freeTextSearchList.size();
+            if (size > 0) {
+                prepStatement.append("AND ( ");
+
+                for (int i = 0; i < size; i++) {
+
+                    String freeText = SQLPrepareStatementHelper.toSQLStartsWithValue(freeTextSearchList.get(i));
+                    prepStatement.append("LABEL ").append(freeText);
+                    prepStatement.append("OR ");
+                    prepStatement.append("CONTENT ").append(freeText);
+
+                    if (i < size - 1) {
+                        prepStatement.append("OR ");
+                    }
+                }
+
+                prepStatement.append(") ");
+
+            }
+
+            CallableStatement stmt = conn.prepareCall(prepStatement.toString());
+            rs = stmt.executeQuery();
+            conn.close();
+
+        } catch (SQLException sqlError) {
+            sqlError.printStackTrace();
+            return rs;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return rs;
+
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return rs;
+
     }
 
     private StringBuilder search_logMessagesFromApplicationNames(
