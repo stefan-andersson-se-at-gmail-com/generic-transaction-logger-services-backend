@@ -15,6 +15,26 @@
         <netbeans.hint.license>gpl30</netbeans.hint.license>
     </properties>
     
+    
+    <!-- Git --> 
+    <scm>
+        <url>https://github.com/stefan-andersson-se-at-gmail-com/generic-transaction-logger-thread-pool-executor-glassfish.git</url>
+        <connection>scm:git:git://github.com/stefan-andersson-se-at-gmail-com/generic-transaction-logger-thread-pool-executor-glassfish.git</connection>
+        <developerConnection>scm:git:git@github.com:stefan-andersson-se-at-gmail-com/generic-transaction-logger-thread-pool-executor-glassfish.git</developerConnection>
+    </scm>
+
+    <!-- Nexus ( user name and PWD in maven -> settings.xml )-->
+    <distributionManagement>
+        <repository>
+            <id>release</id>
+            <name>RepositoryProxyRel</name>
+            <url>http://localhost:8081/nexus/content/repositories/releases</url>
+        </repository>
+    </distributionManagement>
+
+
+    
+    
     <dependencies>
         <dependency>
             <groupId>javax.ws.rs</groupId>
