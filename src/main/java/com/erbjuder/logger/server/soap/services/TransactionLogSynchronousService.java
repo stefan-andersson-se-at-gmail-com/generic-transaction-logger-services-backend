@@ -16,10 +16,11 @@
  */
 package com.erbjuder.logger.server.soap.services;
 
-import com.generic.global.transactionlogger.Response;
-import com.generic.global.transactionlogger.Transactions;
 import com.erbjuder.logger.server.facade.impl.LogMessageFacadeImpl;
 import com.erbjuder.logger.server.facade.interfaces.LogMessageFacade;
+import com.generic.global.transactionlogger.Response;
+import com.generic.global.transactionlogger.Transactions;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -56,7 +57,7 @@ public class TransactionLogSynchronousService extends LogMessageServiceBase {
     @WebResult(name = "Response", targetNamespace = "urn:generic.com:Global:TransactionLogger", partName = "response")
     public Response persist(
             @WebParam(name = "Transactions", targetNamespace = "urn:generic.com:Global:TransactionLogger", partName = "Transactions") Transactions transactions) throws WebServiceException {
-        //logger.log(Level.SEVERE, "[ Got transaction log synchronous event ] ");
+        logger.log(Level.SEVERE, "[ Got transaction log synchronous event ] ");
         return super.create(transactions);
     }
 

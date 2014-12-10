@@ -11,7 +11,14 @@
                     <xsd:complexType>
                         <xsd:sequence>
                             <xsd:element name="UTCLocalTimeStamp" maxOccurs="1" minOccurs="1" nillable="false" type="xsd:dateTime"/>
-                            <xsd:element name="UTCLocalTimeStampNanoSeconds" type="xsd:positiveInteger"/>
+                            <xsd:element name="UTCLocalTimeStampNanoSeconds" maxOccurs="1" minOccurs="1" nillable="false" >
+                                <xsd:simpleType>
+                                     <xsd:restriction base="xsd:integer">
+                                        <xsd:minInclusive value="000001"/>
+                                        <xsd:maxInclusive value="999999"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
                             <xsd:element name="TransactionReferenceID" maxOccurs="1" minOccurs="1" nillable="false">
                                 <xsd:simpleType>
                                     <xsd:restriction base="xsd:string">
@@ -88,6 +95,8 @@
         </xsd:complexType>
     </xsd:element>
 
+
+   
 
     <xsd:element name="Response" type="tns:Response"/>
      

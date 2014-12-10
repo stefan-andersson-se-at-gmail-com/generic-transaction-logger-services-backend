@@ -2,7 +2,7 @@
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
     <persistence-unit name="TransactionLogger" transaction-type="JTA">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-        <jta-data-source>jdbc/TransactionLoggerProd</jta-data-source>
+        <jta-data-source>jdbc/TransactionLoggerDev</jta-data-source>
         <class>com.erbjuder.entity.impl.EdgeConstraints</class>
         <class>com.erbjuder.entity.impl.Edge</class>
         <class>com.erbjuder.entity.impl.FlowConfiguration</class>

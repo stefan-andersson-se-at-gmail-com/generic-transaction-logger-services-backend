@@ -287,14 +287,14 @@
                                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                 <!-- Deploye                                                -->
                                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                                <!--<resource>-->
-                                <!--<file>${basedir}/target/${project.artifactId}-${project.version}.war</file>-->  
-                                <!--<targetPath>/home/adminuser/local/liferay-portal-6.2-ce-ga2_with_G-Fish-4.1_named_as_3.1.2.2/glassfish-3.1.2.2/glassfish/domains/domain1/autodeploy</targetPath>-->               
-                                <!--<targetPath>/home/adminuser/local/glassfish-3.1.2.2/glassfish/domains/domain1/autodeploy</targetPath>-->
-                                <!--                                    <targetPath>/home/adminuser/local/liferay-portal-6.2.0/glassfish-4.0/deploy</targetPath>-->
-                                <!--<targetPath>/home/adminuser/local/glassfish-4.0.1/glassfish/domains/domain1/autodeploy</targetPath>-->
+                                <resource>
+                                <file>${basedir}/target/${project.artifactId}-${project.version}.war</file>  
+<!--                                <targetPath>/home/adminuser/local/liferay-portal-6.2-ce-ga2_with_G-Fish-4.1_named_as_3.1.2.2/glassfish-3.1.2.2/glassfish/domains/domain1/autodeploy</targetPath>               
+                                <targetPath>/home/adminuser/local/glassfish-3.1.2.2/glassfish/domains/domain1/autodeploy</targetPath>
+                                <targetPath>/home/adminuser/local/liferay-portal-6.2.0/glassfish-4.0/deploy</targetPath>-->
+                                <targetPath>/home/server-1/Programs/glassfish-4.1/glassfish/domains/domain1/autodeploy</targetPath>
                                 
-                                <!--</resource>-->
+                                </resource>
                                 
                                 
                                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

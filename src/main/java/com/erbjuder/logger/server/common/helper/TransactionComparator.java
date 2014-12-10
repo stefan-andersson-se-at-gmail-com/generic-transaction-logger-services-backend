@@ -51,8 +51,8 @@ public class TransactionComparator implements Serializable, Comparator<Transacti
 
         // Treat not pressent value as equal 
         int result = 0;
-        int firstTimeNanos = first.getUTCLocalTimeStampNanoSeconds().intValue();
-        int secondTimeNanos = second.getUTCLocalTimeStampNanoSeconds().intValue();
+        int firstTimeNanos = first.getUTCLocalTimeStampNanoSeconds();
+        int secondTimeNanos = second.getUTCLocalTimeStampNanoSeconds();
 
         result = firstTimeNanos < secondTimeNanos ? -1 : firstTimeNanos == secondTimeNanos ? 0 : 1;
         return result;

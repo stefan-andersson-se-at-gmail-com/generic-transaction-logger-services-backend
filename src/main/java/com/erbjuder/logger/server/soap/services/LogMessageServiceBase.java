@@ -107,7 +107,7 @@ public abstract class LogMessageServiceBase {
                     message_id = value;
                     response.setReturn(false);
                 } else {
-                    //logger.log(Level.SEVERE, "Got <Urn : Key> =[ " + urn + " ] " + " [ " + key + " ]");
+                    logger.log(Level.SEVERE, "Got <Urn : Key> =[ " + urn + " ] " + " [ " + key + " ]");
                 }
             }
 
@@ -142,7 +142,7 @@ public abstract class LogMessageServiceBase {
                     long UTCLocalTimeStamp = transaction.getUTCLocalTimeStamp().toGregorianCalendar().getTimeInMillis();
                     long UTCLocalTimeStampNanoSeconds = 0;
                     try {
-                        UTCLocalTimeStampNanoSeconds = transaction.getUTCLocalTimeStampNanoSeconds().longValue();
+                        UTCLocalTimeStampNanoSeconds = transaction.getUTCLocalTimeStampNanoSeconds();
 
                     } catch (Exception UTCLocalTimeStampNanoSecondsNotPressent) {
                         //Skip client nano
@@ -151,14 +151,14 @@ public abstract class LogMessageServiceBase {
                     }
 
                     if (Long.MAX_VALUE > UTCLocalTimeStamp && Long.MIN_VALUE < UTCLocalTimeStamp) {
-                        //logger.log(Level.INFO, "UTCLocalTimeStamp=[ " + UTCLocalTimeStamp + " ]");
-                        //logger.log(Level.INFO, "UTCLocalTimeStampNanoSeconds=[ " + UTCLocalTimeStampNanoSeconds + " ]");
-                        //logger.log(Level.INFO, "createNanoTimeStamp=[ " + TimeStamp.createNanoTimeStamp(UTCLocalTimeStamp, UTCLocalTimeStampNanoSeconds).getNanos() + " ]");
+                        logger.log(Level.INFO, "UTCLocalTimeStamp=[ " + UTCLocalTimeStamp + " ]");
+                        logger.log(Level.INFO, "UTCLocalTimeStampNanoSeconds=[ " + UTCLocalTimeStampNanoSeconds + " ]");
+                        logger.log(Level.INFO, "createNanoTimeStamp=[ " + TimeStampUtils.createNanoTimeStamp(UTCLocalTimeStamp, UTCLocalTimeStampNanoSeconds).getNanos() + " ]");
                         logMessage.setUtcLocalTimeStamp(TimeStampUtils.createNanoTimeStamp(UTCLocalTimeStamp, UTCLocalTimeStampNanoSeconds));
 
                     } else {
-                        //logger.log(Level.INFO, "[ Invalid UTCLocalTimeStamp range, Use current system time instead! ] ");
-                        //logger.log(Level.INFO, "[ " + UTCLocalTimeStamp + " ] ");
+                        logger.log(Level.INFO, "[ Invalid UTCLocalTimeStamp range, Use current system time instead! ] ");
+                        logger.log(Level.INFO, "[ " + UTCLocalTimeStamp + " ] ");
                         logMessage.setUtcLocalTimeStamp(TimeStampUtils.createSystemNanoTimeStamp());
                     }
 
@@ -181,8 +181,8 @@ public abstract class LogMessageServiceBase {
                         logMessage.setExpiredDate(calendar.getTime());
                     }
                 } catch (Exception invalidExiredDateException) {
-                    //logger.log(Level.INFO, "[ Invalid ExpiryDate! Use default expired time instead! ] ");
-                    //logger.log(Level.INFO, invalidExiredDateException.getMessage());
+                    logger.log(Level.INFO, "[ Invalid ExpiryDate! Use default expired time instead! ] ");
+                    logger.log(Level.INFO, invalidExiredDateException.getMessage());
                     Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
                     calendar.add(Calendar.MONTH, addNumberOfMonth);
                     logMessage.setExpiredDate(calendar.getTime());
@@ -209,19 +209,20 @@ public abstract class LogMessageServiceBase {
                     logMessage.setFlowName("");
                     logMessage.setFlowPointName("");
                 }
-
+logger.log(Level.INFO, "Flow done ]");
                 //
                 // Transaction log data
                 logMessage = this.buildTransactioLogDataEntity(transaction, logMessage);
+logger.log(Level.INFO, "Data done ]");
 
                 //
                 // Transaction meta info
-                logMessage = this.buildTransactioMetaInfoEntity(transaction, logMessage);
+                //logMessage = this.buildTransactioMetaInfoEntity(transaction, logMessage);
 
                 //
                 // Persist
                 getLogMessageFacade().create(logMessage);
-
+logger.log(Level.INFO, "Create done ]");
             }
 
             // Flush and close 
@@ -231,6 +232,7 @@ public abstract class LogMessageServiceBase {
         } catch (Throwable ex) {
             StringBuilder builder = new StringBuilder();
             builder.append("============= [ Java Server exception ] =============== \n");
+            builder.append(ex.getMessage());
             logger.log(Level.SEVERE, builder.toString());
             response.setReturn(false);
         }
