@@ -329,7 +329,7 @@ public class LoggerSchema extends MysqlConnection {
         StringBuilder prepareStatement = new StringBuilder();
 
         prepareStatement.append("SELECT ");
-        prepareStatement.append("ID, CONTENT, CONTENTDESCRIPTION, CONTENTMIMETYPE, CONTENTMODIFIED, ");
+        prepareStatement.append("ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
         prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID");
         prepareStatement.append("FROM ").append(databasePartition).append("WHERE ");
         // Between date
@@ -338,9 +338,9 @@ public class LoggerSchema extends MysqlConnection {
         prepareStatement.append("AND ");
         prepareStatement.append("( ");
         prepareStatement.append("CONTENT LIKE ").append(SQLPrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
-        prepareStatement.append("CONTENTDESCRIPTION LIKE ").append(SQLPrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
+        prepareStatement.append("LABEL LIKE ").append(SQLPrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
         prepareStatement.append("CONTENTSIZE LIKE ").append(SQLPrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
-        prepareStatement.append("CONTENTMIMETYPE LIKE ").append(SQLPrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
+        prepareStatement.append("MIMETYPE LIKE ").append(SQLPrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
         prepareStatement.append(") ");
         return prepareStatement;
 

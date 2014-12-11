@@ -160,7 +160,7 @@ public abstract class AbstractFacadeImpl<T> implements AbstractFacade<T> {
         Join logData = entity.join("logMessageData");
         Path logDataLabelPath = logData.get("label");
         Path logDataContentPath = logData.get("content");
-        Predicate logDataContentDescriptionPredicate = builder.like(logDataLabelPath, "%" + freeText + "%");
+        Predicate logDataLabelPredicate = builder.like(logDataLabelPath, "%" + freeText + "%");
         Predicate logDataContentPredicate = builder.like(logDataContentPath, "%" + freeText + "%");
 
         //
@@ -183,7 +183,7 @@ public abstract class AbstractFacadeImpl<T> implements AbstractFacade<T> {
         if (freeText != null && !freeText.isEmpty()) {
 
             predicate
-                    = builder.or(logDataContentDescriptionPredicate, logDataContentPredicate);
+                    = builder.or(logDataLabelPredicate, logDataContentPredicate);
         }
 
         if (fromDate != -1 && toDate != -1) {

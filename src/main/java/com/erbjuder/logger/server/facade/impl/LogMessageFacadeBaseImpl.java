@@ -1207,7 +1207,7 @@ public abstract class LogMessageFacadeBaseImpl extends AbstractFacadeImpl<LogMes
         Join logData = entity.join("logMessageData");
 
         logData.alias("MSG_DATA_OBJ");
-        Path logDataContentDescriptionPath = logData.get("contentDescription");
+        Path logDataLabelPath = logData.get("label");
         Path logDataContentPath = logData.get("content");
 
         Predicate ORCondition = null;
@@ -1217,7 +1217,7 @@ public abstract class LogMessageFacadeBaseImpl extends AbstractFacadeImpl<LogMes
         Predicate pred_3 = builder.like(applicationNamePath, "%" + inFreeText + "%");
         Predicate pred_4 = builder.like(transactionReferenceIDPath, "%" + inFreeText + "%");
         Predicate pred_5 = builder.like(logDataContentPath, "%" + inFreeText + "%");
-        Predicate pred_6 = builder.like(logDataContentDescriptionPath, "%" + inFreeText + "%");
+        Predicate pred_6 = builder.like(logDataLabelPath, "%" + inFreeText + "%");
 
         Predicate tmp = builder.or(
                 pred_1,
@@ -1246,113 +1246,7 @@ public abstract class LogMessageFacadeBaseImpl extends AbstractFacadeImpl<LogMes
         return subquery;
     }
 
-    private Subquery<LogMessage> subQueryLogMessageMetaInfo(
-            CriteriaBuilder builder,
-            CriteriaQuery criteriaQuery,
-            String inApplicationName,
-            String inFlowName,
-            String inFlowPointName,
-            String inTransactionReferenceId,
-            String inFromDate,
-            String inToDate,
-            String inFreeText,
-            Boolean inViewError) {
-
-        Subquery<LogMessage> subquery = criteriaQuery.subquery(LogMessage.class);
-        Root entity = subquery.from(LogMessage.class);
-
-        entity.alias(
-                "MSG_META");
-        subquery.select(entity.get("id"));
-        Predicate whereConditions = null;
-
-        // 
-        // LogMessage
-        Path applicationNamePath = entity.get("applicationName");
-        Path utcServerTimeStampPath = entity.get("utcServerTimeStamp");
-        Path flowNamePath = entity.get("flowName");
-        Path flowPointNamePath = entity.get("flowPointName");
-        Path transactionReferenceIDPath = entity.get("transactionReferenceID");
-        Path isErrorPath = entity.get("isError");
-
-        if (inViewError
-                != null) {
-            Predicate predicate = builder.equal(isErrorPath, inViewError);
-            whereConditions = whereConditions == null ? predicate : builder.and(whereConditions, predicate);
-        }
-
-        if (inFromDate
-                != null && !inFromDate.isEmpty()
-                && inToDate != null && !inToDate.isEmpty()) {
-            Predicate predicate = builder.between(utcServerTimeStampPath, inFromDate, inToDate);
-            whereConditions = whereConditions == null ? predicate : builder.and(whereConditions, predicate);
-        }
-
-        if (inApplicationName
-                != null && !inApplicationName.isEmpty()) {
-            Predicate predicate = builder.like(applicationNamePath, inApplicationName + "%");
-            whereConditions = whereConditions == null ? predicate : builder.and(whereConditions, predicate);
-        }
-
-        if (inTransactionReferenceId
-                != null && !inTransactionReferenceId.isEmpty()) {
-            Predicate predicate = builder.like(transactionReferenceIDPath, inTransactionReferenceId + "%");
-            whereConditions = whereConditions == null ? predicate : builder.and(whereConditions, predicate);
-        }
-
-        if (inFlowName
-                != null && !inFlowName.isEmpty()) {
-            Predicate predicate = builder.like(flowNamePath, inFlowName + "%");
-            whereConditions = whereConditions == null ? predicate : builder.and(whereConditions, predicate);
-        }
-
-        if (inFlowPointName
-                != null && !inFlowPointName.isEmpty()) {
-            Predicate predicate = builder.like(flowPointNamePath, inFlowPointName + "%");
-            whereConditions = whereConditions == null ? predicate : builder.and(whereConditions, predicate);
-        }
-
-        // LogData
-        Join metaInfo = entity.join("logMessageMetaInfo");
-
-        metaInfo.alias(
-                "MSG_META_OBJ");
-        Path metaValuePath = metaInfo.get("metaValue");
-        Path metaLabelPath = metaInfo.get("metaLabel");
-
-        Predicate ORCondition = null;
-
-        Predicate pred_1 = builder.like(flowNamePath, "%" + inFreeText + "%");
-        Predicate pred_2 = builder.like(flowPointNamePath, "%" + inFreeText + "%");
-        Predicate pred_3 = builder.like(applicationNamePath, "%" + inFreeText + "%");
-        Predicate pred_4 = builder.like(transactionReferenceIDPath, "%" + inFreeText + "%");
-        Predicate pred_5 = builder.like(metaLabelPath, "%" + inFreeText + "%");
-        Predicate pred_6 = builder.like(metaValuePath, "%" + inFreeText + "%");
-        Predicate tmp = builder.or(
-                pred_1,
-                pred_2,
-                pred_3,
-                pred_4,
-                pred_5,
-                pred_6
-        );
-        ORCondition = ORCondition == null ? tmp : builder.and(ORCondition, tmp);
-
-        if (whereConditions != null && ORCondition
-                != null) {
-            whereConditions = builder.and(whereConditions, ORCondition);
-        } else if (whereConditions == null && ORCondition
-                != null) {
-            whereConditions = ORCondition;
-        }
-
-        if (whereConditions
-                != null) {
-            subquery.where(whereConditions);
-        }
-        return subquery;
-    }
-
+  
     private Subquery<List> subQueryLogMessageData_2(
             CriteriaBuilder builder,
             CriteriaQuery criteriaQuery,
@@ -1367,11 +1261,11 @@ public abstract class LogMessageFacadeBaseImpl extends AbstractFacadeImpl<LogMes
         subquery.select(logData.get("logMessage").get("id"));
 
         Path utcServerTimeStampPath = logData.get("utcServerTimeStamp");
-        Path logDataContentDescriptionPath = logData.get("contentDescription");
+        Path logDataLabelPath = logData.get("label");
         Path logDataContentPath = logData.get("content");
 
         Predicate pred_1 = builder.like(logDataContentPath, "%" + inFreeText + "%");
-        Predicate pred_2 = builder.like(logDataContentDescriptionPath, "%" + inFreeText + "%");
+        Predicate pred_2 = builder.like(logDataLabelPath, "%" + inFreeText + "%");
         Predicate orConditions = builder.or(pred_1, pred_2);
 
         Predicate predicate = builder.between(utcServerTimeStampPath, inFromDate, inToDate);
@@ -1457,7 +1351,7 @@ public abstract class LogMessageFacadeBaseImpl extends AbstractFacadeImpl<LogMes
         Join logData = entity.join(clazz);
 
         logData.alias("MSG_DATA_OBJ");
-        Path logDataContentDescriptionPath = logData.get("contentDescription");
+        Path logDataLabelPath = logData.get("label");
         Path logDataContentPath = logData.get("content");
 
         Predicate ORCondition = null;
@@ -1467,7 +1361,7 @@ public abstract class LogMessageFacadeBaseImpl extends AbstractFacadeImpl<LogMes
         Predicate pred_3 = builder.like(applicationNamePath, "%" + inFreeText + "%");
         Predicate pred_4 = builder.like(transactionReferenceIDPath, "%" + inFreeText + "%");
         Predicate pred_5 = builder.like(logDataContentPath, "%" + inFreeText + "%");
-        Predicate pred_6 = builder.like(logDataContentDescriptionPath, "%" + inFreeText + "%");
+        Predicate pred_6 = builder.like(logDataLabelPath, "%" + inFreeText + "%");
 
         Predicate tmp = builder.or(
                 pred_1,

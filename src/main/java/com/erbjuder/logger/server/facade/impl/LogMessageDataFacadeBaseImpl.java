@@ -323,8 +323,8 @@ public abstract class LogMessageDataFacadeBaseImpl implements LogMessageDataFaca
 
         StringBuilder nativeQuery = new StringBuilder();
         nativeQuery.append("SELECT ");
-        nativeQuery.append("ID, CONTENTDESCRIPTION, ");
-        nativeQuery.append("CONTENTMIMETYPE, CONTENTSIZE, CONTENTMODIFIED, SEARCHABLE,");
+        nativeQuery.append("ID, LABEL, ");
+        nativeQuery.append("MIMETYPE, CONTENTSIZE, MODIFIED, SEARCHABLE,");
         nativeQuery.append("UTCSERVERTIMESTAMP, UTCLOCALTIMESTAMP ");
         nativeQuery.append("FROM ").append(clazz.getSimpleName()).append(" ");
         nativeQuery.append("where LOGMESSAGE_ID = '").append(logMessagePK).append("' ");
@@ -345,20 +345,20 @@ public abstract class LogMessageDataFacadeBaseImpl implements LogMessageDataFaca
         for (Object[] result : rawResultList) {
 
             long id = (Long) result[0];
-            String contentDescription = (String) result[1];
-            String contentMimeType = (String) result[2];
+            String label = (String) result[1];
+            String mimeType = (String) result[2];
             long contentSize = (Long) result[3];
-            boolean contentModified = (Boolean) result[4];
+            boolean modified = (Boolean) result[4];
             boolean searchable = (Boolean) result[5];
             java.sql.Timestamp utcServerTimeStamp = (java.sql.Timestamp) result[6];
             java.sql.Timestamp utcLocalTimeStamp = (java.sql.Timestamp) result[7];
 
             resultList.add(new LogMessageData_Incomplete(
                     id,
-                    contentDescription,
-                    contentMimeType,
+                    label,
+                    mimeType,
                     contentSize,
-                    contentModified,
+                    modified,
                     searchable,
                     utcServerTimeStamp,
                     utcLocalTimeStamp,

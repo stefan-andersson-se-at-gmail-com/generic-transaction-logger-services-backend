@@ -114,8 +114,7 @@ public abstract class LogMessageServiceBase {
             //
             // Copy all element into new structure due the original list seams to be NOT modifiable
             // ( That's a requirement of Collection.sort method )
-            getLogMessageFacade().getEntityManager().getTransaction().begin();
-            
+              
             List<Transactions.Transaction> tmpTransactionList = transactions.getTransaction();
             Transactions.Transaction[] transactionArray = tmpTransactionList.toArray(new Transaction[tmpTransactionList.size()]);
             Arrays.sort(transactionArray, new TransactionComparator()); 
