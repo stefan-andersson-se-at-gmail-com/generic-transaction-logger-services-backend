@@ -48,10 +48,11 @@ public class LogMessageData_Partition_14 implements Serializable, LogMessageData
     @TableGenerator(name = "PARTITION_14",
             pkColumnName = "ENTITY", allocationSize = 5, table = "PK_ALLOCATE_SIZE_5")
     private Long id;
-    @Column(columnDefinition = DataBase.LOGMESSAGEDATA_PARTITION_14_CONTENT_COLUMN_DEFINITION)
-    protected String content;
+     
     private String label;
     private String mimeType;
+    @Column(columnDefinition = DataBase.LOGMESSAGEDATA_PARTITION_14_CONTENT_COLUMN_DEFINITION)
+    protected String content;
     private java.sql.Timestamp utcLocalTimeStamp;
     private java.sql.Timestamp utcServerTimeStamp;
     private boolean modified = false;

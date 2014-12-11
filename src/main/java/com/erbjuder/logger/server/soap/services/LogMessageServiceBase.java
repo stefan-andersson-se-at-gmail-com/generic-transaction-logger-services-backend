@@ -114,9 +114,11 @@ public abstract class LogMessageServiceBase {
             //
             // Copy all element into new structure due the original list seams to be NOT modifiable
             // ( That's a requirement of Collection.sort method )
+            getLogMessageFacade().getEntityManager().getTransaction().begin();
+            
             List<Transactions.Transaction> tmpTransactionList = transactions.getTransaction();
             Transactions.Transaction[] transactionArray = tmpTransactionList.toArray(new Transaction[tmpTransactionList.size()]);
-            Arrays.sort(transactionArray, new TransactionComparator());
+            Arrays.sort(transactionArray, new TransactionComparator()); 
             for (Transactions.Transaction transaction : transactionArray) {
 
                 LogMessage logMessage = new LogMessage();
@@ -209,26 +211,18 @@ public abstract class LogMessageServiceBase {
                     logMessage.setFlowName("");
                     logMessage.setFlowPointName("");
                 }
-logger.log(Level.INFO, "Flow done ]");
+                logger.log(Level.INFO, "Flow done ]");
                 //
                 // Transaction log data
                 logMessage = this.buildTransactioLogDataEntity(transaction, logMessage);
-logger.log(Level.INFO, "Data done ]");
-
-                //
-                // Transaction meta info
-                //logMessage = this.buildTransactioMetaInfoEntity(transaction, logMessage);
-
+                 
                 //
                 // Persist
                 getLogMessageFacade().create(logMessage);
-logger.log(Level.INFO, "Create done ]");
+
             }
-
-            // Flush and close 
-            getLogMessageFacade().getEntityManager().flush();
-            getLogMessageFacade().getEntityManager().close();
-
+            
+             
         } catch (Throwable ex) {
             StringBuilder builder = new StringBuilder();
             builder.append("============= [ Java Server exception ] =============== \n");

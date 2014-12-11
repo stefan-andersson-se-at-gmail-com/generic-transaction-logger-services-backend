@@ -44,15 +44,14 @@ public class LogMessageData_Partition_01 implements Serializable, LogMessageData
     private LogMessage logMessage;
     private static final long serialVersionUID = 1L;
     @Id
-     @GeneratedValue(strategy = GenerationType.TABLE, generator = "PARTITION_01")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "PARTITION_01")
     @TableGenerator(name = "PARTITION_01",
             pkColumnName = "ENTITY", allocationSize = 5000, table = "PK_ALLOCATE_SIZE_5000")
     private Long id;
-    @Column(columnDefinition = DataBase.LOGMESSAGEDATA_PARTITION_01_CONTENT_COLUMN_DEFINITION)
-    protected String content;
-
     private String label;
     private String mimeType;
+    @Column(columnDefinition = DataBase.LOGMESSAGEDATA_PARTITION_01_CONTENT_COLUMN_DEFINITION)
+    protected String content;
     private java.sql.Timestamp utcLocalTimeStamp;
     private java.sql.Timestamp utcServerTimeStamp;
     private boolean modified = false;
@@ -91,7 +90,7 @@ public class LogMessageData_Partition_01 implements Serializable, LogMessageData
         }
         return true;
     }
- 
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -129,7 +128,7 @@ public class LogMessageData_Partition_01 implements Serializable, LogMessageData
         this.contentSize = contentSize;
     }
 
-         @Override
+    @Override
     public Timestamp getUtcLocalTimeStamp() {
         return utcLocalTimeStamp;
     }
@@ -148,8 +147,6 @@ public class LogMessageData_Partition_01 implements Serializable, LogMessageData
     public void setUtcServerTimeStamp(Timestamp utcServerTimeStamp) {
         this.utcServerTimeStamp = utcServerTimeStamp;
     }
-
-    
 
     @Override
     public String getLabel() {

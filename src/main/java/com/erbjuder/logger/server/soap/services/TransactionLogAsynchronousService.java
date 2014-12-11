@@ -46,14 +46,16 @@ public class TransactionLogAsynchronousService extends LogMessageServiceBase {
 
     @EJB
     private LogMessageFacadeImpl logMessageFacade;
+      
     @Resource
     private WebServiceContext jaxwsContext;
     private static final Logger logger = Logger.getLogger(TransactionLogAsynchronousService.class.getName());
 
     public void persist(
             @WebParam(name = "Transactions", targetNamespace = "urn:generic.com:Global:TransactionLogger", partName = "Transactions") Transactions transactions) throws WebServiceException {
-        logger.log(Level.SEVERE, "[ Got transaction log asynchronous event ] ");
+        logger.log(Level.SEVERE, "[ Got transaction log asynchronous event ] ");       
         super.create(transactions);
+
     }
 
     @Override

@@ -44,14 +44,15 @@ public class LogMessageData_Partition_02 implements Serializable, LogMessageData
     private LogMessage logMessage;
     private static final long serialVersionUID = 1L;
     @Id
-     @GeneratedValue(strategy = GenerationType.TABLE, generator = "PARTITION_02")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "PARTITION_02")
     @TableGenerator(name = "PARTITION_02",
             pkColumnName = "ENTITY", allocationSize = 2000, table = "PK_ALLOCATE_SIZE_2000")
     private Long id;
-    @Column(columnDefinition = DataBase.LOGMESSAGEDATA_PARTITION_02_CONTENT_COLUMN_DEFINITION)
-    protected String content;
+     
     private String label;
     private String mimeType;
+    @Column(columnDefinition = DataBase.LOGMESSAGEDATA_PARTITION_02_CONTENT_COLUMN_DEFINITION)
+    protected String content;
     private java.sql.Timestamp utcLocalTimeStamp;
     private java.sql.Timestamp utcServerTimeStamp;
     private boolean modified = false;
@@ -138,7 +139,7 @@ public class LogMessageData_Partition_02 implements Serializable, LogMessageData
         this.contentSize = contentSize;
     }
 
-         @Override
+    @Override
     public Timestamp getUtcLocalTimeStamp() {
         return utcLocalTimeStamp;
     }
