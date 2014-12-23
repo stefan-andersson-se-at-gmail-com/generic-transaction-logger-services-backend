@@ -18,12 +18,12 @@ package com.erbjuder.logger.server.rest.util;
 
 //import org.codehaus.jettison.json.JSONArray;
 //import org.codehaus.jettison.json.JSONObject;
+import com.erbjuder.logger.server.common.helper.TimeStampUtils;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-//import org.owasp.esapi.ESAPI;
 
 /**
  *
@@ -149,25 +149,25 @@ public class ResultSetConverter {
                 for (int i = 1; i < numColumns + 1; i++) {
                     String column_name = rsmd.getColumnName(i);
                     if (rsmd.getColumnType(i) == java.sql.Types.ARRAY) {
-                        obj.put(column_name, rs.getArray(column_name));
+                        obj.put(column_name, rs.getArray(column_name).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.BIGINT) {
-                        obj.put(column_name, rs.getInt(column_name));
+                        obj.put(column_name, rs.getBigDecimal(column_name).toBigInteger().toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.BOOLEAN) {
-                        obj.put(column_name, rs.getBoolean(column_name));
+                        obj.put(column_name, ((Boolean)rs.getBoolean(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.BLOB) {
                         obj.put(column_name, rs.getBlob(column_name));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.DOUBLE) {
-                        obj.put(column_name, rs.getDouble(column_name));
+                        obj.put(column_name, ((Double)rs.getDouble(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.FLOAT) {
-                        obj.put(column_name, rs.getFloat(column_name));
+                        obj.put(column_name, ((Float)rs.getFloat(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.INTEGER) {
-                        obj.put(column_name, rs.getInt(column_name));
+                        obj.put(column_name, ((Integer)rs.getInt(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.NVARCHAR) {
                         obj.put(column_name, rs.getNString(column_name));
@@ -181,22 +181,22 @@ public class ResultSetConverter {
                         obj.put(column_name, rs.getNString(column_name));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TINYINT) {
-                        obj.put(column_name, rs.getInt(column_name));
+                        obj.put(column_name, ((Integer)rs.getInt(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.SMALLINT) {
-                        obj.put(column_name, rs.getInt(column_name));
+                        obj.put(column_name, ((Integer)rs.getInt(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.DATE) {
-                        obj.put(column_name, rs.getDate(column_name));
+                        obj.put(column_name, rs.getDate(column_name).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TIME) {
-                        obj.put(column_name, rs.getTime(column_name));
+                        obj.put(column_name, TimeStampUtils.dateTimeToString(rs.getTime(column_name)));
 
-                    } else if (rsmd.getColumnType(i) == java.sql.Types.TIMESTAMP) {
-                        obj.put(column_name, rs.getTimestamp(column_name));
+                    } else if (rsmd.getColumnType(i) == java.sql.Types.TIMESTAMP) {                       
+                        obj.put(column_name, TimeStampUtils.timeStampToString(rs.getTimestamp(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.NUMERIC) {
-                        obj.put(column_name, rs.getBigDecimal(column_name));
+                        obj.put(column_name, rs.getBigDecimal(column_name).toString());
 
                     } else {
                         obj.put(column_name, rs.getObject(column_name));

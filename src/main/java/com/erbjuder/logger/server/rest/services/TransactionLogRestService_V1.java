@@ -54,8 +54,13 @@ public class TransactionLogRestService_V1 {
             ) {
         try {
  
-              
-          
+         System.err.println("[ Got REST call ]") ;   
+         System.err.println("fromDate=["+ fromDate +"]") ;   
+         System.err.println("toDate=["+ toDate +"]") ;
+         System.err.println("transactionReferenceId=["+transactionReferenceId+"]") ;
+         System.err.println("applicationNameList=["+applicationNames+"]") ;
+         System.err.println("viewError["+viewError+"]") ;
+         
          LoggerSchema loggerSchema = new LoggerSchema();
          ResultSetConverter converter = new ResultSetConverter();
          JSONArray jsonResult = converter.toJSONArray(loggerSchema.search_logMessageList(

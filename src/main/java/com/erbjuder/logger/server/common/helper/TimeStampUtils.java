@@ -17,6 +17,8 @@
 package com.erbjuder.logger.server.common.helper;
 
 import java.sql.Timestamp;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -88,4 +90,20 @@ public class TimeStampUtils {
         return createMysqlNanoTimeStamp(date.getTime(), nanoSeconds);
     }
 
+    public static String dateTimeToString(Date date) {
+        Format format = getDateFormater();
+        String timeToSeconds = format.format(date);
+        return timeToSeconds;
+    }
+
+    public static String timeStampToString(Timestamp timestamp) {
+        Format format = TimeStampUtils.getDateFormater();
+        String timeToSeconds = format.format(timestamp);
+        String nanoTime = Integer.toString(timestamp.getNanos());
+        return timeToSeconds + "." + nanoTime;
+    }
+
+    private static SimpleDateFormat getDateFormater() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    }
 }
