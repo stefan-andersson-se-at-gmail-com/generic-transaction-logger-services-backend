@@ -31,8 +31,8 @@ import org.json.simple.JSONObject;
  */
 public class ResultSetConverter {
 
-     
-    
+    /*
+     */
     public List<String> toStringList(ResultSet rs) throws Exception {
 
         List<String> list = new ArrayList<String>();
@@ -116,6 +116,14 @@ public class ResultSetConverter {
 
     }
 
+    public JSONArray toJSONArray(List<ResultSet> rsList) throws Exception {
+        JSONArray json = new JSONArray();
+        for (ResultSet rs : rsList) {
+            json = toJSONArray(rs, json);
+        }
+        return json;
+    }
+
     /**
      * This will convert database records into a JSON Array Simply pass in a
      * ResultSet from a database connection and it loop return a JSON array.
@@ -130,7 +138,12 @@ public class ResultSetConverter {
      * @throws Exception
      */
     public JSONArray toJSONArray(ResultSet rs) throws Exception {
-        JSONArray json = new JSONArray(); //JSON array that will be returned
+        return this.toJSONArray(rs, new JSONArray());
+
+    }
+
+    private JSONArray toJSONArray(ResultSet rs, JSONArray json) throws Exception {
+
         String temp = null;
         try {
 
@@ -155,19 +168,19 @@ public class ResultSetConverter {
                         obj.put(column_name, rs.getBigDecimal(column_name).toBigInteger().toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.BOOLEAN) {
-                        obj.put(column_name, ((Boolean)rs.getBoolean(column_name)).toString());
+                        obj.put(column_name, ((Boolean) rs.getBoolean(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.BLOB) {
                         obj.put(column_name, rs.getBlob(column_name));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.DOUBLE) {
-                        obj.put(column_name, ((Double)rs.getDouble(column_name)).toString());
+                        obj.put(column_name, ((Double) rs.getDouble(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.FLOAT) {
-                        obj.put(column_name, ((Float)rs.getFloat(column_name)).toString());
+                        obj.put(column_name, ((Float) rs.getFloat(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.INTEGER) {
-                        obj.put(column_name, ((Integer)rs.getInt(column_name)).toString());
+                        obj.put(column_name, ((Integer) rs.getInt(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.NVARCHAR) {
                         obj.put(column_name, rs.getNString(column_name));
@@ -181,10 +194,10 @@ public class ResultSetConverter {
                         obj.put(column_name, rs.getNString(column_name));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TINYINT) {
-                        obj.put(column_name, ((Integer)rs.getInt(column_name)).toString());
+                        obj.put(column_name, ((Integer) rs.getInt(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.SMALLINT) {
-                        obj.put(column_name, ((Integer)rs.getInt(column_name)).toString());
+                        obj.put(column_name, ((Integer) rs.getInt(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.DATE) {
                         obj.put(column_name, rs.getDate(column_name).toString());
@@ -192,7 +205,7 @@ public class ResultSetConverter {
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TIME) {
                         obj.put(column_name, TimeStampUtils.dateTimeToString(rs.getTime(column_name)));
 
-                    } else if (rsmd.getColumnType(i) == java.sql.Types.TIMESTAMP) {                       
+                    } else if (rsmd.getColumnType(i) == java.sql.Types.TIMESTAMP) {
                         obj.put(column_name, TimeStampUtils.timeStampToString(rs.getTimestamp(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.NUMERIC) {

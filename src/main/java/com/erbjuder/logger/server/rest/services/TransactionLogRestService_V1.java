@@ -16,8 +16,10 @@
  */
 package com.erbjuder.logger.server.rest.services;
 
+import com.erbjuder.logger.server.common.helper.DataBase;
 import com.erbjuder.logger.server.rest.services.dao.LoggerSchema;
 import com.erbjuder.logger.server.rest.util.ResultSetConverter;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -36,53 +38,97 @@ public class TransactionLogRestService_V1 {
 
 //    @PersistenceUnit(unitName = "TransactionLogger")
 //    private EntityManagerFactory entityManagerFactory;
-
-  
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
     public Response search(
             @QueryParam("fromDate") String fromDate,
-            @QueryParam("toDate") String toDate, 
+            @QueryParam("toDate") String toDate,
             @QueryParam("transactionReferenceId") String transactionReferenceId,
-            @QueryParam("viewError") Boolean viewError, 
-            @QueryParam("applicationNameList") List<String> applicationNames, 
-            @QueryParam("flowNameList") List<String> flowNames, 
-            @QueryParam("flowPointNameList") List<String> flowPointName, 
-            @QueryParam("FreeTextSearchList") List<String> freeTextSearchList,  
-            @QueryParam("DataBaseSearchList") List<String> dataBaseSearchList 
-            ) {
+            @QueryParam("viewError") Boolean viewError,
+            @QueryParam("applicationNameList") List<String> applicationNames,
+            @QueryParam("flowNameList") List<String> flowNames,
+            @QueryParam("flowPointNameList") List<String> flowPointName,
+            @QueryParam("freeTextSearchList") List<String> freeTextSearchList,
+            @QueryParam("dataBaseSearchList") List<String> dataBaseSearchList
+    ) {
         try {
- 
-         System.err.println("[ Got REST call ]") ;   
-         System.err.println("fromDate=["+ fromDate +"]") ;   
-         System.err.println("toDate=["+ toDate +"]") ;
-         System.err.println("transactionReferenceId=["+transactionReferenceId+"]") ;
-         System.err.println("applicationNameList=["+applicationNames+"]") ;
-         System.err.println("viewError["+viewError+"]") ;
-         
-         LoggerSchema loggerSchema = new LoggerSchema();
-         ResultSetConverter converter = new ResultSetConverter();
-         JSONArray jsonResult = converter.toJSONArray(loggerSchema.search_logMessageList(
-                    fromDate, 
-                    toDate, 
-                    transactionReferenceId, 
-                    viewError, 
-                    applicationNames, 
-                    flowNames, 
-                    flowPointName, 
-                    freeTextSearchList, 
+
+            System.err.println("[ Got REST call ]");
+            System.err.println("fromDate=[" + fromDate + "]");
+            System.err.println("toDate=[" + toDate + "]");
+            System.err.println("transactionReferenceId=[" + transactionReferenceId + "]");
+            System.err.println("applicationNameList=[" + applicationNames + "]");
+            System.err.println("viewError[" + viewError + "]");
+
+            LoggerSchema loggerSchema = new LoggerSchema();
+            ResultSetConverter converter = new ResultSetConverter();
+            JSONArray jsonResult = converter.toJSONArray(loggerSchema.search_logMessageList(
+                    fromDate,
+                    toDate,
+                    transactionReferenceId,
+                    viewError,
+                    applicationNames,
+                    flowNames,
+                    flowPointName,
+                    freeTextSearchList,
                     dataBaseSearchList
             ));
-          
-            
+
             return Response.ok(jsonResult.toString()).build();
-            
-            
+
         } catch (Exception e) {
             return Response.serverError().build();
         }
     }
 
+    @GET
+    @Path("/view")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response search(
+            @QueryParam("logMessageId") String logMessageId,
+            @QueryParam("dataBaseSearchList") List<String> dataBaseSearchList
+    ) {
+        try {
+
+            // 
+            // Use dafault if no partition list are provided
+            if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
+                dataBaseSearchList = getDefaultSearchableDatabases();
+            }
+
+            System.err.println("[ Got REST call ]");
+            System.err.println("logMessageId=[" + logMessageId + "]");
+            System.err.println("dataBaseSearchList=[" + dataBaseSearchList + "]");
+
+            LoggerSchema loggerSchema = new LoggerSchema();
+            ResultSetConverter converter = new ResultSetConverter();
+            JSONArray jsonResult = converter.toJSONArray(loggerSchema.fetch_LogMessageData(
+                    logMessageId,
+                    dataBaseSearchList));
+
+            return Response.ok(jsonResult.toString()).build();
+
+        } catch (Exception e) {
+            return Response.serverError().build();
+        }
+    }
+
+    private List<String> getDefaultSearchableDatabases() {
+        List<String> defaultSearchableDatabases = new ArrayList<String>();
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_01_CLASS.getSimpleName());
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_02_CLASS.getSimpleName());
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_03_CLASS.getSimpleName());
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_04_CLASS.getSimpleName());
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_05_CLASS.getSimpleName());
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_06_CLASS.getSimpleName());
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_07_CLASS.getSimpleName());
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_08_CLASS.getSimpleName());
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_09_CLASS.getSimpleName());
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_10_CLASS.getSimpleName());
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_11_CLASS.getSimpleName());
+        return defaultSearchableDatabases;
+
+    }
+
 }
- 

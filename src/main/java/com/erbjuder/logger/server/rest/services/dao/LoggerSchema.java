@@ -21,6 +21,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,54 +42,52 @@ public class LoggerSchema extends MysqlConnection {
             List<String> dataPartitionList) throws Exception {
 
         ResultSet rs = null;
-        Connection conn = null;
-        try {
-            conn = MysqlConnection();
+        try (Connection conn = MysqlConnection()) {
 
-            StringBuilder prepStatement = new StringBuilder();
-            prepStatement.append("SELECT ");
-            prepStatement.append("ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
-            prepStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
-            prepStatement.append("FROM ").append("LogMessage ").append("WHERE ");
+            StringBuilder prepareStatement = new StringBuilder();
+            prepareStatement.append("SELECT ");
+            prepareStatement.append("ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
+            prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
+            prepareStatement.append("FROM ").append("LogMessage ").append("WHERE ");
 
             // Between date
-            prepStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
 
             // Transaction ref ID
             if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
-                prepStatement.append("AND ");
-                prepStatement.append("TRANSACTIONREFERENCEID LIKE ").append(SQLPrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+                prepareStatement.append("AND ");
+                prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(SQLPrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
             }
 
             // view error
             if (viewError != null) {
-                prepStatement.append("AND ");
-                prepStatement.append("ISERROR = ").append(SQLPrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                prepareStatement.append("AND ");
+                prepareStatement.append("ISERROR = ").append(SQLPrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
             }
 
             // application names
             if (applicationNames != null && !applicationNames.isEmpty()) {
-                prepStatement.append("AND ");
-                prepStatement.append("APPLICATIONNAME IN ").append(SQLPrepareStatementHelper.toSQLList(applicationNames)).append(" ");
+                prepareStatement.append("AND ");
+                prepareStatement.append("APPLICATIONNAME IN ").append(SQLPrepareStatementHelper.toSQLList(applicationNames)).append(" ");
             }
 
             // flow names
             if (flowNames != null && !flowNames.isEmpty()) {
-                prepStatement.append("AND ");
-                prepStatement.append("FLOWNAME IN ").append(SQLPrepareStatementHelper.toSQLList(flowNames)).append(" ");
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWNAME IN ").append(SQLPrepareStatementHelper.toSQLList(flowNames)).append(" ");
             }
 
             // flow point names
             if (flowPointNames != null && !flowPointNames.isEmpty()) {
-                prepStatement.append("AND ");
-                prepStatement.append("FLOWPOINTNAME IN ").append(SQLPrepareStatementHelper.toSQLList(flowPointNames)).append(" ");
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWPOINTNAME IN ").append(SQLPrepareStatementHelper.toSQLList(flowPointNames)).append(" ");
             }
 
             // Free text search
             if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
                     && dataPartitionList != null && !dataPartitionList.isEmpty()) {
 
-                prepStatement.append("AND ( ");
+                prepareStatement.append("AND ( ");
                 int size = dataPartitionList.size();
                 for (int i = 0; i < size; i++) {
 
@@ -101,18 +100,25 @@ public class LoggerSchema extends MysqlConnection {
                             freeTextSearchList
                     );
 
-                    prepStatement.append("ID IN ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+                    prepareStatement.append("ID IN ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
 
                     if (i < size - 1) {
-                        prepStatement.append("OR ");
+                        prepareStatement.append("OR ");
                     }
 
                 }
 
-                prepStatement.append(") ");
+                prepareStatement.append(") ");
             }
 
-            CallableStatement stmt = conn.prepareCall(prepStatement.toString());
+            
+            // 
+            // Order by
+            prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC ");
+            
+            
+            
+            CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
             conn.close();
 
@@ -123,13 +129,47 @@ public class LoggerSchema extends MysqlConnection {
             e.printStackTrace();
             return rs;
 
-        } finally {
-            if (conn != null) {
-                conn.close();
-            }
         }
         return rs;
 
+    }
+
+    public List<ResultSet> fetch_LogMessageData(
+            String logMessageId,
+            List<String> dataPartitionList) {
+
+        List<ResultSet> rsList = new ArrayList<>();
+        try (Connection conn = MysqlConnection()) {
+
+            for (String databasePartition : dataPartitionList) {
+
+                StringBuilder prepareStatement = new StringBuilder();
+                prepareStatement.append("SELECT ");
+                prepareStatement.append("ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
+                prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID ");
+                prepareStatement.append("FROM ").append(databasePartition).append(" WHERE LOGMESSAGE_ID = ").append(logMessageId);
+
+                ResultSet rs = null;
+                CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
+                rs = stmt.executeQuery();
+
+                if (rs != null) {
+                    rsList.add(rs);
+                }
+            }
+
+             
+            
+            conn.close();
+        } catch (SQLException sqlError) {
+            sqlError.printStackTrace();
+            return rsList;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return rsList;
+
+        }
+        return rsList;
     }
 
     private StringBuilder search_LogMessageIdsFromPartition(
@@ -140,39 +180,39 @@ public class LoggerSchema extends MysqlConnection {
             List<String> freeTextSearchList
     ) {
 
-        StringBuilder prepStatement = new StringBuilder();
+        StringBuilder prepareStatement = new StringBuilder();
         String partitionID = logMessageDataPartition + "_ID";
 
-        prepStatement.append("SELECT ");
-        prepStatement.append("DISTINCT ( ID ) as ").append(partitionID);
-        prepStatement.append("FROM ").append(SQLPrepareStatementHelper.toSQLValue(logMessageDataPartition)).append("WHERE ");
+        prepareStatement.append("SELECT ");
+        prepareStatement.append("DISTINCT ( ID ) as ").append(partitionID);
+        prepareStatement.append("FROM ").append(SQLPrepareStatementHelper.toSQLValue(logMessageDataPartition)).append("WHERE ");
 
         // Between date
-        prepStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
-        prepStatement.append("AND ");
-        prepStatement.append(partitionID).append(" = ").append(logMessageId);
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        prepareStatement.append("AND ");
+        prepareStatement.append(partitionID).append(" = ").append(logMessageId);
 
         int size = freeTextSearchList.size();
         if (size > 0) {
-            prepStatement.append("AND ( ");
+            prepareStatement.append("AND ( ");
 
             for (int i = 0; i < size; i++) {
 
                 String freeText = SQLPrepareStatementHelper.toSQLStartsWithValue(freeTextSearchList.get(i));
-                prepStatement.append("LABEL ").append(freeText);
-                prepStatement.append("OR ");
-                prepStatement.append("CONTENT ").append(freeText);
+                prepareStatement.append("LABEL ").append(freeText);
+                prepareStatement.append("OR ");
+                prepareStatement.append("CONTENT ").append(freeText);
 
                 if (i < size - 1) {
-                    prepStatement.append("OR ");
+                    prepareStatement.append("OR ");
                 }
             }
 
-            prepStatement.append(") ");
+            prepareStatement.append(") ");
 
         }
 
-        return prepStatement;
+        return prepareStatement;
 
     }
 
@@ -185,46 +225,43 @@ public class LoggerSchema extends MysqlConnection {
     ) throws Exception {
 
         ResultSet rs = null;
-        Connection conn = null;
+        try (Connection conn = MysqlConnection()) {
 
-        try {
-            conn = MysqlConnection();
-
-            StringBuilder prepStatement = new StringBuilder();
-            prepStatement.append("SELECT ");
-            prepStatement.append("ID, LABEL, CONTENT, MIMETYPE, CONTENTSIZE, MODIFIED");
-            prepStatement.append("SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOG_MESSAGE_ID ");
-            prepStatement.append("FROM ").append(SQLPrepareStatementHelper.toSQLValue(logMessageDataPartition)).append("WHERE ");
+            StringBuilder prepareStatement = new StringBuilder();
+            prepareStatement.append("SELECT ");
+            prepareStatement.append("ID, LABEL, CONTENT, MIMETYPE, CONTENTSIZE, MODIFIED");
+            prepareStatement.append("SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOG_MESSAGE_ID ");
+            prepareStatement.append("FROM ").append(SQLPrepareStatementHelper.toSQLValue(logMessageDataPartition)).append("WHERE ");
 
             // Between date
-            prepStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
 
             if (logMessageId != null && !logMessageId.isEmpty()) {
-                prepStatement.append("AND ");
-                prepStatement.append("ID = ").append(logMessageId);
+                prepareStatement.append("AND ");
+                prepareStatement.append("ID = ").append(logMessageId);
             }
 
             int size = freeTextSearchList.size();
             if (size > 0) {
-                prepStatement.append("AND ( ");
+                prepareStatement.append("AND ( ");
 
                 for (int i = 0; i < size; i++) {
 
                     String freeText = SQLPrepareStatementHelper.toSQLStartsWithValue(freeTextSearchList.get(i));
-                    prepStatement.append("LABEL ").append(freeText);
-                    prepStatement.append("OR ");
-                    prepStatement.append("CONTENT ").append(freeText);
+                    prepareStatement.append("LABEL ").append(freeText);
+                    prepareStatement.append("OR ");
+                    prepareStatement.append("CONTENT ").append(freeText);
 
                     if (i < size - 1) {
-                        prepStatement.append("OR ");
+                        prepareStatement.append("OR ");
                     }
                 }
 
-                prepStatement.append(") ");
+                prepareStatement.append(") ");
 
             }
 
-            CallableStatement stmt = conn.prepareCall(prepStatement.toString());
+            CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
             conn.close();
 
@@ -235,10 +272,6 @@ public class LoggerSchema extends MysqlConnection {
             e.printStackTrace();
             return rs;
 
-        } finally {
-            if (conn != null) {
-                conn.close();
-            }
         }
         return rs;
 

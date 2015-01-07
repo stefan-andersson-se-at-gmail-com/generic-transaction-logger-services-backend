@@ -231,3 +231,233 @@ rename table transactionlogger_prod.LogMessageData_Max5MB to transactionlogger_p
 rename table transactionlogger_prod.LogMessageData_Max10MB to transactionlogger_prod.LogMessageData_Partition_15;
 rename table transactionlogger_prod.LogMessageData_Max16MB to transactionlogger_prod.LogMessageData_Partition_16;
 rename table transactionlogger_prod.LogMessageData_Max4GB to transactionlogger_prod.LogMessageData_Partition_17;
+
+
+
+
+alter table transactionlogger_dev.LogMessage MODIFY transactionlogger_dev.LogMessage.UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessage MODIFY transactionlogger_dev.LogMessage.UTCLOCALTIMESTAMP datetime(6);
+
+
+
+alter table transactionlogger_test.LogMessage MODIFY transactionlogger_test.LogMessage.UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessage MODIFY transactionlogger_test.LogMessage.UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessage MODIFY transactionlogger_qa.LogMessage.UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessage MODIFY transactionlogger_qa.LogMessage.UTCLOCALTIMESTAMP datetime(6);
+
+
+alter table transactionlogger_prod.LogMessage MODIFY transactionlogger_prod.LogMessage.UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessage MODIFY transactionlogger_prod.LogMessage.UTCLOCALTIMESTAMP datetime(6);
+
+
+
+
+alter table transactionlogger_dev.LogMessageData_Partition_01 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_01 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_02 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_02 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_03 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_03 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_04 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_04 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_05 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_05 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_06 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_06 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_07 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_07 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_08 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_08 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_09 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_09 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_10 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_10 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_11 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_11 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_12 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_12 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_13 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_13 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_14 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_14 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_15 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_15 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_16 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_16 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_dev.LogMessageData_Partition_17 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_dev.LogMessageData_Partition_17 modify UTCLOCALTIMESTAMP datetime(6);
+
+
+
+
+alter table transactionlogger_test.LogMessageData_Partition_01 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_01 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_02 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_02 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_03 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_03 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_04 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_04 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_05 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_05 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_06 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_06 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_07 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_07 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_08 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_08 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_09 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_09 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_10 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_10 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_11 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_11 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_12 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_12 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_13 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_13 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_14 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_14 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_15 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_15 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_16 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_16 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_test.LogMessageData_Partition_17 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_test.LogMessageData_Partition_17 modify UTCLOCALTIMESTAMP datetime(6);
+
+
+alter table transactionlogger_qa.LogMessageData_Partition_01 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_01 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_02 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_02 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_03 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_03 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_04 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_04 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_05 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_05 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_06 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_06 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_07 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_07 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_08 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_08 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_09 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_09 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_10 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_10 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_11 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_11 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_12 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_12 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_13 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_13 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_14 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_14 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_15 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_15 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_16 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_16 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_qa.LogMessageData_Partition_17 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_qa.LogMessageData_Partition_17 modify UTCLOCALTIMESTAMP datetime(6);
+
+
+alter table transactionlogger_prod.LogMessageData_Partition_01 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_01 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_02 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_02 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_03 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_03 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_04 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_04 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_05 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_05 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_06 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_06 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_07 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_07 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_08 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_08 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_09 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_09 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_10 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_10 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_11 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_11 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_12 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_12 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_13 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_13 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_14 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_14 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_15 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_15 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_16 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_16 modify UTCLOCALTIMESTAMP datetime(6);
+
+alter table transactionlogger_prod.LogMessageData_Partition_17 modify UTCSERVERTIMESTAMP datetime(6);
+alter table transactionlogger_prod.LogMessageData_Partition_17 modify UTCLOCALTIMESTAMP datetime(6);

@@ -114,10 +114,9 @@ public abstract class LogMessageServiceBase {
             //
             // Copy all element into new structure due the original list seams to be NOT modifiable
             // ( That's a requirement of Collection.sort method )
-              
             List<Transactions.Transaction> tmpTransactionList = transactions.getTransaction();
             Transactions.Transaction[] transactionArray = tmpTransactionList.toArray(new Transaction[tmpTransactionList.size()]);
-            Arrays.sort(transactionArray, new TransactionComparator()); 
+            Arrays.sort(transactionArray, new TransactionComparator());
             for (Transactions.Transaction transaction : transactionArray) {
 
                 LogMessage logMessage = new LogMessage();
@@ -137,7 +136,6 @@ public abstract class LogMessageServiceBase {
                 logMessage.setApplicationName(transaction.getApplicationName().toLowerCase());
                 logMessage.setIsError(transaction.isIsError());
                 logMessage.setUtcServerTimeStamp(TimeStampUtils.createSystemNanoTimeStamp());
-
                 try {
 
                     long UTCLocalTimeStamp = transaction.getUTCLocalTimeStamp().toGregorianCalendar().getTimeInMillis();
@@ -214,14 +212,13 @@ public abstract class LogMessageServiceBase {
                 //
                 // Transaction log data
                 logMessage = this.buildTransactioLogDataEntity(transaction, logMessage);
-                 
+
                 //
                 // Persist
                 getLogMessageFacade().create(logMessage);
 
             }
-            
-             
+
         } catch (Throwable ex) {
             StringBuilder builder = new StringBuilder();
             builder.append("============= [ Java Server exception ] =============== \n");
