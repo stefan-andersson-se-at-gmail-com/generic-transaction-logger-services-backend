@@ -461,3 +461,238 @@ alter table transactionlogger_prod.LogMessageData_Partition_16 modify UTCLOCALTI
 
 alter table transactionlogger_prod.LogMessageData_Partition_17 modify UTCSERVERTIMESTAMP datetime(6);
 alter table transactionlogger_prod.LogMessageData_Partition_17 modify UTCLOCALTIMESTAMP datetime(6);
+
+
+
+
+
+
+alter table transactionlogger_dev.LogMessageData_Partition_01 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_01 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_01 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_02 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_02 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_02 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_03 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_03 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_03 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_04 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_04 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_04 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_05 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_05 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_05 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_06 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_06 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_06 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_07 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_07 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_07 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_08 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_08 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_08 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_09 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_09 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_09 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_10 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_10 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_10 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_11 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_11 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_11 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_12 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_12 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_12 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_13 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_13 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_13 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_14 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_14 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_14 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_15 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_15 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_15 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_16 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_16 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_16 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_dev.LogMessageData_Partition_17 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_17 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_dev.LogMessageData_Partition_17 change CONTENTMODIFIED MODIFIED tinyint(1);
+  
+
+
+
+
+
+
+
+alter table transactionlogger_test.LogMessageData_Partition_01 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_01 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_01 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_02 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_02 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_02 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_03 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_03 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_03 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_04 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_04 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_04 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_05 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_05 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_05 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_06 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_06 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_06 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_07 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_07 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_07 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_08 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_08 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_08 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_09 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_09 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_09 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_10 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_10 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_10 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_11 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_11 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_11 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_12 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_12 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_12 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_13 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_13 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_13 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_14 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_14 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_14 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_15 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_15 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_15 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_16 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_16 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_16 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_test.LogMessageData_Partition_17 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_17 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_test.LogMessageData_Partition_17 change CONTENTMODIFIED MODIFIED tinyint(1);
+  
+
+
+
+alter table transactionlogger_qa.LogMessageData_Partition_01 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_01 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_01 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_02 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_02 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_02 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_03 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_03 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_03 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_04 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_04 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_04 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_05 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_05 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_05 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_06 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_06 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_06 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_07 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_07 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_07 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_08 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_08 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_08 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_09 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_09 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_09 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_10 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_10 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_10 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_11 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_11 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_11 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_12 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_12 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_12 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_13 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_13 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_13 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_14 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_14 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_14 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_15 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_15 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_15 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_16 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_16 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_16 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_qa.LogMessageData_Partition_17 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_17 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_qa.LogMessageData_Partition_17 change CONTENTMODIFIED MODIFIED tinyint(1);
+  
+
+
+
+
+
+
+
+
+
+
+
+alter table transactionlogger_prod.LogMessageData_Partition_01 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_01 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_01 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_02 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_02 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_02 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_03 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_03 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_03 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_04 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_04 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_04 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_05 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_05 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_05 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_06 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_06 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_06 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_07 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_07 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_07 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_08 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_08 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_08 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_09 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_09 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_09 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_10 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_10 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_10 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_11 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_11 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_11 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_12 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_12 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_12 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_13 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_13 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_13 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_14 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_14 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_14 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_15 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_15 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_15 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_16 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_16 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_16 change CONTENTMODIFIED MODIFIED tinyint(1);
+alter table transactionlogger_prod.LogMessageData_Partition_17 change CONTENTDESCRIPTION LABEL varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_17 change CONTENTMIMETYPE MIMETYPE varchar(255);
+alter table transactionlogger_prod.LogMessageData_Partition_17 change CONTENTMODIFIED MODIFIED tinyint(1);
+  
