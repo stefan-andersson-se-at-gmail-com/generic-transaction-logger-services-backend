@@ -346,10 +346,11 @@
                                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                 <resource>
                                     <directory>src/main/environment/</directory>                      
-                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR/WEB-INF/classes</targetPath>
+                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR/WEB-INF/classes/META-INF</targetPath>
                                     <preservePath>true</preservePath>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
+                                <!-- WAR path -->
                                 <resource>
                                     <directory>src/main/environment/dev</directory>                      
                                     <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-DEV/WEB-INF/classes</targetPath>
@@ -374,6 +375,33 @@
                                     <preservePath>true</preservePath>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
+                            
+                                <!-- Jar path -->
+                                <resource>
+                                    <directory>src/main/environment/dev</directory>                      
+                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-DEV/META-INF</targetPath>
+                                    <preservePath>true</preservePath>
+                                    <failIfNotFound>false</failIfNotFound>
+                                </resource>
+                                <resource>
+                                    <directory>src/main/environment/test</directory>                      
+                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-TEST/META-INF</targetPath>
+                                    <preservePath>true</preservePath>
+                                    <failIfNotFound>false</failIfNotFound>
+                                </resource>
+                                <resource>
+                                    <directory>src/main/environment/qa</directory>                      
+                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-QA/META-INF</targetPath>
+                                    <preservePath>true</preservePath>
+                                    <failIfNotFound>false</failIfNotFound>
+                                </resource>
+                                <resource>
+                                    <directory>src/main/environment/prod</directory>                      
+                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-PROD/META-INF</targetPath>
+                                    <preservePath>true</preservePath>
+                                    <failIfNotFound>false</failIfNotFound>
+                                </resource>
+                            
                             
                                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                 <!-- Copy "wsdl"                                          -->
