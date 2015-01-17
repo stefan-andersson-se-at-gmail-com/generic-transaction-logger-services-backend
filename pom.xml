@@ -345,7 +345,7 @@
                                 <!-- Copy "environment"                                     -->
                                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                 <resource>
-                                    <directory>src/main/environment/base</directory>                      
+                                    <directory>src/main/environment/</directory>                      
                                     <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR/WEB-INF/classes</targetPath>
                                     <preservePath>true</preservePath>
                                     <failIfNotFound>false</failIfNotFound>
@@ -446,15 +446,8 @@
 
 
                                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                                <!-- Deploye                                                -->
+                                <!-- Deploye                                              -->
                                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                                <resource>
-                                    <file>${basedir}/target/${project.artifactId}-${project.version}.war</file>  
-                                    <!--<targetPath>/home/adminuser/local/liferay-portal-6.2-ce-ga2_with_G-Fish-4.1_named_as_3.1.2.2/glassfish-3.1.2.2/glassfish/domains/domain1/autodeploy</targetPath>-->               
-                                    <!--<targetPath>/home/adminuser/local/glassfish-3.1.2.2/glassfish/domains/domain1/autodeploy</targetPath>-->
-                                    <!--<targetPath>/home/adminuser/local/liferay-portal-6.2.0/glassfish-4.0/deploy</targetPath>-->
-                                    <targetPath>/home/server-1/Portal/portal-6.2-ce-ga2_with_gfish_4.1_b13-12_named_3.1.2.2/glassfish-3.1.2.2/glassfish/domains/domain1/autodeploy</targetPath>       
-                                </resource>
                                 <resource>
                                     <file>${basedir}/target/${project.artifactId}-${project.version}-Dev.war</file>  
                                     <!--<targetPath>/home/adminuser/local/liferay-portal-6.2-ce-ga2_with_G-Fish-4.1_named_as_3.1.2.2/glassfish-3.1.2.2/glassfish/domains/domain1/autodeploy</targetPath>-->               
@@ -558,7 +551,7 @@
                                 <!-- Copy "environment"                                   -->
                                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                 <resource>
-                                    <directory>src/main/environment/base</directory>                      
+                                    <directory>src/main/environment</directory>                      
                                     <targetPath>${basedir}/target/${project.artifactId}-${project.version}-JAR/META-INF</targetPath>
                                     <preservePath>true</preservePath>
                                     <failIfNotFound>false</failIfNotFound>
