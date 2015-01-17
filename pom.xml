@@ -17,11 +17,11 @@
     
     
     <!-- Git --> 
-    <scm>
+<!--    <scm>
         <url>https://github.com/stefan-andersson-se-at-gmail-com/generic-transaction-logger-services-backend.git</url>
         <connection>scm:git:git://github.com/stefan-andersson-se-at-gmail-com/generic-transaction-logger-services-backend.git</connection>
         <developerConnection>scm:git:git@github.com:stefan-andersson-se-at-gmail-com/generic-transaction-logger-services-backend.git</developerConnection>
-    </scm>
+    </scm>-->
 
     <!-- Nexus ( user name and PWD in maven -> settings.xml )-->
     <distributionManagement>
@@ -198,6 +198,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
                 <executions>
                     <execution>
                         <id>1</id>
@@ -281,6 +282,150 @@
                     </execution>
                 </executions>
             </plugin>
+            
+            
+            
+            
+            
+            
+            <!-- Install JAR artifact into Nexus -->
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+                <executions>
+                    <execution>
+                        <id>jar-1</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>jar</packaging>
+                            <artifactId>${project.artifactId}-Dev</artifactId>
+                            <groupId>${project.groupId}</groupId>
+                            <version>${project.version}</version>
+                            <file>
+                                ${project.build.directory}/${project.artifactId}-${project.version}-Dev.jar
+                            </file>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jar-2</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>war</packaging>
+                            <artifactId>${project.artifactId}-Test</artifactId>
+                            <groupId>${project.groupId}</groupId>
+                            <version>${project.version}</version>
+                            <file>
+                                ${project.build.directory}/${project.artifactId}-${project.version}-Test.jar
+                            </file>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jar-3</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>jar</packaging>
+                            <artifactId>${project.artifactId}-QA</artifactId>
+                            <groupId>${project.groupId}</groupId>
+                            <version>${project.version}</version>
+                            <file>
+                                ${project.build.directory}/${project.artifactId}-${project.version}-QA.jar
+                            </file>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jar-4</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>war</packaging>
+                            <artifactId>${project.artifactId}-Prod</artifactId>
+                            <groupId>${project.groupId}</groupId>
+                            <version>${project.version}</version>
+                            <file>
+                                ${project.build.directory}/${project.artifactId}-${project.version}-Prod.jar
+                            </file>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>war-1</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>war</packaging>
+                            <artifactId>${project.artifactId}-Dev</artifactId>
+                            <groupId>${project.groupId}</groupId>
+                            <version>${project.version}</version>
+                            <file>
+                                ${project.build.directory}/${project.artifactId}-${project.version}-Dev.war
+                            </file>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>war-2</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>war</packaging>
+                            <artifactId>${project.artifactId}-Test</artifactId>
+                            <groupId>${project.groupId}</groupId>
+                            <version>${project.version}</version>
+                            <file>
+                                ${project.build.directory}/${project.artifactId}-${project.version}-Test.war
+                            </file>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>war-3</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>war</packaging>
+                            <artifactId>${project.artifactId}-QA</artifactId>
+                            <groupId>${project.groupId}</groupId>
+                            <version>${project.version}</version>
+                            <file>
+                                ${project.build.directory}/${project.artifactId}-${project.version}-QA.war
+                            </file>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>war-4</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>war</packaging>
+                            <artifactId>${project.artifactId}-Prod</artifactId>
+                            <groupId>${project.groupId}</groupId>
+                            <version>${project.version}</version>
+                            <file>
+                                ${project.build.directory}/${project.artifactId}-${project.version}-Prod.war
+                            </file>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            
             
             
             
