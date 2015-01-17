@@ -17,7 +17,7 @@
     
     
     <!-- Git --> 
-<!--    <scm>
+    <!--    <scm>
         <url>https://github.com/stefan-andersson-se-at-gmail-com/generic-transaction-logger-services-backend.git</url>
         <connection>scm:git:git://github.com/stefan-andersson-se-at-gmail-com/generic-transaction-logger-services-backend.git</connection>
         <developerConnection>scm:git:git@github.com:stefan-andersson-se-at-gmail-com/generic-transaction-logger-services-backend.git</developerConnection>
@@ -307,6 +307,7 @@
                             <file>
                                 ${project.build.directory}/${project.artifactId}-${project.version}-Dev.jar
                             </file>
+                            <url>http://localhost:8081/nexus/content/repositories/releases</url>
                         </configuration>
                     </execution>
                     <execution>
@@ -323,6 +324,7 @@
                             <file>
                                 ${project.build.directory}/${project.artifactId}-${project.version}-Test.jar
                             </file>
+                            <url>http://localhost:8081/nexus/content/repositories/releases</url>
                         </configuration>
                     </execution>
                     <execution>
@@ -339,6 +341,7 @@
                             <file>
                                 ${project.build.directory}/${project.artifactId}-${project.version}-QA.jar
                             </file>
+                            <url>http://localhost:8081/nexus/content/repositories/releases</url>
                         </configuration>
                     </execution>
                     <execution>
@@ -355,6 +358,7 @@
                             <file>
                                 ${project.build.directory}/${project.artifactId}-${project.version}-Prod.jar
                             </file>
+                            <url>http://localhost:8081/nexus/content/repositories/releases</url>
                         </configuration>
                     </execution>
                     <execution>
@@ -371,6 +375,7 @@
                             <file>
                                 ${project.build.directory}/${project.artifactId}-${project.version}-Dev.war
                             </file>
+                            <url>http://localhost:8081/nexus/content/repositories/releases</url>
                         </configuration>
                     </execution>
                     <execution>
@@ -387,6 +392,7 @@
                             <file>
                                 ${project.build.directory}/${project.artifactId}-${project.version}-Test.war
                             </file>
+                            <url>http://localhost:8081/nexus/content/repositories/releases</url>
                         </configuration>
                     </execution>
                     <execution>
@@ -403,6 +409,7 @@
                             <file>
                                 ${project.build.directory}/${project.artifactId}-${project.version}-QA.war
                             </file>
+                            <url>http://localhost:8081/nexus/content/repositories/releases</url>
                         </configuration>
                     </execution>
                     <execution>
@@ -419,6 +426,7 @@
                             <file>
                                 ${project.build.directory}/${project.artifactId}-${project.version}-Prod.war
                             </file>
+                            <url>http://localhost:8081/nexus/content/repositories/releases</url>
                         </configuration>
                     </execution>
                 </executions>
