@@ -353,25 +353,25 @@
                                 <!-- WAR path -->
                                 <resource>
                                     <directory>src/main/environment/dev</directory>                      
-                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-DEV/WEB-INF/classes</targetPath>
+                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-DEV/WEB-INF/classes/META-INF</targetPath>
                                     <preservePath>true</preservePath>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
                                 <resource>
                                     <directory>src/main/environment/test</directory>                      
-                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-TEST/WEB-INF/classes</targetPath>
+                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-TEST/WEB-INF/classes/META-INF</targetPath>
                                     <preservePath>true</preservePath>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
                                 <resource>
                                     <directory>src/main/environment/qa</directory>                      
-                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-QA/WEB-INF/classes</targetPath>
+                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-QA/WEB-INF/classes/META-INF</targetPath>
                                     <preservePath>true</preservePath>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
                                 <resource>
                                     <directory>src/main/environment/prod</directory>                      
-                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-PROD/WEB-INF/classes</targetPath>
+                                    <targetPath>${basedir}/target/${project.artifactId}-${project.version}-WAR-PROD/WEB-INF/classes/META-INF</targetPath>
                                     <preservePath>true</preservePath>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
