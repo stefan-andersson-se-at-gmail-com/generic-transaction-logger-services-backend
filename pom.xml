@@ -4,7 +4,7 @@
 
     <groupId>com.erbjuder.logger</groupId>
     <artifactId>log_message_services_backend</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8</version>
     <packaging>war</packaging>
 
     <name>log_message_services_backend</name>
