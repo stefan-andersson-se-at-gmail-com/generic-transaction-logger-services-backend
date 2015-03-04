@@ -660,7 +660,7 @@
 
     <repositories>     
         
-
+        
         <repository>
             <id>all-nexus</id>
             <name>all-nexus</name>
