@@ -546,31 +546,36 @@
                                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                 <resource>
                                     <targetPath>${basedir}/target/${project.artifactId}-${project.version}-JAR</targetPath>
-                                    <file>${basedir}/target/${project.artifactId}-${project.version}-WAR/WEB-INF/lib/*.jar</file>
+                                    <directory>${basedir}/target/${project.artifactId}-${project.version}-WAR/WEB-INF/lib/</directory>
+									<include>**/*.jar</include>
                                     <unpack>true</unpack>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
                                 <resource>
                                     <targetPath>${basedir}/target/${project.artifactId}-${project.version}-JAR-DEV</targetPath>
-                                    <file>${basedir}/target/${project.artifactId}-${project.version}-WAR-DEV/WEB-INF/lib/*.jar</file>
+                                    <directory>${basedir}/target/${project.artifactId}-${project.version}-WAR/WEB-INF/lib/</directory>
+									<include>**/*.jar</include>
                                     <unpack>true</unpack>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
                                 <resource>
                                     <targetPath>${basedir}/target/${project.artifactId}-${project.version}-JAR-TEST</targetPath>
-                                    <file>${basedir}/target/${project.artifactId}-${project.version}-WAR-TEST/WEB-INF/lib/*.jar</file>
+                                    <directory>${basedir}/target/${project.artifactId}-${project.version}-WAR/WEB-INF/lib/</directory>
+									<include>**/*.jar</include>
                                     <unpack>true</unpack>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
                                 <resource>
                                     <targetPath>${basedir}/target/${project.artifactId}-${project.version}-JAR-QA</targetPath>
-                                    <file>${basedir}/target/${project.artifactId}-${project.version}-WAR-QA/WEB-INF/lib/*.jar</file>
+                                    <directory>${basedir}/target/${project.artifactId}-${project.version}-WAR/WEB-INF/lib/</directory>
+									<include>**/*.jar</include>
                                     <unpack>true</unpack>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
                                 <resource>
                                     <targetPath>${basedir}/target/${project.artifactId}-${project.version}-JAR-PROD</targetPath>
-                                    <file>${basedir}/target/${project.artifactId}-${project.version}-WAR-PROD/WEB-INF/lib/*.jar</file>
+                                    <directory>${basedir}/target/${project.artifactId}-${project.version}-WAR/WEB-INF/lib/</directory>
+									<include>**/*.jar</include>
                                     <unpack>true</unpack>
                                     <failIfNotFound>false</failIfNotFound>
                                 </resource>
