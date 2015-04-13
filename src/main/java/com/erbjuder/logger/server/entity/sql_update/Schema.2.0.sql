@@ -187,7 +187,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `LogMessage`
 -- -----------------------------------------------------
-CREATE TABLCE IF NOT EXISTS `LogMessage` (
+CREATE TABLE IF NOT EXISTS `LogMessage` (
   `ID` BIGINT(20) NOT NULL AUTO_INCREMENT,
   `APPLICATIONNAME` VARCHAR(255) NULL DEFAULT NULL,
   `EXPIREDDATE` DATE NULL DEFAULT NULL,
