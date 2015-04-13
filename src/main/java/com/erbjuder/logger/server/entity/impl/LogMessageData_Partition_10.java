@@ -29,7 +29,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
 import org.json.simple.JSONObject;
 
 /**
@@ -44,9 +43,7 @@ public class LogMessageData_Partition_10 implements Serializable, LogMessageData
     private LogMessage logMessage;
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "PARTITION_10")
-    @TableGenerator(name = "PARTITION_10",
-            pkColumnName = "ENTITY", allocationSize = 50, table = "PK_ALLOCATE_SIZE_50")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
      
     private String label;

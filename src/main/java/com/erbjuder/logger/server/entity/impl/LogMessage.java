@@ -35,7 +35,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -50,9 +49,7 @@ public class LogMessage implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-     @GeneratedValue(strategy = GenerationType.TABLE, generator = "LOGMESSAGE")
-    @TableGenerator(name = "LOGMESSAGE",
-            pkColumnName = "ENTITY", allocationSize = 1000, table = "PK_ALLOCATE_SIZE_1000")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private java.sql.Timestamp utcLocalTimeStamp;
     private java.sql.Timestamp utcServerTimeStamp;

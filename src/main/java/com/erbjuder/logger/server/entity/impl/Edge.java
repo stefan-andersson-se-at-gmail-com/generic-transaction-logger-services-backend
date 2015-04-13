@@ -41,7 +41,7 @@ public class Edge implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToOne(targetEntity = EdgeConstraints.class, mappedBy = "edge", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private EdgeConstraints constraints;
