@@ -100,7 +100,7 @@ public class LoggerSchema extends MysqlConnection {
                             freeTextSearchList
                     );
 
-                    prepareStatement.append("ID IN ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
 
                     if (i < size - 1) {
                         prepareStatement.append("OR ");
@@ -108,7 +108,7 @@ public class LoggerSchema extends MysqlConnection {
 
                 }
 
-                prepareStatement.append(") ");
+                prepareStatement.append(" ) ");
             }
 
             
@@ -117,7 +117,7 @@ public class LoggerSchema extends MysqlConnection {
             prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC ");
             
             
-            
+             System.err.println(prepareStatement.toString());
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
             conn.close();
@@ -147,7 +147,7 @@ public class LoggerSchema extends MysqlConnection {
                 prepareStatement.append("SELECT ");
                 prepareStatement.append("ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
                 prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID ");
-                prepareStatement.append("FROM ").append(databasePartition).append(" WHERE LOGMESSAGE_ID = ").append(logMessageId);
+                prepareStatement.append("FROM ").append(databasePartition).append(" WHERE LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageId);
 
                 ResultSet rs = null;
                 CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
@@ -184,13 +184,13 @@ public class LoggerSchema extends MysqlConnection {
         String partitionID = logMessageDataPartition + "_ID";
 
         prepareStatement.append("SELECT ");
-        prepareStatement.append("DISTINCT ( ID ) as ").append(partitionID);
-        prepareStatement.append("FROM ").append(SQLPrepareStatementHelper.toSQLValue(logMessageDataPartition)).append("WHERE ");
+        prepareStatement.append("DISTINCT ( LOGMESSAGE_ID ) as ").append(partitionID).append(" ");
+        prepareStatement.append("FROM ").append(logMessageDataPartition).append(" WHERE ");
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
         prepareStatement.append("AND ");
-        prepareStatement.append(partitionID).append(" = ").append(logMessageId);
+        prepareStatement.append(logMessageDataPartition).append(".LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageId).append(" ");
 
         int size = freeTextSearchList.size();
         if (size > 0) {
@@ -198,17 +198,17 @@ public class LoggerSchema extends MysqlConnection {
 
             for (int i = 0; i < size; i++) {
 
-                String freeText = SQLPrepareStatementHelper.toSQLStartsWithValue(freeTextSearchList.get(i));
-                prepareStatement.append("LABEL ").append(freeText);
+                String freeText = SQLPrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
+                prepareStatement.append("LABEL LIKE ").append(freeText).append(" ");
                 prepareStatement.append("OR ");
-                prepareStatement.append("CONTENT ").append(freeText);
+                prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ");
 
                 if (i < size - 1) {
                     prepareStatement.append("OR ");
                 }
             }
 
-            prepareStatement.append(") ");
+            prepareStatement.append(" ) ");
 
         }
 
@@ -229,16 +229,16 @@ public class LoggerSchema extends MysqlConnection {
 
             StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
-            prepareStatement.append("ID, LABEL, CONTENT, MIMETYPE, CONTENTSIZE, MODIFIED");
-            prepareStatement.append("SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOG_MESSAGE_ID ");
-            prepareStatement.append("FROM ").append(SQLPrepareStatementHelper.toSQLValue(logMessageDataPartition)).append("WHERE ");
+            prepareStatement.append("ID, LABEL, CONTENT, MIMETYPE, CONTENTSIZE, MODIFIED, ");
+            prepareStatement.append("SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID ");
+            prepareStatement.append("FROM ").append(logMessageDataPartition).append(" WHERE ");
 
             // Between date
             prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
 
             if (logMessageId != null && !logMessageId.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("ID = ").append(logMessageId);
+                prepareStatement.append(logMessageDataPartition).append(".LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageId).append(" ");
             }
 
             int size = freeTextSearchList.size();
@@ -247,10 +247,10 @@ public class LoggerSchema extends MysqlConnection {
 
                 for (int i = 0; i < size; i++) {
 
-                    String freeText = SQLPrepareStatementHelper.toSQLStartsWithValue(freeTextSearchList.get(i));
-                    prepareStatement.append("LABEL ").append(freeText);
+                    String freeText = SQLPrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
+                    prepareStatement.append("LABEL LIKE ").append(freeText).append(" ");
                     prepareStatement.append("OR ");
-                    prepareStatement.append("CONTENT ").append(freeText);
+                    prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ");
 
                     if (i < size - 1) {
                         prepareStatement.append("OR ");
@@ -364,7 +364,7 @@ public class LoggerSchema extends MysqlConnection {
         prepareStatement.append("SELECT ");
         prepareStatement.append("ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
         prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID");
-        prepareStatement.append("FROM ").append(databasePartition).append("WHERE ");
+        prepareStatement.append("FROM ").append(databasePartition).append(" WHERE ");
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
 

@@ -28,8 +28,9 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class LogMessageDataFacadeImpl extends LogMessageDataFacadeBaseImpl {
 
-    @PersistenceContext(unitName = "TransactionLogger")
+   @PersistenceContext(unitName = "TransactionLogger")
     private EntityManager em;
+    
     // Logger
     private static final Logger logger = Logger.getLogger(LogMessageDataFacadeImpl.class.getName());
 

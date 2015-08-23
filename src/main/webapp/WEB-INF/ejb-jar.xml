@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:ejb="http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd" version="3.1">
+
+
+    <enterprise-beans>
+        <session>
+            <ejb-name>MultiEntityManagertWrapper</ejb-name>   
+            <ejb-class>com.erbjuder.logger.server.facade.impl.MultiEntityManagertWrapperImpl</ejb-class>
+            <session-type>Stateless</session-type>
+
+            <!-- Persistece contexts -->
+             <persistence-context-ref>
+                <description>TransactionLogger</description>             
+                <persistence-context-ref-name>persistence/TransactionLogger</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_001</description>             
+                <persistence-context-ref-name>persistence/TransactionLogger_001</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_001</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+
+            <persistence-context-ref>
+                <description>TransactionLogger_002</description>             
+                <persistence-context-ref-name>persistence/TransactionLogger_002</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_002</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+<!--         
+            <persistence-context-ref>
+                <description>TransactionLogger_003</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_003</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_003</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+          
+            <persistence-context-ref>
+                <description>TransactionLogger_004</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_004</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_004</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+          
+          
+            <persistence-context-ref>
+                <description>TransactionLogger_005</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_005</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_005</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_006</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_006</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_006</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_007</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_007</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_007</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_008</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_008</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_008</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_009</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_009</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_009</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_010</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_010</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_010</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_011</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_011</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_011</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_012</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_012</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_012</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_013</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_013</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_013</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_014</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_014</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_014</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_015</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_015</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_015</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_016</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_016</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_016</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_017</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_017</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_017</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_018</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_018</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_018</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_019</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_019</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_019</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_020</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_020</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_020</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_021</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_021</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_021</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_022</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_022</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_022</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_023</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_023</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_023</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_024</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_024</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_024</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_025</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_025</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_025</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_026</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_026</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_026</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_027</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_027</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_027</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_028</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_028</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_028</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_029</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_029</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_029</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_030</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_030</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_030</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            
+            <persistence-context-ref>
+                <description>TransactionLogger_031</description>             
+                <persistence-context-ref-name>persistence/TRANSACTIONLOGGER_031</persistence-context-ref-name>        
+                <persistence-unit-name>TransactionLogger_031</persistence-unit-name>
+                <persistence-context-type>Transaction</persistence-context-type>
+            </persistence-context-ref>
+            -->
+            
+        </session>
+    </enterprise-beans>
+
+</ejb-jar>

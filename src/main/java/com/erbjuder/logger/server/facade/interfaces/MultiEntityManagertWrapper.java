@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2014 erbjuder.com
+/*
+ * Copyright (C) 2015 Stefan Andersson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,27 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.erbjuder.logger.server.facade.impl;
+package com.erbjuder.logger.server.facade.interfaces;
 
-import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 /**
  *
  * @author Stefan Andersson
  */
-@Stateless
-public class FlowPointFacadeImpl extends FlowPointFacadeBaseImpl {
-   @PersistenceContext(unitName = "TransactionLogger")
-    private EntityManager em;
 
-    @Override
-    public EntityManager getEntityManager() {
-        return em;
-    }
-
-    public FlowPointFacadeImpl() {
-        super();
-    }
+public interface MultiEntityManagertWrapper extends EntityManager {
+    
 }

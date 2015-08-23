@@ -63,6 +63,12 @@ public class TransactionLogRestService_V1 {
             System.err.println("applicationNameList=[" + applicationNames + "]");
             System.err.println("viewError[" + viewError + "]");
 
+            // 
+            // Use dafault if no partition list are provided
+            if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
+                dataBaseSearchList = getDefaultSearchableDatabases();
+            }
+
             LoggerSchema loggerSchema = new LoggerSchema();
             ResultSetConverter converter = new ResultSetConverter();
             JSONArray jsonResult = converter.toJSONArray(loggerSchema.search_logMessageList(
@@ -120,9 +126,9 @@ public class TransactionLogRestService_V1 {
     @Path("/persist")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response persist(){
-        
-         return Response.ok("OK").build();
+    public Response persist() {
+
+        return Response.ok("OK").build();
     }
 
     private List<String> getDefaultSearchableDatabases() {

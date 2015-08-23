@@ -29,7 +29,7 @@ public class SQLPrepareStatementHelper {
     }
 
         public static String toSQLContainsValue(String value) {
-        return "'" + value + "%'";
+        return "'%" + value + "%'";
     }
     
     public static String toSQLValue(String value) {

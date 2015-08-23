@@ -1,40 +1,260 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-  <persistence-unit name="TransactionLogger" transaction-type="JTA">
+  
+    <persistence-unit name="TransactionLogger" transaction-type="JTA">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <jta-data-source>jdbc/TransactionLoggerDev</jta-data-source>
-    <class>com.erbjuder.entity.impl.EdgeConstraints</class>
-    <class>com.erbjuder.entity.impl.Edge</class>
-    <class>com.erbjuder.entity.impl.FlowConfiguration</class>
-    <class>com.erbjuder.entity.impl.Graph</class>
-    <class>com.erbjuder.entity.impl.LogMessageData</class>
-    <class>com.erbjuder.entity.impl.LogMessage</class>
-    <class>com.erbjuder.entity.impl.LogMessageMetaInfo</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max20B</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max40B</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max60B</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max80B</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max100B</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max150B</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max200B</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max255B</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max64KB</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max1MB</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max2MB</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max3MB</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max4MB</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max5MB</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max10MB</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max16MB</class>
-    <class>com.erbjuder.entity.impl.LogMessageData_Max4GB</class>
-    <class>com.erbjuder.entity.impl.Node</class>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+    </persistence-unit>
+      
+    <persistence-unit name="TransactionLogger_001" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_001</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+    <persistence-unit name="TransactionLogger_002" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_002</jta-data-source>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>ALL</shared-cache-mode>
     <properties>
-      <property name="eclipselink.ddl-generation" value="create-tables"/>
-      <property name="eclipselink.logging.level" value="FINE"/>
-      <property name="eclipselink.logging.parameters" value="true"/>
-      <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
     </properties>
   </persistence-unit>
+<!--  
+      <persistence-unit name="TransactionLogger_003" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_003</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+      <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_004" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_004</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+     <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_005" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_005</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+     <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_006" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_006</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_007" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_007</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_008" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_008</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+      <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_009" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_009</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_010" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_010</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+     <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_011" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_011</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+     <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_012" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_012</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_013" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_013</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+      <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_014" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_014</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+       <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_015" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_015</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_016" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_016</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_017" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_017</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_018" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_018</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+     <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_019" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_019</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_020" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_020</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+     <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_021" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_021</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+     <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_022" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_022</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+     <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_023" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_023</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_024" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_024</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+     <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_025" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_025</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_026" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_026</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_027" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_027</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_028" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_028</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_029" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_029</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+     <properties/>
+  </persistence-unit>
+  
+      <persistence-unit name="TransactionLogger_030" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TransactionLoggerDev_030</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <properties/>
+  </persistence-unit>
+  
+        <persistence-unit name="TransactionLogger_031" transaction-type="JTA">
+      <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+      <jta-data-source>jdbc/TransactionLoggerDev_031</jta-data-source>
+      <exclude-unlisted-classes>false</exclude-unlisted-classes>
+      <shared-cache-mode>ALL</shared-cache-mode>
+      <properties/>
+    </persistence-unit>-->
 </persistence>
