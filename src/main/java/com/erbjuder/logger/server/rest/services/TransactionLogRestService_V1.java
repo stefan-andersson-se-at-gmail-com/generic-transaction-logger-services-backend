@@ -48,11 +48,14 @@ public class TransactionLogRestService_V1 {
             @QueryParam("toDate") String toDate,
             @QueryParam("transactionReferenceId") String transactionReferenceId,
             @QueryParam("viewError") Boolean viewError,
-            @QueryParam("applicationNameList") List<String> applicationNames,
-            @QueryParam("flowNameList") List<String> flowNames,
-            @QueryParam("flowPointNameList") List<String> flowPointName,
-            @QueryParam("freeTextSearchList") List<String> freeTextSearchList,
-            @QueryParam("dataBaseSearchList") List<String> dataBaseSearchList
+            @QueryParam("viewAppName") List<String> viewApplicationNames,
+            @QueryParam("viewFlowName") List<String> viewFlowNames,
+            @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
+            @QueryParam("notViewFlowName") List<String> notViewFlowNames,
+            @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("search") List<String> freeTextSearchList,
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
         try {
 
@@ -60,7 +63,7 @@ public class TransactionLogRestService_V1 {
             System.err.println("fromDate=[" + fromDate + "]");
             System.err.println("toDate=[" + toDate + "]");
             System.err.println("transactionReferenceId=[" + transactionReferenceId + "]");
-            System.err.println("applicationNameList=[" + applicationNames + "]");
+            System.err.println("applicationNameList=[" + viewApplicationNames + "]");
             System.err.println("viewError[" + viewError + "]");
 
             // 
@@ -76,9 +79,12 @@ public class TransactionLogRestService_V1 {
                     toDate,
                     transactionReferenceId,
                     viewError,
-                    applicationNames,
-                    flowNames,
-                    flowPointName,
+                    viewApplicationNames,
+                    viewFlowNames,
+                    viewFlowPointName,
+                    notViewApplicationNames,
+                    notViewFlowNames,
+                    notViewFlowPointName,
                     freeTextSearchList,
                     dataBaseSearchList
             ));

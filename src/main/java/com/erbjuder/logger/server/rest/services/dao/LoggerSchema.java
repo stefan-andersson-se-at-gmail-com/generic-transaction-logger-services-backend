@@ -35,9 +35,12 @@ public class LoggerSchema extends MysqlConnection {
             String toDate,
             String transactionReferenceId,
             Boolean viewError,
-            List<String> applicationNames,
-            List<String> flowNames,
-            List<String> flowPointNames,
+            List<String> viewApplicationNames,
+            List<String> viewFlowNames,
+            List<String> viewFlowPointNames,
+            List<String> notViewApplicationNames,
+            List<String> notViewFlowNames,
+            List<String> notViewFlowPointNames,
             List<String> freeTextSearchList,
             List<String> dataPartitionList) throws Exception {
 
@@ -66,23 +69,43 @@ public class LoggerSchema extends MysqlConnection {
             }
 
             // application names
-            if (applicationNames != null && !applicationNames.isEmpty()) {
+            if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("APPLICATIONNAME IN ").append(SQLPrepareStatementHelper.toSQLList(applicationNames)).append(" ");
+                prepareStatement.append("APPLICATIONNAME IN ").append(SQLPrepareStatementHelper.toSQLList(viewApplicationNames)).append(" ");
             }
 
+            // not application names
+            if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("APPLICATIONNAME NOT IN ").append(SQLPrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+            }
+            
             // flow names
-            if (flowNames != null && !flowNames.isEmpty()) {
+            if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("FLOWNAME IN ").append(SQLPrepareStatementHelper.toSQLList(flowNames)).append(" ");
+                prepareStatement.append("FLOWNAME IN ").append(SQLPrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
             }
 
+            
+             // not flow names
+            if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWNAME NOT IN ").append(SQLPrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+            }
+            
             // flow point names
-            if (flowPointNames != null && !flowPointNames.isEmpty()) {
+            if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("FLOWPOINTNAME IN ").append(SQLPrepareStatementHelper.toSQLList(flowPointNames)).append(" ");
+                prepareStatement.append("FLOWPOINTNAME IN ").append(SQLPrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
             }
 
+            
+            // not flow point names
+            if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(SQLPrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+            }
+            
             // Free text search
             if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
                     && dataPartitionList != null && !dataPartitionList.isEmpty()) {
