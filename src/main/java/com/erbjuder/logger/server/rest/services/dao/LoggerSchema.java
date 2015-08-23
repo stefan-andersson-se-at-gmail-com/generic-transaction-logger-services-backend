@@ -33,6 +33,8 @@ public class LoggerSchema extends MysqlConnection {
     public ResultSet search_logMessageList(
             String fromDate,
             String toDate,
+            Integer page,
+            Integer pageSize,
             String transactionReferenceId,
             Boolean viewError,
             List<String> viewApplicationNames,
@@ -139,8 +141,10 @@ public class LoggerSchema extends MysqlConnection {
             // Order by
             prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC ");
             
+            // Pagination
+            prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(page * pageSize ).append(" ");
             
-             System.err.println(prepareStatement.toString());
+            System.err.println(prepareStatement.toString());
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
             conn.close();

@@ -46,6 +46,8 @@ public class TransactionLogRestService_V1 {
     public Response search(
             @QueryParam("fromDate") String fromDate,
             @QueryParam("toDate") String toDate,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize,
             @QueryParam("transactionReferenceId") String transactionReferenceId,
             @QueryParam("viewError") Boolean viewError,
             @QueryParam("viewAppName") List<String> viewApplicationNames,
@@ -77,6 +79,8 @@ public class TransactionLogRestService_V1 {
             JSONArray jsonResult = converter.toJSONArray(loggerSchema.search_logMessageList(
                     fromDate,
                     toDate,
+                    page,
+                    pageSize,
                     transactionReferenceId,
                     viewError,
                     viewApplicationNames,
