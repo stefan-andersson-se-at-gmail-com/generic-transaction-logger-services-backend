@@ -36,9 +36,9 @@ import org.xml.sax.SAXException;
 public class PersistenceUnitParser {
 
     public static final String FILE_NAME = "persistence.xml";
-    public static final String PERSISTENCE_JAR_PATH = "/META-INF/" + FILE_NAME;
-    public static final String PERSISTENCE_WAR_PATH_1 = "/WEB-INF/classes/" + FILE_NAME;
-    public static final String PERSISTENCE_WAR_PATH_2 = "/WEB-INF/classes/" + PERSISTENCE_JAR_PATH;
+    public static final String PERSISTENCE_JAR_PATH = "META-INF/" + FILE_NAME;
+    public static final String PERSISTENCE_WAR_PATH_1 = "WEB-INF/classes/" + FILE_NAME;
+    public static final String PERSISTENCE_WAR_PATH_2 = "WEB-INF/classes/" + PERSISTENCE_JAR_PATH;
                                                             
     private String unitName = "";
     private static PersistenceUnitImpl persistenceUnit = null;
@@ -151,7 +151,18 @@ public class PersistenceUnitParser {
             JPAHandler handler = new JPAHandler(new Bundle(xml, xml), "1.0");
             getSAxParser().parse(in, handler);
             return handler;
-        } else {
+        } 
+        
+        
+         
+        in = Thread.currentThread().getContextClassLoader().getResourceAsStream(PERSISTENCE_JAR_PATH);
+        if (in != null) {
+            URL xml = new File(path).toURI().toURL();
+            JPAHandler handler = new JPAHandler(new Bundle(xml, xml), "1.0");
+            getSAxParser().parse(in, handler);
+            return handler;
+        } 
+        else {
 
             throw new FileNotFoundException("property file '" + path
                     + "' not found in the classpath");

@@ -19,6 +19,7 @@ package com.erbjuder.logger.server.rest.util;
 //import org.codehaus.jettison.json.JSONArray;
 //import org.codehaus.jettison.json.JSONObject;
 import com.erbjuder.logger.server.common.helper.TimeStampUtils;
+import com.erbjuder.logger.server.entity.impl.LogMessage;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -114,6 +115,82 @@ public class ResultSetConverter {
         }
         return list; //return String list
 
+    }
+
+    public List<LogMessage> toLogMessages(List<ResultSet> rsList) throws Exception {
+        List<LogMessage> logMessages = new ArrayList<LogMessage>();
+        for (ResultSet rs : rsList) {
+            logMessages = toLogMessageInternal(rs, logMessages);
+        }
+        return logMessages;
+    }
+
+    public List<LogMessage> toLogMessages(ResultSet rs) throws Exception {
+        return toLogMessageInternal(rs, new ArrayList<LogMessage>());
+    }
+
+    private List<LogMessage> toLogMessageInternal(ResultSet rs, List<LogMessage> logMessages) {
+
+        try {
+
+            // we will need the column names.
+            java.sql.ResultSetMetaData rsmd = rs.getMetaData();
+            //loop through the ResultSet
+            while (rs.next()) {
+
+                //figure out how many columns there are
+                int numColumns = rsmd.getColumnCount();
+
+                //each row in the ResultSet will be converted to a Object
+                LogMessage obj = new LogMessage();
+
+                // loop through all the columns 
+                for (int i = 1; i < numColumns + 1; i++) {
+                    String column_name = rsmd.getColumnName(i);
+
+                    if (column_name.equals("ID")) {
+                        obj.setId(rs.getBigDecimal(column_name).longValueExact());
+                    }
+
+                    if (column_name.equals("APPLICATIONNAME")) {
+                        obj.setApplicationName(rs.getNString(column_name));
+                    }
+
+                    if (column_name.equals("EXPIREDDATE")) {
+                        obj.setExpiredDate(rs.getDate(column_name));
+                    }
+
+                    if (column_name.equals("FLOWNAME")) {
+                        obj.setFlowName(rs.getNString(column_name));
+                    }
+
+                    if (column_name.equals("FLOWPOINTNAME")) {
+                        obj.setFlowPointName(rs.getNString(column_name));
+                    }
+
+                    if (column_name.equals("ISERROR")) {
+                        obj.setIsError(rs.getBoolean(column_name));
+                    }
+
+                    if (column_name.equals("TRANSACTIONREFERENCEID")) {
+                        obj.setTransactionReferenceID(rs.getNString(column_name));
+                    }
+
+                    if (column_name.equals("UTCLOCALTIMESTAMP")) {
+                        obj.setUtcLocalTimeStamp(rs.getTimestamp(column_name));
+                    }
+
+                    if (column_name.equals("UTCSERVERTIMESTAMP")) {
+                        obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
+                    }
+                }//end foreach
+                logMessages.add(obj);
+            }//end while
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return logMessages;
     }
 
     public JSONArray toJSONArray(List<ResultSet> rsList) throws Exception {
