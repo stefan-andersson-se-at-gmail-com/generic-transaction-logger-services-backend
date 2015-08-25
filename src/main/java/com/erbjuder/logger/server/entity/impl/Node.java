@@ -233,9 +233,9 @@ public class Node implements Serializable {
         }
 
         JSONArray logMessagesList = new JSONArray();
-        for (LogMessage logMessage : this.getLogMessages()) {
-            logMessagesList.add(logMessage.toJSON());
-        }
+//        for (LogMessage logMessage : this.getLogMessages()) {
+//            logMessagesList.add(logMessage.toJSON());
+//        }
 
         JSONObject node = new JSONObject();
         node.put("id", this.getId());

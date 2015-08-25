@@ -18,8 +18,27 @@ package com.erbjuder.logger.server.rest.util;
 
 //import org.codehaus.jettison.json.JSONArray;
 //import org.codehaus.jettison.json.JSONObject;
+import com.erbjuder.logger.server.common.helper.DataBase;
 import com.erbjuder.logger.server.common.helper.TimeStampUtils;
 import com.erbjuder.logger.server.entity.impl.LogMessage;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_01;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_02;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_03;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_04;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_05;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_06;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_07;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_08;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_09;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_10;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_11;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_12;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_13;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_14;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_15;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_16;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_17;
+import com.erbjuder.logger.server.entity.interfaces.LogMessageData;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -191,6 +210,123 @@ public class ResultSetConverter {
         }
 
         return logMessages;
+    }
+
+    public List<LogMessageData> toLogMessageData(List<ResultSet> rsList) throws Exception {
+        List<LogMessageData> logMessageData = new ArrayList<LogMessageData>();
+        for (ResultSet rs : rsList) {
+            logMessageData = toLogMessageDataInternal(rs, logMessageData);
+        }
+        return logMessageData;
+    }
+
+    public List<LogMessageData> toLogMessageData(ResultSet rs) throws Exception {
+        return toLogMessageDataInternal(rs, new ArrayList<LogMessageData>());
+    }
+
+    private List<LogMessageData> toLogMessageDataInternal(ResultSet rs, List<LogMessageData> logMessageData) {
+
+        try {
+
+            // we will need the column names.
+            java.sql.ResultSetMetaData rsmd = rs.getMetaData();
+            //loop through the ResultSet
+            while (rs.next()) {
+
+                //figure out how many columns there are
+                int numColumns = rsmd.getColumnCount();
+                String tableName = rsmd.getTableName(1);
+                LogMessageData obj = null;
+                if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_01_NAME)) {
+                    obj = new LogMessageData_Partition_01();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_02_NAME)) {
+                    obj = new LogMessageData_Partition_02();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_03_NAME)) {
+                    obj = new LogMessageData_Partition_03();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_04_NAME)) {
+                    obj = new LogMessageData_Partition_04();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_05_NAME)) {
+                    obj = new LogMessageData_Partition_05();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_06_NAME)) {
+                    obj = new LogMessageData_Partition_06();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_07_NAME)) {
+                    obj = new LogMessageData_Partition_07();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_08_NAME)) {
+                    obj = new LogMessageData_Partition_08();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_09_NAME)) {
+                    obj = new LogMessageData_Partition_09();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_10_NAME)) {
+                    obj = new LogMessageData_Partition_10();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_11_NAME)) {
+                    obj = new LogMessageData_Partition_11();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_12_NAME)) {
+                    obj = new LogMessageData_Partition_12();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_13_NAME)) {
+                    obj = new LogMessageData_Partition_13();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_14_NAME)) {
+                    obj = new LogMessageData_Partition_14();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_15_NAME)) {
+                    obj = new LogMessageData_Partition_15();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_16_NAME)) {
+                    obj = new LogMessageData_Partition_16();
+                } else if (tableName.equals(DataBase.LOGMESSAGEDATA_PARTITION_17_NAME)) {
+                    obj = new LogMessageData_Partition_17();
+                }
+
+         
+                // loop through all the columns 
+                for (int i = 1; i < numColumns + 1; i++) {
+                    String column_name = rsmd.getColumnName(i);
+
+                    if (column_name.equals("ID")) {
+                        obj.setId(rs.getBigDecimal(column_name).longValueExact());
+                    }
+
+                    if (column_name.equals("CONTENT")) {
+                        obj.setContent(rs.getNString(column_name));
+                    }
+
+                    if (column_name.equals("LABEL")) {
+                        obj.setLabel(rs.getNString(column_name));
+                    }
+
+                    if (column_name.equals("MIMETYPE")) {
+                        obj.setMimeType(rs.getNString(column_name));
+                    }
+
+                    if (column_name.equals("MODIFIED")) {
+                        obj.setModified(rs.getBoolean(column_name));
+                    }
+
+                    if (column_name.equals("CONTENTSIZE")) {
+                        obj.setContentSize(rs.getBigDecimal(column_name).longValueExact());
+                    }
+
+                    if (column_name.equals("SEARCHABLE")) {
+                        obj.setSearchable(rs.getBoolean(column_name));
+                    }
+
+                    if (column_name.equals("UTCLOCALTIMESTAMP")) {
+                        obj.setUtcLocalTimeStamp(rs.getTimestamp(column_name));
+                    }
+
+                    if (column_name.equals("UTCSERVERTIMESTAMP")) {
+                        obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
+                    }
+                    
+//                    if (column_name.equals("LOGMESSAGE_ID")) {
+//                        obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
+//                    }
+                    
+                     
+                }//end foreach
+                logMessageData.add(obj);
+            }//end while
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+         
+        return logMessageData;
     }
 
     public JSONArray toJSONArray(List<ResultSet> rsList) throws Exception {

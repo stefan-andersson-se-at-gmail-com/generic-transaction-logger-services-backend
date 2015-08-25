@@ -18,7 +18,6 @@ package com.erbjuder.logger.server.entity.interfaces;
 
 import com.erbjuder.logger.server.entity.impl.LogMessage;
 import java.sql.Timestamp;
-import org.json.simple.JSONObject;
 
 /**
  *
@@ -66,9 +65,5 @@ public interface LogMessageData extends Comparable<LogMessageData>{
 
     public void setContent(String content);
 
-    public String toJSONString();
-
-    public String toJSONPrettyString();
-
-    public JSONObject toJSON();
+    
 }

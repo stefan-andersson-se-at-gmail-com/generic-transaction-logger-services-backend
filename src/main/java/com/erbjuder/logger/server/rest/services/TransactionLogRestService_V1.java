@@ -105,7 +105,7 @@ public class TransactionLogRestService_V1 {
     @Produces(MediaType.APPLICATION_JSON)
     public Response search(
             @QueryParam("logMessageId") String logMessageId,
-            @QueryParam("dataBaseSearchList") List<String> dataBaseSearchList
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
         try {
 

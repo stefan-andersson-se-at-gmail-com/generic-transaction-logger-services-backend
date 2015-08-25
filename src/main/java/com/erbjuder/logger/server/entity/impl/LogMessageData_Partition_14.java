@@ -17,9 +17,7 @@
 package com.erbjuder.logger.server.entity.impl;
 
 import com.erbjuder.logger.server.common.helper.DataBase;
-import com.erbjuder.logger.server.common.helper.JSONPrettyPrintWriter;
 import com.erbjuder.logger.server.entity.interfaces.LogMessageData;
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import javax.persistence.Column;
@@ -29,7 +27,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import org.json.simple.JSONObject;
 
 /**
  *
@@ -177,40 +174,8 @@ public class LogMessageData_Partition_14 implements Serializable, LogMessageData
     }
 
     @Override
-    public String toString() {
-        return toJSONString();
-    }
-
-    @Override
-    public String toJSONString() {
-        return toJSON().toString();
-    }
-
-    @Override
-    public String toJSONPrettyString() {
-        String jsonString = "";
-        try {
-            JSONPrettyPrintWriter writer = new JSONPrettyPrintWriter();
-            toJSON().writeJSONString(writer);
-            jsonString = writer.toString();
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-
-        return jsonString;
-    }
-
-    @Override
-    public JSONObject toJSON() {
-
-        JSONObject node = new JSONObject();
-        node.put("id", this.getId());
-        node.put("label", this.getLabel());
-        node.put("mimeType", this.getMimeType());
-        node.put("content", this.getContent());
-        node.put("logMessage", this.getLogMessage().getId());
-        return node;
-
+        public String toString() {
+        return this.getClass().getCanonicalName() + "@" + this.hashCode();
     }
 
     @Override

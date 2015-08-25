@@ -16,23 +16,23 @@
  */
 package com.erbjuder.logger.server.common.helper;
 
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_05;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_15;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_06;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_16;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_10;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_07;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_01;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_02;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_03;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_04;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_05;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_06;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_07;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_08;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_09;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_10;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_11;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_12;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_02;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_17;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_13;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_14;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_03;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_09;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_04;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_15;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_16;
+import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_17;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -78,6 +78,28 @@ public class DataBase {
     public static final Class LOGMESSAGEDATA_PARTITION_16_CLASS = LogMessageData_Partition_16.class;
     public static final Class LOGMESSAGEDATA_PARTITION_17_CLASS = LogMessageData_Partition_17.class;
 
+    
+    public static final String LOGMESSAGEDATA_PARTITION_01_NAME = "LogMessageData_Partition_01";
+    public static final String LOGMESSAGEDATA_PARTITION_02_NAME = "LogMessageData_Partition_02";
+    public static final String LOGMESSAGEDATA_PARTITION_03_NAME = "LogMessageData_Partition_03";
+    public static final String LOGMESSAGEDATA_PARTITION_04_NAME = "LogMessageData_Partition_04";
+    public static final String LOGMESSAGEDATA_PARTITION_05_NAME = "LogMessageData_Partition_05";
+    public static final String LOGMESSAGEDATA_PARTITION_06_NAME = "LogMessageData_Partition_06";
+    public static final String LOGMESSAGEDATA_PARTITION_07_NAME = "LogMessageData_Partition_07";
+    public static final String LOGMESSAGEDATA_PARTITION_08_NAME = "LogMessageData_Partition_08";
+    public static final String LOGMESSAGEDATA_PARTITION_09_NAME = "LogMessageData_Partition_09"; 
+    public static final String LOGMESSAGEDATA_PARTITION_10_NAME = "LogMessageData_Partition_10";
+    public static final String LOGMESSAGEDATA_PARTITION_11_NAME = "LogMessageData_Partition_11";
+    public static final String LOGMESSAGEDATA_PARTITION_12_NAME = "LogMessageData_Partition_12";
+    public static final String LOGMESSAGEDATA_PARTITION_13_NAME = "LogMessageData_Partition_13";
+    public static final String LOGMESSAGEDATA_PARTITION_14_NAME = "LogMessageData_Partition_14";
+    public static final String LOGMESSAGEDATA_PARTITION_15_NAME = "LogMessageData_Partition_15";
+    public static final String LOGMESSAGEDATA_PARTITION_16_NAME = "LogMessageData_Partition_16";
+    public static final String LOGMESSAGEDATA_PARTITION_17_NAME = "LogMessageData_Partition_17";
+    
+    
+    
+    
     public static final String LOGMESSAGEDATA_PARTITION_01_CONTENT_COLUMN_DEFINITION = "varchar(" + DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_20B + ")";
     public static final String LOGMESSAGEDATA_PARTITION_02_CONTENT_COLUMN_DEFINITION = "varchar(" + DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_40B + ")";
     public static final String LOGMESSAGEDATA_PARTITION_03_CONTENT_COLUMN_DEFINITION = "varchar(" + DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_60B + ")";

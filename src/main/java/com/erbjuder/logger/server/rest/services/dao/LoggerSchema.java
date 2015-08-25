@@ -81,33 +81,31 @@ public class LoggerSchema extends MysqlConnection {
                 prepareStatement.append("AND ");
                 prepareStatement.append("APPLICATIONNAME NOT IN ").append(SQLPrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
             }
-            
+
             // flow names
             if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
                 prepareStatement.append("AND ");
                 prepareStatement.append("FLOWNAME IN ").append(SQLPrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
             }
 
-            
-             // not flow names
+            // not flow names
             if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
                 prepareStatement.append("AND ");
                 prepareStatement.append("FLOWNAME NOT IN ").append(SQLPrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
             }
-            
+
             // flow point names
             if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
                 prepareStatement.append("AND ");
                 prepareStatement.append("FLOWPOINTNAME IN ").append(SQLPrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
             }
 
-            
             // not flow point names
             if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
                 prepareStatement.append("AND ");
                 prepareStatement.append("FLOWPOINTNAME NOT IN ").append(SQLPrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
             }
-            
+
             // Free text search
             if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
                     && dataPartitionList != null && !dataPartitionList.isEmpty()) {
@@ -136,15 +134,13 @@ public class LoggerSchema extends MysqlConnection {
                 prepareStatement.append(" ) ");
             }
 
-            
             // 
             // Order by
             prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC ");
-            
+
             // Pagination
-            prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(page * pageSize ).append(" ");
-            
-            System.err.println(prepareStatement.toString());
+            prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(page * pageSize).append(" ");
+
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
             conn.close();
@@ -165,7 +161,7 @@ public class LoggerSchema extends MysqlConnection {
             String logMessageId,
             List<String> dataPartitionList) {
 
-        List<ResultSet> rsList = new ArrayList<>();
+        List<ResultSet> rsList = new ArrayList<ResultSet>();
         try (Connection conn = MysqlConnection()) {
 
             for (String databasePartition : dataPartitionList) {
@@ -174,7 +170,7 @@ public class LoggerSchema extends MysqlConnection {
                 prepareStatement.append("SELECT ");
                 prepareStatement.append("ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
                 prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID ");
-                prepareStatement.append("FROM ").append(databasePartition).append(" WHERE LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageId);
+                prepareStatement.append("FROM ").append(databasePartition).append(" WHERE LOGMESSAGE_ID = ").append(logMessageId);
 
                 ResultSet rs = null;
                 CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
@@ -182,11 +178,10 @@ public class LoggerSchema extends MysqlConnection {
 
                 if (rs != null) {
                     rsList.add(rs);
+                    System.err.println(rsList);
                 }
             }
 
-             
-            
             conn.close();
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
@@ -202,7 +197,7 @@ public class LoggerSchema extends MysqlConnection {
     private StringBuilder search_LogMessageIdsFromPartition(
             String fromDate,
             String toDate,
-            String logMessageId,
+            String logMessageIdLabel,
             String logMessageDataPartition,
             List<String> freeTextSearchList
     ) {
@@ -217,7 +212,7 @@ public class LoggerSchema extends MysqlConnection {
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
         prepareStatement.append("AND ");
-        prepareStatement.append(logMessageDataPartition).append(".LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageId).append(" ");
+        prepareStatement.append(logMessageDataPartition).append(".LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageIdLabel).append(" ");
 
         int size = freeTextSearchList.size();
         if (size > 0) {
@@ -265,7 +260,7 @@ public class LoggerSchema extends MysqlConnection {
 
             if (logMessageId != null && !logMessageId.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append(logMessageDataPartition).append(".LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageId).append(" ");
+                prepareStatement.append(logMessageDataPartition).append(".LOGMESSAGE_ID = ").append(logMessageId).append(" ");
             }
 
             int size = freeTextSearchList.size();

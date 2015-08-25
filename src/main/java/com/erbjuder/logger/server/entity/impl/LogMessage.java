@@ -16,10 +16,7 @@
  */
 package com.erbjuder.logger.server.entity.impl;
 
-import com.erbjuder.logger.server.common.helper.DataBase;
-import com.erbjuder.logger.server.common.helper.JSONPrettyPrintWriter;
 import com.erbjuder.logger.server.facade.impl.LogMessageDataFacadeImpl;
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -36,8 +33,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 /**
  *
@@ -251,7 +246,7 @@ public class LogMessage implements Serializable {
     public void setLogMessageData_Partition_09(List<LogMessageData_Partition_09> logMessageData_Partition_09) {
         this.logMessageData_Partition_09 = logMessageData_Partition_09;
     }
-    
+
     public List<LogMessageData_Partition_10> getLogMessageData_Partition_10() {
         return logMessageData_Partition_10;
     }
@@ -300,7 +295,6 @@ public class LogMessage implements Serializable {
         this.logMessageData_Partition_15 = logMessageData_Partition_15;
     }
 
-    
     public List<LogMessageData_Partition_16> getLogMessageData_Partition_16() {
         return logMessageData_Partition_16;
     }
@@ -355,47 +349,6 @@ public class LogMessage implements Serializable {
 
     @Override
     public String toString() {
-        return toJSONString();
+        return this.getClass().getCanonicalName() + "@" + this.hashCode();
     }
-
-    public String toJSONString() {
-        return toJSON().toString();
-    }
-
-    public String toJSONPrettyString() {
-        String jsonString = "";
-        try {
-            JSONPrettyPrintWriter writer = new JSONPrettyPrintWriter();
-            toJSON().writeJSONString(writer);
-            jsonString = writer.toString();
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-
-        return jsonString;
-    }
-
-    public JSONObject toJSON() {
-
-        JSONArray logMessageDataList = new JSONArray();
-        //@TODO MUSt create separate query the return required information
-        for (com.erbjuder.logger.server.entity.interfaces.LogMessageData data : this.getLogMessageData(DataBase.LOGMESSAGEDATA_PARTITION_CLASSES)) {
-            logMessageDataList.add(data.toJSON());
-        }
-
-        JSONObject node = new JSONObject();
-        node.put("id", this.getId());
-        node.put("isError", this.isIsError());
-        node.put("applicationName", this.getApplicationName());
-        node.put("expiredDate", this.getExpiredDate());
-        node.put("utcLocalTimeStamp", this.getUtcLocalTimeStamp());
-        node.put("utcServerTimeStamp", this.getUtcServerTimeStamp());
-        node.put("flowName", this.getFlowName());
-        node.put("flowPointName", this.getFlowPointName());
-        //node.put("logMessageData", logMessageDataList);
-        //node.put("logMessageMetaInfo", logMessageMetaInfoList);
-        return node;
-
-    }
-
 }
