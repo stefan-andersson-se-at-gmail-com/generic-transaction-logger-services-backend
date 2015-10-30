@@ -16,7 +16,6 @@
  */
 package com.erbjuder.logger.server.common.helper;
 
-import com.erbjuder.logger.server.common.helper.DataBase;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,14 +33,14 @@ public class DataBaseSearchController {
     private Set<Class> treatAsSelectedDatabases = new HashSet<Class>();
     private Map<String, String> databases;
 
-    public static final String LBL_MAX_1MB =  "Payload betweeen:  0  -  1 Megabyte";
-    public static final String LBL_MAX_2MB =  "Payload betweeen:  1+ -  2 Megabyte";
-    public static final String LBL_MAX_3MB =  "Payload betweeen:  2+ -  3 Megabyte";
-    public static final String LBL_MAX_4MB =  "Payload betweeen:  3+ -  4 Megabyte";
-    public static final String LBL_MAX_5MB =  "Payload betweeen:  4+ -  5 Megabyte";
+    public static final String LBL_MAX_1MB = "Payload betweeen:  0  -  1 Megabyte";
+    public static final String LBL_MAX_2MB = "Payload betweeen:  1+ -  2 Megabyte";
+    public static final String LBL_MAX_3MB = "Payload betweeen:  2+ -  3 Megabyte";
+    public static final String LBL_MAX_4MB = "Payload betweeen:  3+ -  4 Megabyte";
+    public static final String LBL_MAX_5MB = "Payload betweeen:  4+ -  5 Megabyte";
     public static final String LBL_MAX_10MB = "Payload betweeen:  5+ - 10 Megabyte";
     public static final String LBL_MAX_16MB = "Payload betweeen: 10+ - 16 Megabyte";
-    public static final String LBL_MAX_4GB =  "Payload betweeen: 16+ - 4  Gigabyte";
+    public static final String LBL_MAX_4GB = "Payload betweeen: 16+ - 4  Gigabyte";
 
     public DataBaseSearchController() {
         init();

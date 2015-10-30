@@ -14,25 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.erbjuder.logger.server.facade.interfaces;
+package com.erbjuder.logger.server.common.helper;
 
-import com.erbjuder.logger.server.entity.impl.ApplicationFlowConfiguration;
-import java.util.Collection;
 import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  *
  * @author Stefan Andersson
  */
-public interface ApplicationFlowConfigurationFacade extends AbstractFacade<ApplicationFlowConfiguration> {
+public class PrepareStatementHelper {
 
-    public List<ApplicationFlowConfiguration> findFlowConfigurations(Collection<String> flowNames);
+    public static String toSQLStartsWithValue(String value) {
+        return "'" + value + "%'";
+    }
 
-    public List<ApplicationFlowConfiguration> findAllFlowConfigurations();
+        public static String toSQLContainsValue(String value) {
+        return "'%" + value + "%'";
+    }
     
-    public ApplicationFlowConfiguration findByName(String flowName);
+    public static String toSQLValue(String value) {
+        return "'" + value + "'";
+    }
 
-    @Override
-    public EntityManager getEntityManager();
+    public static String toSQLList(List<String> list) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        for (String value : list) {
+            builder.append(PrepareStatementHelper.toSQLValue(value)).append(",");
+        }
+        builder.deleteCharAt(builder.lastIndexOf(",")).append(")");
+        return builder.toString();
+    }
+
 }

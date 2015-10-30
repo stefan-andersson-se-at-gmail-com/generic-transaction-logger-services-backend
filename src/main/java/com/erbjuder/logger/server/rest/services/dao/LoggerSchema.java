@@ -16,7 +16,7 @@
  */
 package com.erbjuder.logger.server.rest.services.dao;
 
-import com.erbjuder.logger.server.rest.helper.SQLPrepareStatementHelper;
+import com.erbjuder.logger.server.common.helper.PrepareStatementHelper;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -56,54 +56,54 @@ public class LoggerSchema extends MysqlConnection {
             prepareStatement.append("FROM ").append("LogMessage ").append("WHERE ");
 
             // Between date
-            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
 
             // Transaction ref ID
             if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(SQLPrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+                prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
             }
 
             // view error
             if (viewError != null) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("ISERROR = ").append(SQLPrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
             }
 
             // application names
             if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("APPLICATIONNAME IN ").append(SQLPrepareStatementHelper.toSQLList(viewApplicationNames)).append(" ");
+                prepareStatement.append("APPLICATIONNAME IN ").append(PrepareStatementHelper.toSQLList(viewApplicationNames)).append(" ");
             }
 
             // not application names
             if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("APPLICATIONNAME NOT IN ").append(SQLPrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
             }
 
             // flow names
             if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("FLOWNAME IN ").append(SQLPrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
             }
 
             // not flow names
             if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("FLOWNAME NOT IN ").append(SQLPrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
             }
 
             // flow point names
             if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("FLOWPOINTNAME IN ").append(SQLPrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
             }
 
             // not flow point names
             if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(SQLPrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
             }
 
             // Free text search
@@ -210,7 +210,7 @@ public class LoggerSchema extends MysqlConnection {
         prepareStatement.append("FROM ").append(logMessageDataPartition).append(" WHERE ");
 
         // Between date
-        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
         prepareStatement.append("AND ");
         prepareStatement.append(logMessageDataPartition).append(".LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageIdLabel).append(" ");
 
@@ -220,7 +220,7 @@ public class LoggerSchema extends MysqlConnection {
 
             for (int i = 0; i < size; i++) {
 
-                String freeText = SQLPrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
+                String freeText = PrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
                 prepareStatement.append("LABEL LIKE ").append(freeText).append(" ");
                 prepareStatement.append("OR ");
                 prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ");
@@ -256,7 +256,7 @@ public class LoggerSchema extends MysqlConnection {
             prepareStatement.append("FROM ").append(logMessageDataPartition).append(" WHERE ");
 
             // Between date
-            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
 
             if (logMessageId != null && !logMessageId.isEmpty()) {
                 prepareStatement.append("AND ");
@@ -269,7 +269,7 @@ public class LoggerSchema extends MysqlConnection {
 
                 for (int i = 0; i < size; i++) {
 
-                    String freeText = SQLPrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
+                    String freeText = PrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
                     prepareStatement.append("LABEL LIKE ").append(freeText).append(" ");
                     prepareStatement.append("OR ");
                     prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ");
@@ -313,11 +313,11 @@ public class LoggerSchema extends MysqlConnection {
         prepareStatement.append("FROM ").append("LogMessage ").append("WHERE ");
 
         // Between date
-        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
 
         for (String applicationName : applicationNames) {
             prepareStatement.append("AND ");
-            prepareStatement.append("APPLICATIONNAME LIKE ").append(SQLPrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+            prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
         }
 
         return prepareStatement;
@@ -338,11 +338,11 @@ public class LoggerSchema extends MysqlConnection {
         prepareStatement.append("FROM ").append("LogMessage ").append("WHERE ");
 
         // Between date
-        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
 
         for (String flowName : flowNames) {
             prepareStatement.append("AND ");
-            prepareStatement.append("APPLICATIONNAME LIKE ").append(SQLPrepareStatementHelper.toSQLStartsWithValue(flowName)).append(" ");
+            prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(flowName)).append(" ");
         }
 
         return prepareStatement;
@@ -363,11 +363,11 @@ public class LoggerSchema extends MysqlConnection {
         prepareStatement.append("FROM ").append("LogMessage ").append("WHERE ");
 
         // Between date
-        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
 
         for (String flowPointName : flowPointNames) {
             prepareStatement.append("AND ");
-            prepareStatement.append("APPLICATIONNAME LIKE ").append(SQLPrepareStatementHelper.toSQLStartsWithValue(flowPointName)).append(" ");
+            prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(flowPointName)).append(" ");
         }
 
         return prepareStatement;
@@ -388,14 +388,14 @@ public class LoggerSchema extends MysqlConnection {
         prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID");
         prepareStatement.append("FROM ").append(databasePartition).append(" WHERE ");
         // Between date
-        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(SQLPrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(SQLPrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
 
         prepareStatement.append("AND ");
         prepareStatement.append("( ");
-        prepareStatement.append("CONTENT LIKE ").append(SQLPrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
-        prepareStatement.append("LABEL LIKE ").append(SQLPrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
-        prepareStatement.append("CONTENTSIZE LIKE ").append(SQLPrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
-        prepareStatement.append("MIMETYPE LIKE ").append(SQLPrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
+        prepareStatement.append("CONTENT LIKE ").append(PrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
+        prepareStatement.append("LABEL LIKE ").append(PrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
+        prepareStatement.append("CONTENTSIZE LIKE ").append(PrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
+        prepareStatement.append("MIMETYPE LIKE ").append(PrepareStatementHelper.toSQLContainsValue(freeText)).append(" OR ");
         prepareStatement.append(") ");
         return prepareStatement;
 

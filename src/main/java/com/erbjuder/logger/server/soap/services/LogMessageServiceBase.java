@@ -17,6 +17,7 @@
 package com.erbjuder.logger.server.soap.services;
 
 import com.erbjuder.logger.server.common.helper.DataBase;
+import com.erbjuder.logger.server.common.helper.DatabasePartitionHelper;
 import com.erbjuder.logger.server.common.helper.TimeStampUtils;
 import com.erbjuder.logger.server.common.helper.TransactionComparator;
 import com.erbjuder.logger.server.rest.services.dao.MysqlConnection;
@@ -88,8 +89,6 @@ public class LogMessageServiceBase extends MysqlConnection {
             Long endPK = primaryKeySequencePrepareStatement.getLong(1);
             Long startPK = endPK - numOfPrimaryKeys;
 
-            System.err.println("endPK =[ " + endPK + " ]");
-            System.err.println("Init startPK =[ " + startPK + " ]");
             // initialize prepareStatement LogMessage
             for (Transactions.Transaction transaction : transactionArray) {
                 long logMessageId = startPK;
@@ -97,7 +96,6 @@ public class LogMessageServiceBase extends MysqlConnection {
                 startPK = presistLogMessageData(logMessageId, connection, transaction, startPK + 1);
             }
 
-            System.err.println("End startPK =[ " + startPK + " ]");
             connection.commit();
             connection.close();
 
@@ -142,7 +140,7 @@ public class LogMessageServiceBase extends MysqlConnection {
 
         // Prepare statement
         preparedStatement.setLong(1, logMessageId);
-        preparedStatement.setInt(2, this.calculationPartitionId(utcServerTimestamp));
+        preparedStatement.setInt(2, DatabasePartitionHelper.getPartitionId(utcServerTimestamp));
         preparedStatement.setTimestamp(3, utcClientTimestamp);
         preparedStatement.setTimestamp(4, utcServerTimestamp);
         preparedStatement.setDate(5, expiredDate);
@@ -164,7 +162,6 @@ public class LogMessageServiceBase extends MysqlConnection {
             long startPK
     ) throws SQLException {
 
-         
         long accumulated_batch_size = 0L;
         PreparedStatement preparedStatement = null;
         java.sql.Date expiredDate = new java.sql.Date(this.getExpiredDate(transaction).getTime());
@@ -190,19 +187,17 @@ public class LogMessageServiceBase extends MysqlConnection {
                 accumulated_batch_size = accumulated_batch_size + contentSize;
             }
 
-            
             // Iff accumulated WILL be larger than MAX ==> execute
-            if (accumulated_batch_size >= LogMessageServiceBase.mysql_max_allowed_packet && preparedStatement != null) { 
+            if (accumulated_batch_size >= LogMessageServiceBase.mysql_max_allowed_packet && preparedStatement != null) {
                 preparedStatement.executeBatch();
                 accumulated_batch_size = 0L;
-            } 
-            
-            
+            }
+
             String logMessageDataPrepareStatementString = getLogMessageDataPrepaterStatementMysql_Insert(contentSize);
             preparedStatement = connection.prepareStatement(logMessageDataPrepareStatementString);
             connection.setAutoCommit(false);
             preparedStatement.setLong(1, primaryKey);
-            preparedStatement.setInt(2, this.calculationPartitionId(utcServerTimestamp));
+            preparedStatement.setInt(2, DatabasePartitionHelper.getPartitionId(utcServerTimestamp));
             preparedStatement.setString(3, label);
             preparedStatement.setString(4, mimeType);
             preparedStatement.setString(5, content);
@@ -213,8 +208,7 @@ public class LogMessageServiceBase extends MysqlConnection {
             preparedStatement.setTimestamp(10, utcServerTimestamp);
             preparedStatement.setDate(11, expiredDate);
             preparedStatement.setLong(12, logMessageId);
-            
-     
+
             preparedStatement.addBatch();
             startPK = startPK + 1;
 
@@ -325,11 +319,6 @@ public class LogMessageServiceBase extends MysqlConnection {
             calendar.add(Calendar.MONTH, LogMessageServiceBase.addNumberOfMonth);
             return calendar.getTime();
         }
-    }
-
-    private int calculationPartitionId(Timestamp utcServerTimestamp) {
-        Calendar calendar = Calendar.getInstance();
-        return calendar.get(Calendar.DAY_OF_YEAR);
     }
 
     private String logMessageDataPartitionNameFromContentSize(long contentSize) {
