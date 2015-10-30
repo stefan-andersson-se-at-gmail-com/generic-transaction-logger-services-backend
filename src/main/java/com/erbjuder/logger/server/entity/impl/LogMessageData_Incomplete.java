@@ -19,6 +19,7 @@ package com.erbjuder.logger.server.entity.impl;
 import com.erbjuder.logger.server.entity.interfaces.LogMessageData;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  *
@@ -157,12 +158,12 @@ public class LogMessageData_Incomplete implements Serializable, LogMessageData {
     public void setUtcServerTimeStamp(Timestamp utcServerTimeStamp) {
         this.utcServerTimeStamp = utcServerTimeStamp;
     }
-    @Override
+     
     public LogMessage getLogMessage() {
         return logMessage;
     }
 
-    @Override
+ 
     public void setLogMessage(LogMessage logMessage) {
         this.logMessage = logMessage;
     }
@@ -205,6 +206,36 @@ public class LogMessageData_Incomplete implements Serializable, LogMessageData {
     @Override
     public int compareTo(LogMessageData o) {
         return this.label.compareToIgnoreCase(o.getLabel());
+    }
+
+    @Override
+    public Long getPartitionId() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setPartitionId(Long id) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Long getLogMessageId() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setLogMessageId(Long logMessageId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Date getExpiredDate() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setExpiredDate(Date date) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

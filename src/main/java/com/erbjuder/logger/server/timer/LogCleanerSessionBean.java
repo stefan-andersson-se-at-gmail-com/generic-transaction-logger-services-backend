@@ -16,9 +16,6 @@
  */
 package com.erbjuder.logger.server.timer;
 
-import com.erbjuder.logger.server.facade.impl.LogMessageFacadeImpl;
-import com.erbjuder.logger.server.facade.interfaces.LogMessageFacade;
-import javax.ejb.EJB;
 import javax.ejb.Singleton;
 
 /**
@@ -28,11 +25,4 @@ import javax.ejb.Singleton;
 @Singleton
 public class LogCleanerSessionBean extends LogCleanerSessionBeanBase {
 
-    @EJB
-    private LogMessageFacadeImpl transactionEntityFacade;
-
-    @Override
-    public LogMessageFacade getLogMessageFacade() {
-        return transactionEntityFacade;
-    }
 }

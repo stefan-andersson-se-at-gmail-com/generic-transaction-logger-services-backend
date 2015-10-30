@@ -16,18 +16,14 @@
  */
 package com.erbjuder.logger.server.soap.services;
 
-import com.erbjuder.logger.server.facade.impl.LogMessageFacadeImpl;
-import com.erbjuder.logger.server.facade.interfaces.LogMessageFacade;
 import com.generic.global.transactionlogger.Transactions;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Resource;
-import javax.ejb.EJB;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceException;
+
 /**
  *
  * @author Stefan Andersson
@@ -44,27 +40,13 @@ import javax.xml.ws.WebServiceException;
 
 public class TransactionLogAsynchronousService extends LogMessageServiceBase {
 
-    @EJB
-    private LogMessageFacadeImpl logMessageFacade;
-      
-    @Resource
-    private WebServiceContext jaxwsContext;
     private static final Logger logger = Logger.getLogger(TransactionLogAsynchronousService.class.getName());
 
     public void persist(
             @WebParam(name = "Transactions", targetNamespace = "urn:generic.com:Global:TransactionLogger", partName = "Transactions") Transactions transactions) throws WebServiceException {
-        logger.log(Level.SEVERE, "[ Got transaction log asynchronous event ] ");       
+        logger.log(Level.SEVERE, "[ Got transaction log asynchronous event ] ");
         super.create(transactions);
 
     }
 
-    @Override
-    public LogMessageFacade getLogMessageFacade() {
-        return logMessageFacade;
-    }
-
-    @Override
-    public WebServiceContext getWebServiceContext() {
-        return jaxwsContext;
-    }
 }

@@ -61,108 +61,108 @@ public abstract class LogMessageDataFacadeBaseImpl implements LogMessageDataFaca
     public List<LogMessageData> getLogMessageData(LogMessage logMessage, Set<Class> fetchFromLogMessage) {
 
         List<LogMessageData> data = new ArrayList<LogMessageData>();
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_01_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_01());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_01(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_02_CLASS)) {
-
-            data.addAll(logMessage.getLogMessageData_Partition_02());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_02(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_03_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_03());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_03(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_04_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_04());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_04(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_05_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_05());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_05(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_06_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_06());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_06(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_07_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_07());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_07(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_08_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_08());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_08(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_09_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_09());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_09(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_10_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_10());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_10(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_11_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_11());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_11(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_12_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_12());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_12(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_13_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_13());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_13(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_14_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_14());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_14(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_15_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_15());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_15(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_16_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_16());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_16(logMessage));
-        }
-
-        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_17_CLASS)) {
-            data.addAll(logMessage.getLogMessageData_Partition_17());
-        } else {
-            data.addAll(this.getIncompleteLogMessageData_Partition_17(logMessage));
-        }
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_01_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_01());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_01(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_02_CLASS)) {
+//
+//            data.addAll(logMessage.getLogMessageData_Partition_02());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_02(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_03_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_03());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_03(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_04_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_04());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_04(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_05_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_05());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_05(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_06_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_06());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_06(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_07_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_07());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_07(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_08_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_08());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_08(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_09_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_09());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_09(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_10_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_10());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_10(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_11_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_11());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_11(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_12_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_12());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_12(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_13_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_13());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_13(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_14_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_14());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_14(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_15_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_15());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_15(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_16_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_16());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_16(logMessage));
+//        }
+//
+//        if (fetchFromLogMessage.contains(DataBase.LOGMESSAGEDATA_PARTITION_17_CLASS)) {
+//            data.addAll(logMessage.getLogMessageData_Partition_17());
+//        } else {
+//            data.addAll(this.getIncompleteLogMessageData_Partition_17(logMessage));
+//        }
 
         Collections.sort(data);
         return data;

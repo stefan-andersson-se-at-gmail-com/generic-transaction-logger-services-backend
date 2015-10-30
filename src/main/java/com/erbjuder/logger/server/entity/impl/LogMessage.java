@@ -16,21 +16,14 @@
  */
 package com.erbjuder.logger.server.entity.impl;
 
-import com.erbjuder.logger.server.facade.impl.LogMessageDataFacadeImpl;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import javax.naming.InitialContext;
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 
@@ -44,68 +37,28 @@ public class LogMessage implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID")
     private Long id;
+    @Column(name = "PARTITION_ID")
+    private Long partitionId;
+    @Column(name = "UTCLOCALTIMESTAMP")
     private java.sql.Timestamp utcLocalTimeStamp;
+    @Column(name = "UTCSERVERTIMESTAMP")
     private java.sql.Timestamp utcServerTimeStamp;
-    private String transactionReferenceID;
-    private String applicationName;
-    private boolean isError;
+    @Column(name = "EXPIREDDATE")
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date expiredDate;
+    @Column(name = "TRANSACTIONREFERENCEID")
+    private String transactionReferenceID;
+    @Column(name = "APPLICATIONNAME")
+    private String applicationName;
+    @Column(name = "ISERROR")
+    private boolean isError;
+    @Column(name = "FLOWNAME")
     private String flowName;
+    @Column(name = "FLOWPOINTNAME")
     private String flowPointName;
-
-    @OneToMany(targetEntity = LogMessageData_Partition_01.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_01> logMessageData_Partition_01 = new ArrayList<LogMessageData_Partition_01>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_02.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_02> logMessageData_Partition_02 = new ArrayList<LogMessageData_Partition_02>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_03.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_03> logMessageData_Partition_03 = new ArrayList<LogMessageData_Partition_03>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_04.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_04> logMessageData_Partition_04 = new ArrayList<LogMessageData_Partition_04>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_05.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_05> logMessageData_Partition_05 = new ArrayList<LogMessageData_Partition_05>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_06.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_06> logMessageData_Partition_06 = new ArrayList<LogMessageData_Partition_06>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_07.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_07> logMessageData_Partition_07 = new ArrayList<LogMessageData_Partition_07>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_08.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_08> logMessageData_Partition_08 = new ArrayList<LogMessageData_Partition_08>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_09.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_09> logMessageData_Partition_09 = new ArrayList<LogMessageData_Partition_09>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_10.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_10> logMessageData_Partition_10 = new ArrayList<LogMessageData_Partition_10>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_11.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_11> logMessageData_Partition_11 = new ArrayList<LogMessageData_Partition_11>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_12.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_12> logMessageData_Partition_12 = new ArrayList<LogMessageData_Partition_12>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_13.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_13> logMessageData_Partition_13 = new ArrayList<LogMessageData_Partition_13>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_14.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_14> logMessageData_Partition_14 = new ArrayList<LogMessageData_Partition_14>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_15.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_15> logMessageData_Partition_15 = new ArrayList<LogMessageData_Partition_15>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_16.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_16> logMessageData_Partition_16 = new ArrayList<LogMessageData_Partition_16>();
-
-    @OneToMany(targetEntity = LogMessageData_Partition_17.class, mappedBy = "logMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LogMessageData_Partition_17> logMessageData_Partition_17 = new ArrayList<LogMessageData_Partition_17>();
 
     public Long getId() {
         return id;
@@ -161,154 +114,6 @@ public class LogMessage implements Serializable {
 
     public void setExpiredDate(Date expiredDate) {
         this.expiredDate = new java.sql.Date(expiredDate.getTime());
-    }
-
-    public List<com.erbjuder.logger.server.entity.interfaces.LogMessageData> getLogMessageData(Set<Class> classSelectionList) {
-        try {
-
-            LogMessageDataFacadeImpl logMessageDataFacade = (LogMessageDataFacadeImpl) new InitialContext().lookup("java:module/LogMessageDataFacadeImpl");
-            return logMessageDataFacade.getLogMessageData(this, classSelectionList);
-
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-            return null;
-        }
-    }
-
-    public List<LogMessageData_Partition_01> getLogMessageData_Partition_01() {
-        return logMessageData_Partition_01;
-    }
-
-    public void setLogMessageData_Partition_01(List<LogMessageData_Partition_01> logMessageData_Partition_01) {
-        this.logMessageData_Partition_01 = logMessageData_Partition_01;
-    }
-
-    public List<LogMessageData_Partition_02> getLogMessageData_Partition_02() {
-        return logMessageData_Partition_02;
-    }
-
-    public void setLogMessageData_Partition_02(List<LogMessageData_Partition_02> logMessageData_Partition_02) {
-        this.logMessageData_Partition_02 = logMessageData_Partition_02;
-    }
-
-    public List<LogMessageData_Partition_03> getLogMessageData_Partition_03() {
-        return logMessageData_Partition_03;
-    }
-
-    public void setLogMessageData_Partition_03(List<LogMessageData_Partition_03> logMessageData_Partition_03) {
-        this.logMessageData_Partition_03 = logMessageData_Partition_03;
-    }
-
-    public List<LogMessageData_Partition_04> getLogMessageData_Partition_04() {
-        return logMessageData_Partition_04;
-    }
-
-    public void setLogMessageData_Partition_04(List<LogMessageData_Partition_04> logMessageData_Partition_04) {
-        this.logMessageData_Partition_04 = logMessageData_Partition_04;
-    }
-
-    public List<LogMessageData_Partition_05> getLogMessageData_Partition_05() {
-        return logMessageData_Partition_05;
-    }
-
-    public void setLogMessageData_Partition_05(List<LogMessageData_Partition_05> logMessageData_Partition_05) {
-        this.logMessageData_Partition_05 = logMessageData_Partition_05;
-    }
-
-    public List<LogMessageData_Partition_06> getLogMessageData_Partition_06() {
-        return logMessageData_Partition_06;
-    }
-
-    public void setLogMessageData_Partition_06(List<LogMessageData_Partition_06> logMessageData_Partition_06) {
-        this.logMessageData_Partition_06 = logMessageData_Partition_06;
-    }
-
-    public List<LogMessageData_Partition_07> getLogMessageData_Partition_07() {
-        return logMessageData_Partition_07;
-    }
-
-    public void setLogMessageData_Partition_07(List<LogMessageData_Partition_07> logMessageData_Partition_07) {
-        this.logMessageData_Partition_07 = logMessageData_Partition_07;
-    }
-
-    public List<LogMessageData_Partition_08> getLogMessageData_Partition_08() {
-        return logMessageData_Partition_08;
-    }
-
-    public void setLogMessageData_Partition_08(List<LogMessageData_Partition_08> logMessageData_Partition_08) {
-        this.logMessageData_Partition_08 = logMessageData_Partition_08;
-    }
-
-    public List<LogMessageData_Partition_09> getLogMessageData_Partition_09() {
-        return logMessageData_Partition_09;
-    }
-
-    public void setLogMessageData_Partition_09(List<LogMessageData_Partition_09> logMessageData_Partition_09) {
-        this.logMessageData_Partition_09 = logMessageData_Partition_09;
-    }
-
-    public List<LogMessageData_Partition_10> getLogMessageData_Partition_10() {
-        return logMessageData_Partition_10;
-    }
-
-    public void setLogMessageData_Partition_10(ArrayList<LogMessageData_Partition_10> logMessageData_Partition_10) {
-        this.logMessageData_Partition_10 = logMessageData_Partition_10;
-    }
-
-    public List<LogMessageData_Partition_11> getLogMessageData_Partition_11() {
-        return logMessageData_Partition_11;
-    }
-
-    public void setLogMessageData_Partition_11(ArrayList<LogMessageData_Partition_11> logMessageData_Partition_11) {
-        this.logMessageData_Partition_11 = logMessageData_Partition_11;
-    }
-
-    public List<LogMessageData_Partition_12> getLogMessageData_Partition_12() {
-        return logMessageData_Partition_12;
-    }
-
-    public void setLogMessageData_Partition_12(ArrayList<LogMessageData_Partition_12> logMessageData_Partition_12) {
-        this.logMessageData_Partition_12 = logMessageData_Partition_12;
-    }
-
-    public List<LogMessageData_Partition_13> getLogMessageData_Partition_13() {
-        return logMessageData_Partition_13;
-    }
-
-    public void setLogMessageData_Partition_13(ArrayList<LogMessageData_Partition_13> logMessageData_Partition_13) {
-        this.logMessageData_Partition_13 = logMessageData_Partition_13;
-    }
-
-    public List<LogMessageData_Partition_14> getLogMessageData_Partition_14() {
-        return logMessageData_Partition_14;
-    }
-
-    public void setLogMessageData_Partition_14(ArrayList<LogMessageData_Partition_14> logMessageData_Partition_14) {
-        this.logMessageData_Partition_14 = logMessageData_Partition_14;
-    }
-
-    public List<LogMessageData_Partition_15> getLogMessageData_Partition_15() {
-        return logMessageData_Partition_15;
-    }
-
-    public void setLogMessageData_Partition_15(ArrayList<LogMessageData_Partition_15> logMessageData_Partition_15) {
-        this.logMessageData_Partition_15 = logMessageData_Partition_15;
-    }
-
-    public List<LogMessageData_Partition_16> getLogMessageData_Partition_16() {
-        return logMessageData_Partition_16;
-    }
-
-    public void setLogMessageData_Partition_16(List<LogMessageData_Partition_16> logMessageData_Partition_16) {
-        this.logMessageData_Partition_16 = logMessageData_Partition_16;
-    }
-
-    public List<LogMessageData_Partition_17> getLogMessageData_Partition_17() {
-        return logMessageData_Partition_17;
-    }
-
-    public void setLogMessageData_Partition_17(List<LogMessageData_Partition_17> logMessageData_Partition_17) {
-        this.logMessageData_Partition_17 = logMessageData_Partition_17;
     }
 
     public String getFlowName() {

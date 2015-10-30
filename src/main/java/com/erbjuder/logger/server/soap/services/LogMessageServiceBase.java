@@ -17,39 +17,19 @@
 package com.erbjuder.logger.server.soap.services;
 
 import com.erbjuder.logger.server.common.helper.DataBase;
-import com.erbjuder.logger.server.common.helper.MimeTypes;
 import com.erbjuder.logger.server.common.helper.TimeStampUtils;
 import com.erbjuder.logger.server.common.helper.TransactionComparator;
-import com.erbjuder.logger.server.common.helper.XMLUtils;
-import com.erbjuder.logger.server.entity.impl.LogMessage;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_01;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_02;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_03;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_04;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_05;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_06;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_07;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_08;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_09;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_10;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_11;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_12;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_13;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_14;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_15;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_16;
-import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_17;
-import com.erbjuder.logger.server.exception.InvalidXML;
-import com.erbjuder.logger.server.facade.interfaces.LogMessageFacade;
+import com.erbjuder.logger.server.rest.services.dao.MysqlConnection;
 import com.generic.global.transactionlogger.Response;
 import com.generic.global.transactionlogger.Transactions;
 import com.generic.global.transactionlogger.Transactions.Transaction;
-import com.sun.xml.messaging.saaj.util.Base64;
-import com.sun.xml.ws.api.message.Header;
-import com.sun.xml.ws.api.message.HeaderList;
-import com.sun.xml.ws.developer.JAXWSProperties;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -58,7 +38,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceException;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -71,470 +50,338 @@ import org.apache.commons.lang3.StringEscapeUtils;
     com.generic.global.fault.ObjectFactory.class,
     com.generic.global.transactionlogger.ObjectFactory.class
 })
-public abstract class LogMessageServiceBase {
+public class LogMessageServiceBase extends MysqlConnection {
 
     private static final Logger logger = Logger.getLogger(LogMessageServiceBase.class.getName());
-    private static int addNumberOfMonth = 3;
-    private static int subtractNumberOfMonth = -1;
-    private static String MESSAGE_ID = "MessageId";
-    private static String MESSAGE_ID_URN = "http://www.w3.org/2005/08/addressing";
-
-    public abstract LogMessageFacade getLogMessageFacade();
-
-    public abstract WebServiceContext getWebServiceContext();
+    private static final int addNumberOfMonth = 3;
+    private static final long mysql_max_allowed_packet = 4294967296L;
 
     public Response create(Transactions transactions) throws WebServiceException {
 
-        //
         // Return 
         Response response = new Response();
         response.setReturn(true);
 
-        try {
+        List<Transactions.Transaction> tmpTransactionList = transactions.getTransaction();
+        Transactions.Transaction[] transactionArray = tmpTransactionList.toArray(new Transaction[tmpTransactionList.size()]);
+        Arrays.sort(transactionArray, new TransactionComparator());
 
-            //
-            // Parse SOAP Header and looking for MessageId
-            String message_id = "";
-            HeaderList headerList = (com.sun.xml.ws.api.message.HeaderList) getWebServiceContext().getMessageContext().get(JAXWSProperties.INBOUND_HEADER_LIST_PROPERTY);
-            for (Header header : headerList) {
+        try (Connection connection = MysqlConnection()) {
 
-                String urn = header.getNamespaceURI();
-                String key = header.getLocalPart();
-                String value = header.getStringContent().trim();
+            // prepareStetment & Connection
+            String logMessagePrepareStatementString = getLogMessagePrepaterStatementMysql_Insert();
+            PreparedStatement logMessagePreparedStatement = connection.prepareStatement(logMessagePrepareStatementString);
 
-                if (MESSAGE_ID_URN.equalsIgnoreCase(urn) && MESSAGE_ID.equalsIgnoreCase(key) && !value.isEmpty()) {
-                    //logger.log(Level.SEVERE, "[ Found messageId " + value + " ] ");
-                    message_id = value;
-                    response.setReturn(false);
-                } else {
-                    logger.log(Level.SEVERE, "Got <Urn : Key> =[ " + urn + " ] " + " [ " + key + " ]");
-                }
-            }
-
-            //
-            // Copy all element into new structure due the original list seams to be NOT modifiable
-            // ( That's a requirement of Collection.sort method )
-            List<Transactions.Transaction> tmpTransactionList = transactions.getTransaction();
-            Transactions.Transaction[] transactionArray = tmpTransactionList.toArray(new Transaction[tmpTransactionList.size()]);
-            Arrays.sort(transactionArray, new TransactionComparator());
+            // Count number of PK we need
+            int numOfPrimaryKeys = transactionArray.length;
             for (Transactions.Transaction transaction : transactionArray) {
-
-                LogMessage logMessage = new LogMessage();
-
-                //
-                // Mandator
-                String referenceId = transaction.getTransactionReferenceID();
-                if (message_id.isEmpty() || referenceId.equals(message_id)) {
-                    logMessage.setTransactionReferenceID(referenceId);
-                } else {
-                    logger.log(Level.SEVERE, "[ TransactionReferanceId don't match SOAP Header content-id ] ");
-                    response.setReturn(false);
-                }
-
-                // 
-                // Server UTC time
-                logMessage.setApplicationName(transaction.getApplicationName().toLowerCase());
-                logMessage.setIsError(transaction.isIsError());
-                logMessage.setUtcServerTimeStamp(TimeStampUtils.createSystemNanoTimeStamp());
-                try {
-
-                    long UTCLocalTimeStamp = transaction.getUTCLocalTimeStamp().toGregorianCalendar().getTimeInMillis();
-                    long UTCLocalTimeStampNanoSeconds = 0;
-                    try {
-                        UTCLocalTimeStampNanoSeconds = transaction.getUTCLocalTimeStampNanoSeconds();
-
-                    } catch (Exception UTCLocalTimeStampNanoSecondsNotPressent) {
-                        //Skip client nano
-                        Timestamp timestamp = new Timestamp(UTCLocalTimeStamp);
-                        UTCLocalTimeStampNanoSeconds = timestamp.getNanos();
-                    }
-
-                    if (Long.MAX_VALUE > UTCLocalTimeStamp && Long.MIN_VALUE < UTCLocalTimeStamp) {
-                        logger.log(Level.INFO, "UTCLocalTimeStamp=[ " + UTCLocalTimeStamp + " ]");
-                        logger.log(Level.INFO, "UTCLocalTimeStampNanoSeconds=[ " + UTCLocalTimeStampNanoSeconds + " ]");
-                        logger.log(Level.INFO, "createNanoTimeStamp=[ " + TimeStampUtils.createNanoTimeStamp(UTCLocalTimeStamp, UTCLocalTimeStampNanoSeconds).getNanos() + " ]");
-                        logMessage.setUtcLocalTimeStamp(TimeStampUtils.createNanoTimeStamp(UTCLocalTimeStamp, UTCLocalTimeStampNanoSeconds));
-
-                    } else {
-                        logger.log(Level.INFO, "[ Invalid UTCLocalTimeStamp range, Use current system time instead! ] ");
-                        logger.log(Level.INFO, "[ " + UTCLocalTimeStamp + " ] ");
-                        logMessage.setUtcLocalTimeStamp(TimeStampUtils.createSystemNanoTimeStamp());
-                    }
-
-                } catch (Exception invalidDateException) {
-                    logger.log(Level.INFO, "[ Invalid log date! Use current system time instead! ] ");
-                    logger.log(Level.INFO, invalidDateException.getMessage());
-                    logMessage.setUtcLocalTimeStamp(TimeStampUtils.createSystemNanoTimeStamp());
-                }
-
-                //
-                // Optional
-                try {
-
-                    Date expiredTime = transaction.getExpiryDate().toGregorianCalendar().getTime();
-                    if (expiredTime != null && Long.MAX_VALUE > expiredTime.getTime() && Long.MIN_VALUE < expiredTime.getTime()) {
-                        logMessage.setExpiredDate(expiredTime);
-                    } else {
-                        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                        calendar.add(Calendar.MONTH, addNumberOfMonth);
-                        logMessage.setExpiredDate(calendar.getTime());
-                    }
-                } catch (Exception invalidExiredDateException) {
-                    logger.log(Level.INFO, "[ Invalid ExpiryDate! Use default expired time instead! ] ");
-                    logger.log(Level.INFO, invalidExiredDateException.getMessage());
-                    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                    calendar.add(Calendar.MONTH, addNumberOfMonth);
-                    logMessage.setExpiredDate(calendar.getTime());
-                }
-
-                //
-                // Transaction point info 
-                if (transaction.getTransactionLogPointInfo() != null) {
-                    String flowName = transaction.getTransactionLogPointInfo().getFlowName().trim().toLowerCase();
-                    String flowPointName = transaction.getTransactionLogPointInfo().getFlowPointName().trim().toLowerCase();
-
-                    if (flowName.isEmpty()) {
-                        flowName = transaction.getApplicationName().trim().toLowerCase();
-                    }
-
-                    if (flowPointName.isEmpty()) {
-                        flowPointName = "";
-                    }
-
-                    logMessage.setFlowName(flowName);
-                    logMessage.setFlowPointName(flowPointName);
-
-                } else {
-                    logMessage.setFlowName("");
-                    logMessage.setFlowPointName("");
-                }
-                logger.log(Level.INFO, "Flow done ]");
-                //
-                // Transaction log data
-                logMessage = this.buildTransactioLogDataEntity(transaction, logMessage);
-
-                //
-                // Persist
-                getLogMessageFacade().create(logMessage);
-
+                numOfPrimaryKeys = numOfPrimaryKeys + transaction.getTransactionLogData().size();
             }
 
-        } catch (Throwable ex) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("============= [ Java Server exception ] =============== \n");
-            builder.append(ex.getMessage());
-            logger.log(Level.SEVERE, builder.toString());
+            // Fetch primary keys
+            String primaryKeySequencePrepareStatementString = getPrimaryKeySequencePrepareStatement_Fetch();
+            CallableStatement primaryKeySequencePrepareStatement = connection.prepareCall(primaryKeySequencePrepareStatementString);
+            primaryKeySequencePrepareStatement.registerOutParameter(1, java.sql.Types.BIGINT);
+            primaryKeySequencePrepareStatement.setString(2, "seq_gen_1");
+            primaryKeySequencePrepareStatement.setInt(3, numOfPrimaryKeys);
+            primaryKeySequencePrepareStatement.execute();
+            Long endPK = primaryKeySequencePrepareStatement.getLong(1);
+            Long startPK = endPK - numOfPrimaryKeys;
+
+            System.err.println("endPK =[ " + endPK + " ]");
+            System.err.println("Init startPK =[ " + startPK + " ]");
+            // initialize prepareStatement LogMessage
+            for (Transactions.Transaction transaction : transactionArray) {
+                long logMessageId = startPK;
+                presistLogMessage(logMessageId, logMessagePreparedStatement, transaction);
+                startPK = presistLogMessageData(logMessageId, connection, transaction, startPK + 1);
+            }
+
+            System.err.println("End startPK =[ " + startPK + " ]");
+            connection.commit();
+            connection.close();
+
+        } catch (SQLException sqlError) {
+            sqlError.printStackTrace();
             response.setReturn(false);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setReturn(false);
+            return response;
+
         }
 
-        //
-        // Return
         return response;
     }
 
-    private LogMessage buildTransactioLogDataEntity(Transactions.Transaction transaction, LogMessage logMessage) {
+    private void presistLogMessage(
+            long logMessageId,
+            PreparedStatement preparedStatement,
+            Transactions.Transaction transaction) throws SQLException {
 
+        // Mandatory fields
+        Boolean isError = transaction.isIsError();
+        String transactionReferenceID = transaction.getTransactionReferenceID();
+        String applicationName = transaction.getApplicationName();
+        Timestamp utcServerTimestamp = TimeStampUtils.createSystemNanoTimeStamp();
+        Timestamp utcClientTimestamp = this.getUTCClientTimestamp(transaction);
+
+        // Optional fields
+        String flowName = "";
+        String flowPointName = "";
+        java.sql.Date expiredDate = new java.sql.Date(this.getExpiredDate(transaction).getTime());
+        if (transaction.getTransactionLogPointInfo() != null
+                && transaction.getTransactionLogPointInfo().getFlowName() != null
+                && transaction.getTransactionLogPointInfo().getFlowPointName() != null
+                && (!transaction.getTransactionLogPointInfo().getFlowName().trim().isEmpty()
+                || !transaction.getTransactionLogPointInfo().getFlowName().trim().isEmpty())) {
+            flowName = transaction.getTransactionLogPointInfo().getFlowName().trim();
+            flowPointName = transaction.getTransactionLogPointInfo().getFlowPointName().trim();
+        }
+
+        // Prepare statement
+        preparedStatement.setLong(1, logMessageId);
+        preparedStatement.setInt(2, this.calculationPartitionId(utcServerTimestamp));
+        preparedStatement.setTimestamp(3, utcClientTimestamp);
+        preparedStatement.setTimestamp(4, utcServerTimestamp);
+        preparedStatement.setDate(5, expiredDate);
+        preparedStatement.setString(6, transactionReferenceID);
+        preparedStatement.setString(7, applicationName);
+        preparedStatement.setBoolean(8, isError);
+        preparedStatement.setString(9, flowName);
+        preparedStatement.setString(10, flowPointName);
+
+        // Execute and assign logMessage PK
+        preparedStatement.executeUpdate();
+
+    }
+
+    private long presistLogMessageData(
+            long logMessageId,
+            Connection connection,
+            Transactions.Transaction transaction,
+            long startPK
+    ) throws SQLException {
+
+         
+        long accumulated_batch_size = 0L;
+        PreparedStatement preparedStatement = null;
+        java.sql.Date expiredDate = new java.sql.Date(this.getExpiredDate(transaction).getTime());
         for (Transactions.Transaction.TransactionLogData transactionLogData : transaction.getTransactionLogData()) {
-            logMessage = addTransactioLogData(transactionLogData, logMessage);
+
+            long primaryKey = startPK;
+            Timestamp utcServerTimestamp = TimeStampUtils.createSystemNanoTimeStamp();
+            Timestamp utcClientTimestamp = this.getUTCClientTimestamp(transaction);
+
+            String label = StringEscapeUtils.unescapeXml(transactionLogData.getContentLabel().trim());
+            String mimeType = transactionLogData.getContentMimeType().trim();
+            String content = transactionLogData.getContent();
+            long contentSize = 0;
+
+            try {
+
+                content = new String(Base64.getDecoder().decode(content.getBytes()));
+                contentSize = content.getBytes().length;
+                accumulated_batch_size = accumulated_batch_size + contentSize;
+            } catch (Exception e) {
+                content = StringEscapeUtils.unescapeXml(content);
+                contentSize = content.getBytes().length;
+                accumulated_batch_size = accumulated_batch_size + contentSize;
+            }
+
+            
+            // Iff accumulated WILL be larger than MAX ==> execute
+            if (accumulated_batch_size >= LogMessageServiceBase.mysql_max_allowed_packet && preparedStatement != null) { 
+                preparedStatement.executeBatch();
+                accumulated_batch_size = 0L;
+            } 
+            
+            
+            String logMessageDataPrepareStatementString = getLogMessageDataPrepaterStatementMysql_Insert(contentSize);
+            preparedStatement = connection.prepareStatement(logMessageDataPrepareStatementString);
+            connection.setAutoCommit(false);
+            preparedStatement.setLong(1, primaryKey);
+            preparedStatement.setInt(2, this.calculationPartitionId(utcServerTimestamp));
+            preparedStatement.setString(3, label);
+            preparedStatement.setString(4, mimeType);
+            preparedStatement.setString(5, content);
+            preparedStatement.setLong(6, contentSize);
+            preparedStatement.setBoolean(7, false);
+            preparedStatement.setBoolean(8, true);
+            preparedStatement.setTimestamp(9, utcClientTimestamp);
+            preparedStatement.setTimestamp(10, utcServerTimestamp);
+            preparedStatement.setDate(11, expiredDate);
+            preparedStatement.setLong(12, logMessageId);
+            
+     
+            preparedStatement.addBatch();
+            startPK = startPK + 1;
+
         }
 
-        return logMessage;
-    }
-
-    private LogMessage addTransactioLogData(Transactions.Transaction.TransactionLogData transactionLogData, LogMessage logMessage) {
-
-        String base64 = MimeTypes.BASE64;
-        String label = StringEscapeUtils.unescapeXml(transactionLogData.getContentLabel().trim().toLowerCase());
-        String mimeType = transactionLogData.getContentMimeType().trim().toLowerCase();
-        String content = StringEscapeUtils.unescapeXml(transactionLogData.getContent().trim());
-        long size = 0;
-        if (base64.equalsIgnoreCase(mimeType)) {
-            content = this.XMLFormatter(content);
-            size = content.getBytes().length;
-
-        } else {
-            size = content.getBytes().length;
+        // Some prepare statements in buffer ==> execute
+        if (accumulated_batch_size > 0 && preparedStatement != null) {
+            preparedStatement.executeBatch();
         }
-
-        // 
-        // Bind data to logmessage
-        return this.updateLogMessage(label, mimeType, content, size, logMessage);
-
+        return startPK;
     }
 
-    private LogMessage updateLogMessage(String label, String mimeType, String content, long size, LogMessage logMessage) {
+    private String getPrimaryKeySequencePrepareStatement_Fetch() {
+        return "{? = call seq_generator_fetch(?,?)}";
+    }
 
-        //                 
+    private String getLogMessagePrepaterStatementMysql_Insert() {
+
+        String mysqlLogMessagePrepareStatement
+                = "INSERT INTO LogMessage ("
+                + "ID, "
+                + "PARTITION_ID, "
+                + "UTCLOCALTIMESTAMP, "
+                + "UTCSERVERTIMESTAMP, "
+                + "EXPIREDDATE, "
+                + "TRANSACTIONREFERENCEID, "
+                + "APPLICATIONNAME, "
+                + "ISERROR, "
+                + "FLOWNAME, "
+                + "FLOWPOINTNAME) "
+                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+
+        return mysqlLogMessagePrepareStatement;
+    }
+
+    private String getLogMessageDataPrepaterStatementMysql_Insert(long contentSize) {
+
+        String LogMessageDataPartitionName = this.logMessageDataPartitionNameFromContentSize(contentSize);
+        String mysqlLogMessageDataPrepareStatement = "INSERT INTO " + LogMessageDataPartitionName + " ("
+                + "ID, "
+                + "PARTITION_ID, "
+                + "LABEL, "
+                + "MIMETYPE, "
+                + "CONTENT, "
+                + "CONTENTSIZE, "
+                + "MODIFIED, "
+                + "SEARCHABLE, "
+                + "UTCLOCALTIMESTAMP, "
+                + "UTCSERVERTIMESTAMP, "
+                + "EXPIREDDATE, "
+                + "LOGMESSAGE_ID) "
+                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+
+        return mysqlLogMessageDataPrepareStatement;
+    }
+
+    private Timestamp getUTCClientTimestamp(Transactions.Transaction transaction) {
+
+        try {
+
+            long UTCLocalTimeStamp = transaction.getUTCLocalTimeStamp().toGregorianCalendar().getTimeInMillis();
+            long UTCLocalTimeStampNanoSeconds = 0;
+            try {
+                UTCLocalTimeStampNanoSeconds = transaction.getUTCLocalTimeStampNanoSeconds();
+
+            } catch (Exception UTCLocalTimeStampNanoSecondsNotPressent) {
+                //Skip client nano
+                Timestamp timestamp = new Timestamp(UTCLocalTimeStamp);
+                UTCLocalTimeStampNanoSeconds = timestamp.getNanos();
+            }
+
+            if (Long.MAX_VALUE > UTCLocalTimeStamp && Long.MIN_VALUE < UTCLocalTimeStamp) {
+                logger.log(Level.INFO, "UTCLocalTimeStamp=[ " + UTCLocalTimeStamp + " ]");
+                logger.log(Level.INFO, "UTCLocalTimeStampNanoSeconds=[ " + UTCLocalTimeStampNanoSeconds + " ]");
+                logger.log(Level.INFO, "createNanoTimeStamp=[ " + TimeStampUtils.createNanoTimeStamp(UTCLocalTimeStamp, UTCLocalTimeStampNanoSeconds).getNanos() + " ]");
+                return TimeStampUtils.createNanoTimeStamp(UTCLocalTimeStamp, UTCLocalTimeStampNanoSeconds);
+
+            } else {
+                logger.log(Level.INFO, "[ Invalid UTCLocalTimeStamp range, Use current system time instead! ] ");
+                logger.log(Level.INFO, "[ " + UTCLocalTimeStamp + " ] ");
+                return TimeStampUtils.createSystemNanoTimeStamp();
+            }
+
+        } catch (Exception invalidDateException) {
+            logger.log(Level.INFO, "[ Invalid log date! Use current system time instead! ] ");
+            logger.log(Level.INFO, invalidDateException.getMessage());
+            return TimeStampUtils.createSystemNanoTimeStamp();
+        }
+    }
+
+    private Date getExpiredDate(Transactions.Transaction transaction) {
+
+        // Optional
+        try {
+
+            Date expiredTime = transaction.getExpiryDate().toGregorianCalendar().getTime();
+            if (expiredTime != null && Long.MAX_VALUE > expiredTime.getTime() && Long.MIN_VALUE < expiredTime.getTime()) {
+                return expiredTime;
+            } else {
+                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                calendar.add(Calendar.MONTH, LogMessageServiceBase.addNumberOfMonth);
+                return calendar.getTime();
+            }
+        } catch (Exception invalidExiredDateException) {
+            logger.log(Level.INFO, "[ Invalid ExpiryDate! Use default expired time instead! ] ");
+            logger.log(Level.INFO, invalidExiredDateException.getMessage());
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            calendar.add(Calendar.MONTH, LogMessageServiceBase.addNumberOfMonth);
+            return calendar.getTime();
+        }
+    }
+
+    private int calculationPartitionId(Timestamp utcServerTimestamp) {
+        Calendar calendar = Calendar.getInstance();
+        return calendar.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private String logMessageDataPartitionNameFromContentSize(long contentSize) {
+
+        // Determ content partition based on size
+        //       
         //  TINYTEXT    |           255 (2 8−1) bytes
         //  TEXT        |        65,535 (216−1) bytes = 64 KiB
         //  MEDIUMTEXT  |    16,777,215 (224−1) bytes = 16 MiB
         //  LONGTEXT    | 4,294,967,295 (232−1) bytes =  4 GiB
-        if (size == 0) {
+        String partitionName = "";
+        if (contentSize == 0) {
             // continue;
 
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_20B) {
-
-            LogMessageData_Partition_01 logMessageData_Max20B = new LogMessageData_Partition_01();
-            logMessageData_Max20B.setLabel(label);
-            logMessageData_Max20B.setMimeType(mimeType);
-            logMessageData_Max20B.setContent(content);
-            logMessageData_Max20B.setContentSize(size);
-
-            logMessageData_Max20B.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max20B.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max20B.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_01().add(logMessageData_Max20B);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_40B) {
-
-            LogMessageData_Partition_02 logMessageData_Max40B = new LogMessageData_Partition_02();
-            logMessageData_Max40B.setLabel(label);
-            logMessageData_Max40B.setMimeType(mimeType);
-            logMessageData_Max40B.setContent(content);
-            logMessageData_Max40B.setContentSize(size);
-
-            logMessageData_Max40B.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max40B.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max40B.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_02().add(logMessageData_Max40B);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_60B) {
-
-            LogMessageData_Partition_03 logMessageData_Max60B = new LogMessageData_Partition_03();
-            logMessageData_Max60B.setLabel(label);
-            logMessageData_Max60B.setMimeType(mimeType);
-            logMessageData_Max60B.setContent(content);
-            logMessageData_Max60B.setContentSize(size);
-
-            logMessageData_Max60B.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max60B.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max60B.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_03().add(logMessageData_Max60B);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_80B) {
-
-            LogMessageData_Partition_04 logMessageData_Max80B = new LogMessageData_Partition_04();
-            logMessageData_Max80B.setLabel(label);
-            logMessageData_Max80B.setMimeType(mimeType);
-            logMessageData_Max80B.setContent(content);
-            logMessageData_Max80B.setContentSize(size);
-
-            logMessageData_Max80B.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max80B.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max80B.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_04().add(logMessageData_Max80B);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_100B) {
-
-            LogMessageData_Partition_05 logMessageData_Max100B = new LogMessageData_Partition_05();
-            logMessageData_Max100B.setLabel(label);
-            logMessageData_Max100B.setMimeType(mimeType);
-            logMessageData_Max100B.setContent(content);
-            logMessageData_Max100B.setContentSize(size);
-
-            logMessageData_Max100B.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max100B.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max100B.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_05().add(logMessageData_Max100B);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_150B) {
-
-            LogMessageData_Partition_06 logMessageData_Max150B = new LogMessageData_Partition_06();
-            logMessageData_Max150B.setLabel(label);
-            logMessageData_Max150B.setMimeType(mimeType);
-            logMessageData_Max150B.setContent(content);
-            logMessageData_Max150B.setContentSize(size);
-
-            logMessageData_Max150B.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max150B.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max150B.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_06().add(logMessageData_Max150B);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_200B) {
-
-            LogMessageData_Partition_07 logMessageData_Max200B = new LogMessageData_Partition_07();
-            logMessageData_Max200B.setLabel(label);
-            logMessageData_Max200B.setMimeType(mimeType);
-            logMessageData_Max200B.setContent(content);
-            logMessageData_Max200B.setContentSize(size);
-
-            logMessageData_Max200B.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max200B.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max200B.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_07().add(logMessageData_Max200B);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_255B) {
-
-            LogMessageData_Partition_08 logMessageData_Max255B = new LogMessageData_Partition_08();
-            logMessageData_Max255B.setLabel(label);
-            logMessageData_Max255B.setMimeType(mimeType);
-            logMessageData_Max255B.setContent(content);
-            logMessageData_Max255B.setContentSize(size);
-
-            logMessageData_Max255B.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max255B.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max255B.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_08().add(logMessageData_Max255B);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_64KB) {
-            LogMessageData_Partition_09 logMessageData_Max64KB = new LogMessageData_Partition_09();
-            logMessageData_Max64KB.setLabel(label);
-            logMessageData_Max64KB.setMimeType(mimeType);
-            logMessageData_Max64KB.setContent(content);
-            logMessageData_Max64KB.setContentSize(size);
-
-            logMessageData_Max64KB.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max64KB.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max64KB.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_09().add(logMessageData_Max64KB);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_1MB) {
-            LogMessageData_Partition_10 logMessageData_Max1MB = new LogMessageData_Partition_10();
-            logMessageData_Max1MB.setLabel(label);
-            logMessageData_Max1MB.setMimeType(mimeType);
-            logMessageData_Max1MB.setContent(content);
-            logMessageData_Max1MB.setContentSize(size);
-            logMessageData_Max1MB.setSearchable(false);
-
-            logMessageData_Max1MB.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max1MB.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max1MB.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_10().add(logMessageData_Max1MB);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_2MB) {
-            LogMessageData_Partition_11 logMessageData_Max2MB = new LogMessageData_Partition_11();
-            logMessageData_Max2MB.setLabel(label);
-            logMessageData_Max2MB.setMimeType(mimeType);
-            logMessageData_Max2MB.setContent(content);
-            logMessageData_Max2MB.setContentSize(size);
-            logMessageData_Max2MB.setSearchable(false);
-
-            logMessageData_Max2MB.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max2MB.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max2MB.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_11().add(logMessageData_Max2MB);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_3MB) {
-            LogMessageData_Partition_12 logMessageData_Max3MB = new LogMessageData_Partition_12();
-            logMessageData_Max3MB.setLabel(label);
-            logMessageData_Max3MB.setMimeType(mimeType);
-            logMessageData_Max3MB.setContent(content);
-            logMessageData_Max3MB.setContentSize(size);
-            logMessageData_Max3MB.setSearchable(false);
-
-            logMessageData_Max3MB.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max3MB.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max3MB.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_12().add(logMessageData_Max3MB);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_4MB) {
-            LogMessageData_Partition_13 logMessageData_Max4MB = new LogMessageData_Partition_13();
-            logMessageData_Max4MB.setLabel(label);
-            logMessageData_Max4MB.setMimeType(mimeType);
-            logMessageData_Max4MB.setContent(content);
-            logMessageData_Max4MB.setContentSize(size);
-            logMessageData_Max4MB.setSearchable(false);
-
-            logMessageData_Max4MB.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max4MB.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max4MB.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_13().add(logMessageData_Max4MB);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_5MB) {
-            LogMessageData_Partition_14 logMessageData_Max5MB = new LogMessageData_Partition_14();
-            logMessageData_Max5MB.setLabel(label);
-            logMessageData_Max5MB.setMimeType(mimeType);
-            logMessageData_Max5MB.setContent(content);
-            logMessageData_Max5MB.setContentSize(size);
-            logMessageData_Max5MB.setSearchable(false);
-
-            logMessageData_Max5MB.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max5MB.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max5MB.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_14().add(logMessageData_Max5MB);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_10MB) {
-            LogMessageData_Partition_15 logMessageData_Max10MB = new LogMessageData_Partition_15();
-            logMessageData_Max10MB.setLabel(label);
-            logMessageData_Max10MB.setMimeType(mimeType);
-            logMessageData_Max10MB.setContent(content);
-            logMessageData_Max10MB.setContentSize(size);
-            logMessageData_Max10MB.setSearchable(false);
-
-            logMessageData_Max10MB.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max10MB.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max10MB.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_15().add(logMessageData_Max10MB);
-
-        } else if (size <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_16MB) {
-            LogMessageData_Partition_16 logMessageData_Max16MB = new LogMessageData_Partition_16();
-            logMessageData_Max16MB.setLabel(label);
-            logMessageData_Max16MB.setMimeType(mimeType);
-            logMessageData_Max16MB.setContent(content);
-            logMessageData_Max16MB.setContentSize(size);
-            logMessageData_Max16MB.setSearchable(false);
-
-            logMessageData_Max16MB.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max16MB.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max16MB.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_16().add(logMessageData_Max16MB);
-
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_20B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_01_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_40B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_02_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_60B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_03_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_80B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_04_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_100B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_05_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_150B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_06_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_200B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_07_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_255B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_08_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_64KB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_09_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_1MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_10_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_2MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_11_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_3MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_12_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_4MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_13_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_5MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_14_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_10MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_15_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_16MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_16_NAME;
         } else {
-            LogMessageData_Partition_17 logMessageData_Max4GB = new LogMessageData_Partition_17();
-            logMessageData_Max4GB.setLabel(label);
-            logMessageData_Max4GB.setMimeType(mimeType);
-            logMessageData_Max4GB.setContent(content);
-            logMessageData_Max4GB.setContentSize(size);
-            logMessageData_Max4GB.setSearchable(false);
-
-            logMessageData_Max4GB.setUtcLocalTimeStamp(logMessage.getUtcLocalTimeStamp());
-            logMessageData_Max4GB.setUtcServerTimeStamp(logMessage.getUtcServerTimeStamp());
-            logMessageData_Max4GB.setLogMessage(logMessage);
-
-            logMessage.getLogMessageData_Partition_17().add(logMessageData_Max4GB);
-
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_17_NAME;
         }
 
-        return logMessage;
+        return partitionName;
 
     }
 
-    private String XMLFormatter(String content) {
-        String xml = content;
-        try {
-            xml = new String(Base64.base64Decode(content));
-            xml = XMLUtils.XmlFormatter(xml);
-        } catch (InvalidXML e1) {
-            try {
-
-                // Try to fix invalid characters
-                xml = XMLUtils.cleanInvalidXmlChars(xml);
-                xml = XMLUtils.XmlFormatter(xml);
-
-            } catch (InvalidXML e2) {
-                // Can't do mutch return decoded xml as is
-            }
-        }
-        return xml;
-    }
-
-    private LogMessage buildTransactioMetaInfoEntity(Transaction transaction, LogMessage logMessage) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }

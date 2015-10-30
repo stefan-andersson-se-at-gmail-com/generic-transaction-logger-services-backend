@@ -16,18 +16,26 @@
  */
 package com.erbjuder.logger.server.entity.interfaces;
 
-import com.erbjuder.logger.server.entity.impl.LogMessage;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  *
  * @author Stefan Andersson
  */
-public interface LogMessageData extends Comparable<LogMessageData>{
+public interface LogMessageData extends Comparable<LogMessageData> {
 
     public Long getId();
 
     public void setId(Long id);
+
+    public Long getPartitionId();
+
+    public void setPartitionId(Long id);
+
+    public Long getLogMessageId();
+
+    public void setLogMessageId(Long logMessageId);
 
     public boolean isModified();
 
@@ -46,12 +54,8 @@ public interface LogMessageData extends Comparable<LogMessageData>{
     public void setUtcLocalTimeStamp(Timestamp utcLocalTimeStamp);
 
     public Timestamp getUtcServerTimeStamp();
- 
-    public void setUtcServerTimeStamp(Timestamp utcServerTimeStamp);
-    
-    public LogMessage getLogMessage();
 
-    public void setLogMessage(LogMessage logMessage);
+    public void setUtcServerTimeStamp(Timestamp utcServerTimeStamp);
 
     public String getLabel();
 
@@ -65,5 +69,8 @@ public interface LogMessageData extends Comparable<LogMessageData>{
 
     public void setContent(String content);
 
-    
+    public Date getExpiredDate();
+
+    public void setExpiredDate(Date date);
+
 }

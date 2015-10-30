@@ -20,13 +20,14 @@ import com.erbjuder.logger.server.common.helper.DataBase;
 import com.erbjuder.logger.server.entity.interfaces.LogMessageData;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -36,22 +37,34 @@ import javax.persistence.Table;
 @Table(name = "LogMessageData_Partition_11")
 public class LogMessageData_Partition_11 implements Serializable, LogMessageData {
 
-    @ManyToOne(targetEntity = LogMessage.class)
-    private LogMessage logMessage;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
     private Long id;
-     
+    @Column(name = "PARTITION_ID")
+    private Long partitionId;
+    @Column(name = "LOGGMESSAGE_ID")
+    private Long logMessageId;
+    @Column(name = "LABEL")
     private String label;
+    @Column(name = "MIMETYPE")
     private String mimeType;
+    @Column(name = "UTCLOCALTIMESTAMP")
+    private java.sql.Timestamp utcLocalTimeStamp;
+    @Column(name = "UTCSERVERTIMESTAMP")
+    private java.sql.Timestamp utcServerTimeStamp;
+    @Column(name = "EXPIREDDATE")
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date expiredDate;
+    @Column(name = "MODIFIED")
+    private boolean modified = false;
+    @Column(name = "SEARCHABLE")
+    private boolean searchable = true;
+    @Column(name = "CONTENTSIZE")
+    private long contentSize;
     @Column(columnDefinition = DataBase.LOGMESSAGEDATA_PARTITION_11_CONTENT_COLUMN_DEFINITION)
     protected String content;
-    private java.sql.Timestamp utcLocalTimeStamp;
-    private java.sql.Timestamp utcServerTimeStamp;
-    private boolean modified = false;
-    private boolean searchable = true;
-    private long contentSize;
 
     @Override
     public Long getId() {
@@ -64,13 +77,23 @@ public class LogMessageData_Partition_11 implements Serializable, LogMessageData
     }
 
     @Override
-    public LogMessage getLogMessage() {
-        return logMessage;
+    public Long getLogMessageId() {
+        return logMessageId;
     }
 
     @Override
-    public void setLogMessage(LogMessage logMessage) {
-        this.logMessage = logMessage;
+    public void setLogMessageId(Long logMessageId) {
+        this.logMessageId = logMessageId;
+    }
+
+    @Override
+    public Long getPartitionId() {
+        return partitionId;
+    }
+
+    @Override
+    public void setPartitionId(Long partitionId) {
+        this.partitionId = partitionId;
     }
 
     @Override
@@ -133,7 +156,7 @@ public class LogMessageData_Partition_11 implements Serializable, LogMessageData
         this.contentSize = contentSize;
     }
 
-           @Override
+    @Override
     public Timestamp getUtcLocalTimeStamp() {
         return utcLocalTimeStamp;
     }
@@ -173,8 +196,16 @@ public class LogMessageData_Partition_11 implements Serializable, LogMessageData
         this.mimeType = mimeType;
     }
 
+    public Date getExpiredDate() {
+        return expiredDate;
+    }
+
+    public void setExpiredDate(Date expiredDate) {
+        this.expiredDate = new java.sql.Date(expiredDate.getTime());
+    }
+
     @Override
-        public String toString() {
+    public String toString() {
         return this.getClass().getCanonicalName() + "@" + this.hashCode();
     }
 

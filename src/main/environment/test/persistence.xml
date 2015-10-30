@@ -6,22 +6,5 @@
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>ALL</shared-cache-mode>
   </persistence-unit>
-  
-    <persistence-unit name="TransactionLogger_001" transaction-type="JTA">
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <jta-data-source>jdbc/TransactionLoggerDev_001</jta-data-source>
-    <exclude-unlisted-classes>false</exclude-unlisted-classes>
-    <shared-cache-mode>ALL</shared-cache-mode>
-    <properties/>
-  </persistence-unit>
-  
-    <persistence-unit name="TransactionLogger_002" transaction-type="JTA">
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <jta-data-source>jdbc/TransactionLoggerDev_002</jta-data-source>
-    <exclude-unlisted-classes>false</exclude-unlisted-classes>
-    <shared-cache-mode>ALL</shared-cache-mode>
-    <properties>
-    </properties>
-  </persistence-unit>
-  
+ 
 </persistence>
