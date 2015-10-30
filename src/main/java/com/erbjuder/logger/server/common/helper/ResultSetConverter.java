@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.erbjuder.logger.server.rest.util;
+package com.erbjuder.logger.server.common.helper;
 
 //import org.codehaus.jettison.json.JSONArray;
 //import org.codehaus.jettison.json.JSONObject;
@@ -42,6 +42,8 @@ import com.erbjuder.logger.server.entity.interfaces.LogMessageData;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -129,8 +131,8 @@ public class ResultSetConverter {
                 }//end foreach
                 list.add(builder.toString());
             }//end while
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(ResultSetConverter.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
         return list; //return String list
 
@@ -171,6 +173,10 @@ public class ResultSetConverter {
                         obj.setId(rs.getBigDecimal(column_name).longValueExact());
                     }
 
+                    if (column_name.equals("PARTITION_ID")) {
+                        obj.setPartitionId(rs.getInt(column_name));
+                    }
+
                     if (column_name.equals("APPLICATIONNAME")) {
                         obj.setApplicationName(rs.getNString(column_name));
                     }
@@ -205,8 +211,8 @@ public class ResultSetConverter {
                 }//end foreach
                 logMessages.add(obj);
             }//end while
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(ResultSetConverter.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
 
         return logMessages;
@@ -273,13 +279,15 @@ public class ResultSetConverter {
                     obj = new LogMessageData_Partition_17();
                 }
 
-         
                 // loop through all the columns 
                 for (int i = 1; i < numColumns + 1; i++) {
                     String column_name = rsmd.getColumnName(i);
 
                     if (column_name.equals("ID")) {
                         obj.setId(rs.getBigDecimal(column_name).longValueExact());
+                    }
+                    if (column_name.equals("PARTITION_ID")) {
+                        obj.setPartitionId(rs.getInt(column_name));
                     }
 
                     if (column_name.equals("CONTENT")) {
@@ -313,19 +321,17 @@ public class ResultSetConverter {
                     if (column_name.equals("UTCSERVERTIMESTAMP")) {
                         obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
                     }
-                    
+
 //                    if (column_name.equals("LOGMESSAGE_ID")) {
 //                        obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
 //                    }
-                    
-                     
                 }//end foreach
                 logMessageData.add(obj);
             }//end while
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(ResultSetConverter.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
-         
+
         return logMessageData;
     }
 
@@ -431,8 +437,8 @@ public class ResultSetConverter {
                 }//end foreach
                 json.add(obj);
             }//end while
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(ResultSetConverter.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
         return json; //return JSON array
     }

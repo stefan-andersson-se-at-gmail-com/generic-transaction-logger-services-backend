@@ -43,7 +43,7 @@ public class LogMessageData_Partition_01 implements Serializable, LogMessageData
     @Column(name = "ID")
     private Long id;
     @Column(name = "PARTITION_ID")
-    private Long partitionId;
+    private int partitionId;
     @Column(name = "LOGGMESSAGE_ID")
     private Long logMessageId;
     @Column(name = "LABEL")
@@ -87,12 +87,12 @@ public class LogMessageData_Partition_01 implements Serializable, LogMessageData
     }
 
     @Override
-    public Long getPartitionId() {
+    public int getPartitionId() {
         return partitionId;
     }
 
     @Override
-    public void setPartitionId(Long partitionId) {
+    public void setPartitionId(int partitionId) {
         this.partitionId = partitionId;
     }
 

@@ -16,7 +16,6 @@
  */
 package com.erbjuder.logger.server.rest.util;
 
-
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 

@@ -16,11 +16,13 @@
  */
 package com.erbjuder.logger.server.rest.services.dao;
 
+import com.erbjuder.logger.server.common.helper.DatabasePartitionHelper;
 import com.erbjuder.logger.server.common.helper.PrepareStatementHelper;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ import java.util.List;
  *
  * @author Stefan Andersson
  */
-public class LoggerSchema extends MysqlConnection {
+public class LogMessageQueries extends MysqlConnection {
 
     public ResultSet search_logMessageList(
             String fromDate,
@@ -51,9 +53,12 @@ public class LoggerSchema extends MysqlConnection {
 
             StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
-            prepareStatement.append("ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
+            prepareStatement.append("ID, PARTITION_ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
             prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
-            prepareStatement.append("FROM ").append("LogMessage ").append("WHERE ");
+            prepareStatement.append("FROM ").append("LogMessage ");
+
+            List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+            prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
 
             // Between date
             prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -168,7 +173,7 @@ public class LoggerSchema extends MysqlConnection {
 
                 StringBuilder prepareStatement = new StringBuilder();
                 prepareStatement.append("SELECT ");
-                prepareStatement.append("ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
+                prepareStatement.append("ID, PARTITION_ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
                 prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID ");
                 prepareStatement.append("FROM ").append(databasePartition).append(" WHERE LOGMESSAGE_ID = ").append(logMessageId);
 
@@ -200,14 +205,17 @@ public class LoggerSchema extends MysqlConnection {
             String logMessageIdLabel,
             String logMessageDataPartition,
             List<String> freeTextSearchList
-    ) {
+    ) throws ParseException {
 
         StringBuilder prepareStatement = new StringBuilder();
         String partitionID = logMessageDataPartition + "_ID";
 
         prepareStatement.append("SELECT ");
         prepareStatement.append("DISTINCT ( LOGMESSAGE_ID ) as ").append(partitionID).append(" ");
-        prepareStatement.append("FROM ").append(logMessageDataPartition).append(" WHERE ");
+        prepareStatement.append("FROM ").append(logMessageDataPartition).append(" ");
+
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+        prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -251,9 +259,12 @@ public class LoggerSchema extends MysqlConnection {
 
             StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
-            prepareStatement.append("ID, LABEL, CONTENT, MIMETYPE, CONTENTSIZE, MODIFIED, ");
+            prepareStatement.append("ID, PARTITION_ID, LABEL, CONTENT, MIMETYPE, CONTENTSIZE, MODIFIED, ");
             prepareStatement.append("SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID ");
-            prepareStatement.append("FROM ").append(logMessageDataPartition).append(" WHERE ");
+            prepareStatement.append("FROM ").append(logMessageDataPartition).append(" ");
+
+            List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+            prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
 
             // Between date
             prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -303,14 +314,17 @@ public class LoggerSchema extends MysqlConnection {
             String fromDate,
             String toDate,
             List<String> applicationNames
-    ) {
+    ) throws ParseException {
 
         StringBuilder prepareStatement = new StringBuilder();
 
         prepareStatement.append("SELECT ");
-        prepareStatement.append("ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
+        prepareStatement.append("ID, PARTITION_ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
         prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
-        prepareStatement.append("FROM ").append("LogMessage ").append("WHERE ");
+        prepareStatement.append("FROM ").append("LogMessage ").append(" ");
+
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+        prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -328,14 +342,17 @@ public class LoggerSchema extends MysqlConnection {
             String fromDate,
             String toDate,
             List<String> flowNames
-    ) {
+    ) throws ParseException {
 
         StringBuilder prepareStatement = new StringBuilder();
 
         prepareStatement.append("SELECT ");
-        prepareStatement.append("ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
+        prepareStatement.append("ID, PARTITION_ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
         prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
-        prepareStatement.append("FROM ").append("LogMessage ").append("WHERE ");
+        prepareStatement.append("FROM ").append("LogMessage ").append(" ");
+
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+        prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -353,14 +370,17 @@ public class LoggerSchema extends MysqlConnection {
             String fromDate,
             String toDate,
             List<String> flowPointNames
-    ) {
+    ) throws ParseException {
 
         StringBuilder prepareStatement = new StringBuilder();
 
         prepareStatement.append("SELECT ");
-        prepareStatement.append("ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
+        prepareStatement.append("ID, PARTITION_ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
         prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
-        prepareStatement.append("FROM ").append("LogMessage ").append("WHERE ");
+        prepareStatement.append("FROM ").append("LogMessage ").append(" ");
+
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+        prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -379,14 +399,18 @@ public class LoggerSchema extends MysqlConnection {
             String toDate,
             String freeText,
             String databasePartition
-    ) {
+    ) throws ParseException {
 
         StringBuilder prepareStatement = new StringBuilder();
 
         prepareStatement.append("SELECT ");
-        prepareStatement.append("ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
+        prepareStatement.append("ID, PARTITION_ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
         prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID");
-        prepareStatement.append("FROM ").append(databasePartition).append(" WHERE ");
+        prepareStatement.append("FROM ").append(databasePartition).append(" ");
+
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+        prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
+
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
 

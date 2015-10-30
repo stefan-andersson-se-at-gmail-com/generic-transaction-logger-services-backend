@@ -17,10 +17,12 @@
 package com.erbjuder.logger.server.rest.services;
 
 import com.erbjuder.logger.server.common.helper.DataBase;
-import com.erbjuder.logger.server.rest.services.dao.LoggerSchema;
-import com.erbjuder.logger.server.rest.util.ResultSetConverter;
+import com.erbjuder.logger.server.rest.services.dao.LogMessageQueries;
+import com.erbjuder.logger.server.common.helper.ResultSetConverter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -74,7 +76,7 @@ public class TransactionLogRestService_V1 {
                 dataBaseSearchList = getDefaultSearchableDatabases();
             }
 
-            LoggerSchema loggerSchema = new LoggerSchema();
+            LogMessageQueries loggerSchema = new LogMessageQueries();
             ResultSetConverter converter = new ResultSetConverter();
             JSONArray jsonResult = converter.toJSONArray(loggerSchema.search_logMessageList(
                     fromDate,
@@ -95,7 +97,8 @@ public class TransactionLogRestService_V1 {
 
             return Response.ok(jsonResult.toString()).build();
 
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
     }
@@ -119,7 +122,7 @@ public class TransactionLogRestService_V1 {
             System.err.println("logMessageId=[" + logMessageId + "]");
             System.err.println("dataBaseSearchList=[" + dataBaseSearchList + "]");
 
-            LoggerSchema loggerSchema = new LoggerSchema();
+            LogMessageQueries loggerSchema = new LogMessageQueries();
             ResultSetConverter converter = new ResultSetConverter();
             JSONArray jsonResult = converter.toJSONArray(loggerSchema.fetch_LogMessageData(
                     logMessageId,
@@ -127,7 +130,8 @@ public class TransactionLogRestService_V1 {
 
             return Response.ok(jsonResult.toString()).build();
 
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
     }

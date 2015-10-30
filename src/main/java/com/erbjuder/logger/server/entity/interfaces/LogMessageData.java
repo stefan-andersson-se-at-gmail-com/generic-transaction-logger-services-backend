@@ -29,9 +29,9 @@ public interface LogMessageData extends Comparable<LogMessageData> {
 
     public void setId(Long id);
 
-    public Long getPartitionId();
+    public int getPartitionId();
 
-    public void setPartitionId(Long id);
+    public void setPartitionId(int id);
 
     public Long getLogMessageId();
 

@@ -209,12 +209,12 @@ public class LogMessageData_Incomplete implements Serializable, LogMessageData {
     }
 
     @Override
-    public Long getPartitionId() {
+    public int getPartitionId() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void setPartitionId(Long id) {
+    public void setPartitionId(int id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

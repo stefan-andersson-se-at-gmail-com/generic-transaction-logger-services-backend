@@ -41,7 +41,7 @@ public class LogMessage implements Serializable {
     @Column(name = "ID")
     private Long id;
     @Column(name = "PARTITION_ID")
-    private Long partitionId;
+    private int partitionId;
     @Column(name = "UTCLOCALTIMESTAMP")
     private java.sql.Timestamp utcLocalTimeStamp;
     @Column(name = "UTCSERVERTIMESTAMP")
@@ -66,6 +66,14 @@ public class LogMessage implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public int getPartitionId() {
+        return partitionId;
+    }
+
+    public void setPartitionId(int partitionId) {
+        this.partitionId = partitionId;
     }
 
     public Timestamp getUtcLocalTimeStamp() {
