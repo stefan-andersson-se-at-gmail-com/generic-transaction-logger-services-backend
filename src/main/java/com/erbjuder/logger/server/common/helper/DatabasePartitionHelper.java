@@ -22,7 +22,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -30,8 +32,8 @@ import java.util.List;
  */
 public class DatabasePartitionHelper {
 
-    private static final String mysql_partition_prefix = "p";
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
+    public static final String mysql_partition_prefix = "p";
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static Calendar calendar = Calendar.getInstance();
 
     public static int getPartitionId() {
@@ -88,11 +90,11 @@ public class DatabasePartitionHelper {
     }
 
     private static List<String> getPartitionSyntaxList(int fromPartition, int toPartition) {
-        List<String> sqlPartitionSyntaxList = new ArrayList<>();
+        Set<String> set = new HashSet<>();
         for (int i = fromPartition; i <= toPartition; i++) {
-            sqlPartitionSyntaxList.add(getPartitionId_SQL_Syntax(i));
+            set.add(mysql_partition_prefix + i);
         }
-
+        List<String> sqlPartitionSyntaxList = new ArrayList<>(set);
         return sqlPartitionSyntaxList;
     }
 

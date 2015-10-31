@@ -46,4 +46,15 @@ public class PrepareStatementHelper {
         return builder.toString();
     }
 
+    
+        public static String toSQL_Partition_List(List<String> list) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        for (String value : list) {
+            builder.append(value).append(",");
+        }
+        builder.deleteCharAt(builder.lastIndexOf(",")).append(")");
+        return builder.toString();
+    }
+    
 }

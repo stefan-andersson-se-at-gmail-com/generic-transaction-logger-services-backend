@@ -18,9 +18,9 @@ package com.erbjuder.logger.server.soap.services;
 
 import com.erbjuder.logger.server.common.helper.DataBase;
 import com.erbjuder.logger.server.common.helper.DatabasePartitionHelper;
+import com.erbjuder.logger.server.common.helper.MysqlConnection;
 import com.erbjuder.logger.server.common.helper.TimeStampUtils;
 import com.erbjuder.logger.server.common.helper.TransactionComparator;
-import com.erbjuder.logger.server.rest.services.dao.MysqlConnection;
 import com.generic.global.transactionlogger.Response;
 import com.generic.global.transactionlogger.Transactions;
 import com.generic.global.transactionlogger.Transactions.Transaction;
@@ -51,7 +51,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
     com.generic.global.fault.ObjectFactory.class,
     com.generic.global.transactionlogger.ObjectFactory.class
 })
-public class LogMessageServiceBase extends MysqlConnection {
+public class LogMessageServiceBase {
 
     private static final Logger logger = Logger.getLogger(LogMessageServiceBase.class.getName());
     private static final int addNumberOfMonth = 3;
@@ -67,7 +67,7 @@ public class LogMessageServiceBase extends MysqlConnection {
         Transactions.Transaction[] transactionArray = tmpTransactionList.toArray(new Transaction[tmpTransactionList.size()]);
         Arrays.sort(transactionArray, new TransactionComparator());
 
-        try (Connection connection = MysqlConnection()) {
+        try (Connection connection = MysqlConnection.getConnection()) {
 
             // prepareStetment & Connection
             String logMessagePrepareStatementString = getLogMessagePrepaterStatementMysql_Insert();
@@ -100,11 +100,10 @@ public class LogMessageServiceBase extends MysqlConnection {
             connection.close();
 
         } catch (SQLException sqlError) {
-            sqlError.printStackTrace();
-            response.setReturn(false);
+            logger.log(Level.SEVERE, sqlError.getMessage());
             return response;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, ex.getMessage());
             response.setReturn(false);
             return response;
 

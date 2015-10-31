@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.erbjuder.logger.server.rest.services.dao;
+package com.erbjuder.logger.server.common.helper;
 
-import com.erbjuder.logger.server.common.helper.DatabasePartitionHelper;
-import com.erbjuder.logger.server.common.helper.PrepareStatementHelper;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -30,7 +28,7 @@ import java.util.List;
  *
  * @author Stefan Andersson
  */
-public class LogMessageQueries extends MysqlConnection {
+public class LogMessageQueries {
 
     public ResultSet search_logMessageList(
             String fromDate,
@@ -49,16 +47,20 @@ public class LogMessageQueries extends MysqlConnection {
             List<String> dataPartitionList) throws Exception {
 
         ResultSet rs = null;
-        try (Connection conn = MysqlConnection()) {
+             
+        try (Connection conn = MysqlConnection.getConnection()) {
 
             StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
             prepareStatement.append("ID, PARTITION_ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
             prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
             prepareStatement.append("FROM ").append("LogMessage ");
-
+ 
+            System.err.println("INPUT DATES=[ " + fromDate + " ] [ " + toDate + " ] ");
+            
             List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-            prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
+            System.err.println("PARTITION SYNTAX=[ " + sqlPartitionSyntaxList + " ] ");
+            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
 
             // Between date
             prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -78,37 +80,37 @@ public class LogMessageQueries extends MysqlConnection {
             // application names
             if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("APPLICATIONNAME IN ").append(PrepareStatementHelper.toSQLList(viewApplicationNames)).append(" ");
+                prepareStatement.append("APPLICATIONNAME IN ").append(PrepareStatementHelper.toSQL_Partition_List(viewApplicationNames)).append(" ");
             }
 
             // not application names
             if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQL_Partition_List(notViewApplicationNames)).append(" ");
             }
 
             // flow names
             if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQL_Partition_List(viewFlowNames)).append(" ");
             }
 
             // not flow names
             if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQL_Partition_List(notViewFlowNames)).append(" ");
             }
 
             // flow point names
             if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQL_Partition_List(viewFlowPointNames)).append(" ");
             }
 
             // not flow point names
             if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
                 prepareStatement.append("AND ");
-                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQL_Partition_List(notViewFlowPointNames)).append(" ");
             }
 
             // Free text search
@@ -143,10 +145,19 @@ public class LogMessageQueries extends MysqlConnection {
             // Order by
             prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC ");
 
-            // Pagination
-            prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(page * pageSize).append(" ");
+            // Pagination: Assume that first page <==> 1
+            int pageOffset = page-1;
+            if ( pageOffset < 0){
+                pageOffset = 0;
+            }else{
+                pageOffset = pageOffset * pageSize;
+            }
+            prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
 
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
+            
+            System.err.println("PREP STMT=[ " + prepareStatement.toString() + " ] ");
+            
             rs = stmt.executeQuery();
             conn.close();
 
@@ -164,10 +175,19 @@ public class LogMessageQueries extends MysqlConnection {
 
     public List<ResultSet> fetch_LogMessageData(
             String logMessageId,
+            int partitionId,
             List<String> dataPartitionList) {
 
         List<ResultSet> rsList = new ArrayList<ResultSet>();
-        try (Connection conn = MysqlConnection()) {
+        try (Connection conn = MysqlConnection.getConnection()) {
+
+            String partitionBefore = DatabasePartitionHelper.mysql_partition_prefix + (partitionId - 1);
+            String partition = DatabasePartitionHelper.mysql_partition_prefix + (partitionId);
+            String partitionAfter = DatabasePartitionHelper.mysql_partition_prefix + (partitionId + 1);
+            List<String> sqlPartitionSyntaxList = new ArrayList();
+            sqlPartitionSyntaxList.add(partitionBefore);
+            sqlPartitionSyntaxList.add(partition);
+            sqlPartitionSyntaxList.add(partitionAfter);
 
             for (String databasePartition : dataPartitionList) {
 
@@ -175,7 +195,10 @@ public class LogMessageQueries extends MysqlConnection {
                 prepareStatement.append("SELECT ");
                 prepareStatement.append("ID, PARTITION_ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
                 prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID ");
-                prepareStatement.append("FROM ").append(databasePartition).append(" WHERE LOGMESSAGE_ID = ").append(logMessageId);
+                prepareStatement.append("FROM ").append(databasePartition).append(" ");
+
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" ");
+                prepareStatement.append("WHERE LOGMESSAGE_ID = ").append(logMessageId);
 
                 ResultSet rs = null;
                 CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
@@ -215,7 +238,7 @@ public class LogMessageQueries extends MysqlConnection {
         prepareStatement.append("FROM ").append(logMessageDataPartition).append(" ");
 
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-        prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -255,7 +278,7 @@ public class LogMessageQueries extends MysqlConnection {
     ) throws Exception {
 
         ResultSet rs = null;
-        try (Connection conn = MysqlConnection()) {
+        try (Connection conn = MysqlConnection.getConnection()) {
 
             StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
@@ -264,7 +287,7 @@ public class LogMessageQueries extends MysqlConnection {
             prepareStatement.append("FROM ").append(logMessageDataPartition).append(" ");
 
             List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-            prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
+            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
 
             // Between date
             prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -324,7 +347,7 @@ public class LogMessageQueries extends MysqlConnection {
         prepareStatement.append("FROM ").append("LogMessage ").append(" ");
 
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-        prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -352,7 +375,7 @@ public class LogMessageQueries extends MysqlConnection {
         prepareStatement.append("FROM ").append("LogMessage ").append(" ");
 
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-        prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -380,7 +403,7 @@ public class LogMessageQueries extends MysqlConnection {
         prepareStatement.append("FROM ").append("LogMessage ").append(" ");
 
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-        prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -409,7 +432,7 @@ public class LogMessageQueries extends MysqlConnection {
         prepareStatement.append("FROM ").append(databasePartition).append(" ");
 
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-        prepareStatement.append("PARTITION (").append(PrepareStatementHelper.toSQLList(sqlPartitionSyntaxList)).append(") WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");

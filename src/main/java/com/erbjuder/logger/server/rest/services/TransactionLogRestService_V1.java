@@ -17,7 +17,7 @@
 package com.erbjuder.logger.server.rest.services;
 
 import com.erbjuder.logger.server.common.helper.DataBase;
-import com.erbjuder.logger.server.rest.services.dao.LogMessageQueries;
+import com.erbjuder.logger.server.common.helper.LogMessageQueries;
 import com.erbjuder.logger.server.common.helper.ResultSetConverter;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +40,8 @@ import org.json.simple.JSONArray;
 @Path("/v1/rest/logmsg")
 public class TransactionLogRestService_V1 {
 
-//    @PersistenceUnit(unitName = "TransactionLogger")
-//    private EntityManagerFactory entityManagerFactory;
+
+// http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/rest/logmsg/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
@@ -108,6 +108,7 @@ public class TransactionLogRestService_V1 {
     @Produces(MediaType.APPLICATION_JSON)
     public Response search(
             @QueryParam("logMessageId") String logMessageId,
+            @QueryParam("logMessagePartitionId") int logMessagePartitionId,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
         try {
@@ -126,6 +127,7 @@ public class TransactionLogRestService_V1 {
             ResultSetConverter converter = new ResultSetConverter();
             JSONArray jsonResult = converter.toJSONArray(loggerSchema.fetch_LogMessageData(
                     logMessageId,
+                    logMessagePartitionId,
                     dataBaseSearchList));
 
             return Response.ok(jsonResult.toString()).build();

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.erbjuder.logger.server.rest.services.dao;
+package com.erbjuder.logger.server.common.helper;
 
 import com.erbjuder.logger.server.rest.helper.PersistenceUnitParser;
 import java.sql.Connection;
@@ -32,16 +32,17 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class MysqlConnection {
 
-    private static DataSource MysqlDS = null; //hold the database object
-    private static Context context = null; //used to lookup the database connection in weblogic 
+    private static String persistenceUnitName = "TransactionLogger";
+    private static DataSource dataSource = null;
+    private static Context context = null;
 
-    private static DataSource MysqlDataSource() throws Exception {
+    private static DataSource DataSource() throws Exception {
         /**
          * check to see if the database object is already defined... if it is,
          * then return the connection, no need to look it up again.
          */
-        if (MysqlDS != null) {
-            return MysqlDS;
+        if (dataSource != null) {
+            return dataSource;
         }
         try {
             /**
@@ -51,18 +52,18 @@ public class MysqlConnection {
             if (context == null) {
                 context = new InitialContext();
             }
-            
-            MysqlDS = (DataSource) context.lookup(new PersistenceUnitParser("TransactionLogger").getDataSourceString());
+
+            dataSource = (DataSource) context.lookup(new PersistenceUnitParser(persistenceUnitName).getDataSourceString());
         } catch (NamingException | ParserConfigurationException ex) {
             Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return MysqlDS;
+        return dataSource;
     }
 
-    protected static Connection MysqlConnection() {
+    public static Connection getConnection() {
         Connection conn = null;
         try {
-            conn = MysqlDataSource().getConnection();
+            conn = MysqlConnection.DataSource().getConnection();
             return conn;
         } catch (Exception ex) {
             Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);

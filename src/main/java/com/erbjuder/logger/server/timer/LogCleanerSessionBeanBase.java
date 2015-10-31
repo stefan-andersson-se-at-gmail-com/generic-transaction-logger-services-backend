@@ -17,7 +17,7 @@
 package com.erbjuder.logger.server.timer;
 
 import com.erbjuder.logger.server.common.helper.DataBase;
-import com.erbjuder.logger.server.rest.services.dao.MysqlConnection;
+import com.erbjuder.logger.server.common.helper.MysqlConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -33,7 +33,7 @@ import javax.ejb.TimerService;
  *
  * @author Stefan Andersson
  */
-public class LogCleanerSessionBeanBase extends MysqlConnection {
+public class LogCleanerSessionBeanBase {
 
     @Resource
     TimerService timerService;
@@ -67,7 +67,7 @@ public class LogCleanerSessionBeanBase extends MysqlConnection {
         this.setLastAutomaticTimeout(currentDate);
         java.sql.Date sqlDate = new java.sql.Date(currentDate.getTime());
 
-        try (Connection connection = MysqlConnection()) {
+        try (Connection connection = MysqlConnection.getConnection()) {
 
             String logMessageDelete = getLogMessagePrepaterStatementMysqlDelete();
             PreparedStatement logMessagePreparedStatement = connection.prepareStatement(logMessageDelete);

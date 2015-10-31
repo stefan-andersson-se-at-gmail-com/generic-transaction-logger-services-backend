@@ -64,12 +64,11 @@ CREATE TABLE IF NOT EXISTS `LogMessage` (
   INDEX `idx_LogMessage.UTCSERVERTIMESTAMP` (`UTCSERVERTIMESTAMP` DESC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ SLOW DISK
---INDEX DIRECTORY = ’/AbsolutePath/’ FAST DISK
+-- DATA DIRECTORY  = ’/AbsolutePath/’ SLOW DISK
+-- INDEX DIRECTORY = ’/AbsolutePath/’ FAST DISK
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
-’/path/’ ENGINE=MyISAM;
 
 
 -- -----------------------------------------------------
@@ -96,8 +95,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_01` (
   INDEX `idx_LogMessageData_Partition_01.EXPIREDDATE` (`EXPIREDDATE` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -128,8 +127,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_02` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -161,8 +160,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_03` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -192,8 +191,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_04` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -224,8 +223,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_05` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -258,8 +257,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_06` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -290,8 +289,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_07` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -322,8 +321,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_08` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -354,8 +353,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_09` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -386,8 +385,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_10` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -417,8 +416,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_11` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -450,8 +449,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_12` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -483,8 +482,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_13` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -516,8 +515,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_14` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -548,8 +547,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_15` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -580,8 +579,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_16` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
@@ -612,8 +611,8 @@ CREATE TABLE IF NOT EXISTS `LogMessageData_Partition_17` (
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
---DATA DIRECTORY  = ’/AbsolutePath/’ 
---INDEX DIRECTORY = ’/AbsolutePath/’
+-- DATA DIRECTORY  = ’/AbsolutePath/’ 
+-- INDEX DIRECTORY = ’/AbsolutePath/’
 PARTITION BY HASH(`PARTITION_ID`)
 PARTITIONS 732;
 
