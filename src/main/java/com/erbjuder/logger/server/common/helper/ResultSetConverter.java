@@ -18,8 +18,6 @@ package com.erbjuder.logger.server.common.helper;
 
 //import org.codehaus.jettison.json.JSONArray;
 //import org.codehaus.jettison.json.JSONObject;
-import com.erbjuder.logger.server.common.helper.DataBase;
-import com.erbjuder.logger.server.common.helper.TimeStampUtils;
 import com.erbjuder.logger.server.entity.impl.LogMessage;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_01;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_02;
@@ -291,15 +289,15 @@ public class ResultSetConverter {
                     }
 
                     if (column_name.equals("CONTENT")) {
-                        obj.setContent(rs.getNString(column_name));
+                        obj.setContent(rs.getString(column_name));
                     }
 
                     if (column_name.equals("LABEL")) {
-                        obj.setLabel(rs.getNString(column_name));
+                        obj.setLabel(rs.getString(column_name));
                     }
 
                     if (column_name.equals("MIMETYPE")) {
-                        obj.setMimeType(rs.getNString(column_name));
+                        obj.setMimeType(rs.getString(column_name));
                     }
 
                     if (column_name.equals("MODIFIED")) {

@@ -103,6 +103,7 @@ public class TransactionLogRestService_V1 {
         }
     }
 
+    // http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/rest/logmsg/view?logMessageId=16877&logMessagePartitionId=304
     @GET
     @Path("/view")
     @Produces(MediaType.APPLICATION_JSON)

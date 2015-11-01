@@ -174,13 +174,16 @@ public class LogMessageServiceBase {
             String mimeType = transactionLogData.getContentMimeType().trim();
             String content = transactionLogData.getContent();
             long contentSize = 0;
-
+            
+            // 
+            // Decode all messages
             try {
 
                 content = new String(Base64.getDecoder().decode(content.getBytes()));
                 contentSize = content.getBytes().length;
                 accumulated_batch_size = accumulated_batch_size + contentSize;
             } catch (Exception e) {
+                
                 content = StringEscapeUtils.unescapeXml(content);
                 contentSize = content.getBytes().length;
                 accumulated_batch_size = accumulated_batch_size + contentSize;
