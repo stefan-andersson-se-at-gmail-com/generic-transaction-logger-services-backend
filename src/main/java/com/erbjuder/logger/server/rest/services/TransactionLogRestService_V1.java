@@ -42,6 +42,7 @@ public class TransactionLogRestService_V1 {
 
 
 // http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/rest/logmsg/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false
+// http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/rest/logmsg/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false&search=534_   
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)

@@ -16,18 +16,13 @@
  */
 package com.erbjuder.logger.server.facade.interfaces;
 
-import com.erbjuder.logger.server.entity.interfaces.LogMessageData;
-import java.util.Date;
-import java.util.List;
-import javax.persistence.EntityManager;
-
 /**
  *
  * @author Stefan Andersson
  */
 public interface LogMessageDataFacade {
- 
-    public EntityManager getEntityManager();
-
-    public List<LogMessageData> findExpired(Date toDate);
+// 
+//    public EntityManager getEntityManager();
+//
+//    public List<LogMessageData> findExpired(Date toDate);
 }

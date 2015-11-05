@@ -16,91 +16,83 @@
  */
 package com.erbjuder.logger.server.facade.interfaces;
 
-import com.erbjuder.logger.server.common.helper.DataBaseSearchController;
-import com.erbjuder.logger.server.common.helper.FreeTextSearchController;
 import com.erbjuder.logger.server.entity.impl.LogMessage;
-import com.erbjuder.logger.server.facade.pojo.FlowAndTransactionId;
-import com.erbjuder.logger.server.facade.pojo.LogMessageStatistic;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  *
  * @author Stefan Andersson
  */
 public interface LogMessageFacade extends AbstractFacade<LogMessage> {
-
-    public int countFlows(Collection<String> flowNames, Collection<String> flowPointNames);
-
-    public List<LogMessage> findFlows(Collection<String> flowNames, Collection<String> flowPointNames, int[] range);
-
-    public List<String> getFlowNames(long fromDate, long toDate, String startsWithName);
-
-    public List<String> getFlowPointNames(long fromDate, long toDate, String startsWithName);
-
-    public List<String> getApplicationNames(long fromDate, long toDate, String startsWithName);
-
-    public int countFlowAndTransactionId();
-
-    public List<FlowAndTransactionId> getFlowAndTransactionId(int[] range);
-
-    public List<LogMessage> getFlowLogMessages(List<FlowAndTransactionId> flowAndTransactionIds);
-
-    public List<LogMessage> findRange(
-            int[] range,
-            String applicationName,
-            String flowName,
-            String flowPointName,
-            String transactionReferenceId,
-            long fromDate,
-            long toDate,
-            FreeTextSearchController freeTextSearch,
-            DataBaseSearchController dataBaseSearchController,
-            Boolean viewError);
-
-    public int count(
-            String applicationName,
-            String flowName,
-            String flowPointName,
-            String transactionReferenceId,
-            long fromDate,
-            long toDate,
-            FreeTextSearchController freeTextSearch,
-            DataBaseSearchController dataBaseSearchController,
-            Boolean viewError,
-            int maxResult);
-
-    public List<LogMessage> findExpired(Date toDate);
-
-    
-    public int countNumberOfTransactions(
-            String applicationName,
-            String flowName,
-            String flowPointName,
-            String transactionReferenceId,
-            long fromDate,
-            long toDate,
-            FreeTextSearchController freeTextSearch,
-            DataBaseSearchController dataBaseSearchController,
-            Boolean viewError,
-            int maxResult
-        );
-    
-    public List<LogMessageStatistic> numberOfTransactions(
-            int[] range,
-            String applicationName,
-            String flowName,
-            String flowPointName,
-            String transactionReferenceId,
-            long fromDate,
-            long toDate,
-            FreeTextSearchController freeTextSearch,
-            DataBaseSearchController dataBaseSearchController,
-            Boolean viewError
-    );
-
-    @Override
-    public EntityManager getEntityManager();
+//
+//    public int countFlows(Collection<String> flowNames, Collection<String> flowPointNames);
+//
+//    public List<LogMessage> findFlows(Collection<String> flowNames, Collection<String> flowPointNames, int[] range);
+//
+//    public List<String> getFlowNames(long fromDate, long toDate, String startsWithName);
+//
+//    public List<String> getFlowPointNames(long fromDate, long toDate, String startsWithName);
+//
+//    public List<String> getApplicationNames(long fromDate, long toDate, String startsWithName);
+//
+//    public int countFlowAndTransactionId();
+//
+//    public List<FlowAndTransactionId> getFlowAndTransactionId(int[] range);
+//
+//    public List<LogMessage> getFlowLogMessages(List<FlowAndTransactionId> flowAndTransactionIds);
+//
+//    public List<LogMessage> findRange(
+//            int[] range,
+//            String applicationName,
+//            String flowName,
+//            String flowPointName,
+//            String transactionReferenceId,
+//            long fromDate,
+//            long toDate,
+//            FreeTextSearchController freeTextSearch,
+//            DataBaseSearchController dataBaseSearchController,
+//            Boolean viewError);
+//
+//    public int count(
+//            String applicationName,
+//            String flowName,
+//            String flowPointName,
+//            String transactionReferenceId,
+//            long fromDate,
+//            long toDate,
+//            FreeTextSearchController freeTextSearch,
+//            DataBaseSearchController dataBaseSearchController,
+//            Boolean viewError,
+//            int maxResult);
+//
+//    public List<LogMessage> findExpired(Date toDate);
+//
+//    
+//    public int countNumberOfTransactions(
+//            String applicationName,
+//            String flowName,
+//            String flowPointName,
+//            String transactionReferenceId,
+//            long fromDate,
+//            long toDate,
+//            FreeTextSearchController freeTextSearch,
+//            DataBaseSearchController dataBaseSearchController,
+//            Boolean viewError,
+//            int maxResult
+//        );
+//    
+//    public List<LogMessageStatistic> numberOfTransactions(
+//            int[] range,
+//            String applicationName,
+//            String flowName,
+//            String flowPointName,
+//            String transactionReferenceId,
+//            long fromDate,
+//            long toDate,
+//            FreeTextSearchController freeTextSearch,
+//            DataBaseSearchController dataBaseSearchController,
+//            Boolean viewError
+//    );
+//
+//    @Override
+//    public EntityManager getEntityManager();
 }

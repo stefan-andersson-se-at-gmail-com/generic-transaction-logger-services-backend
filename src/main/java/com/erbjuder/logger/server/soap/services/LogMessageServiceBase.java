@@ -139,7 +139,7 @@ public class LogMessageServiceBase {
 
         // Prepare statement
         preparedStatement.setLong(1, logMessageId);
-        preparedStatement.setInt(2, DatabasePartitionHelper.getPartitionId(utcServerTimestamp));
+        preparedStatement.setInt(2, DatabasePartitionHelper.calculatePartitionId(utcServerTimestamp));
         preparedStatement.setTimestamp(3, utcClientTimestamp);
         preparedStatement.setTimestamp(4, utcServerTimestamp);
         preparedStatement.setDate(5, expiredDate);
@@ -199,7 +199,7 @@ public class LogMessageServiceBase {
             preparedStatement = connection.prepareStatement(logMessageDataPrepareStatementString);
             connection.setAutoCommit(false);
             preparedStatement.setLong(1, primaryKey);
-            preparedStatement.setInt(2, DatabasePartitionHelper.getPartitionId(utcServerTimestamp));
+            preparedStatement.setInt(2, DatabasePartitionHelper.calculatePartitionId(utcServerTimestamp));
             preparedStatement.setString(3, label);
             preparedStatement.setString(4, mimeType);
             preparedStatement.setString(5, content);
@@ -283,20 +283,20 @@ public class LogMessageServiceBase {
             }
 
             if (Long.MAX_VALUE > UTCLocalTimeStamp && Long.MIN_VALUE < UTCLocalTimeStamp) {
-                logger.log(Level.INFO, "UTCLocalTimeStamp=[ " + UTCLocalTimeStamp + " ]");
-                logger.log(Level.INFO, "UTCLocalTimeStampNanoSeconds=[ " + UTCLocalTimeStampNanoSeconds + " ]");
-                logger.log(Level.INFO, "createNanoTimeStamp=[ " + TimeStampUtils.createNanoTimeStamp(UTCLocalTimeStamp, UTCLocalTimeStampNanoSeconds).getNanos() + " ]");
+                // logger.log(Level.INFO, "UTCLocalTimeStamp=[ " + UTCLocalTimeStamp + " ]");
+                // logger.log(Level.INFO, "UTCLocalTimeStampNanoSeconds=[ " + UTCLocalTimeStampNanoSeconds + " ]");
+                // logger.log(Level.INFO, "createNanoTimeStamp=[ " + TimeStampUtils.createNanoTimeStamp(UTCLocalTimeStamp, UTCLocalTimeStampNanoSeconds).getNanos() + " ]");
                 return TimeStampUtils.createNanoTimeStamp(UTCLocalTimeStamp, UTCLocalTimeStampNanoSeconds);
 
             } else {
-                logger.log(Level.INFO, "[ Invalid UTCLocalTimeStamp range, Use current system time instead! ] ");
-                logger.log(Level.INFO, "[ " + UTCLocalTimeStamp + " ] ");
+                // logger.log(Level.INFO, "[ Invalid UTCLocalTimeStamp range, Use current system time instead! ] ");
+                // logger.log(Level.INFO, "[ " + UTCLocalTimeStamp + " ] ");
                 return TimeStampUtils.createSystemNanoTimeStamp();
             }
 
         } catch (Exception invalidDateException) {
-            logger.log(Level.INFO, "[ Invalid log date! Use current system time instead! ] ");
-            logger.log(Level.INFO, invalidDateException.getMessage());
+            // logger.log(Level.INFO, "[ Invalid log date! Use current system time instead! ] ");
+            // logger.log(Level.INFO, invalidDateException.getMessage());
             return TimeStampUtils.createSystemNanoTimeStamp();
         }
     }
@@ -315,8 +315,8 @@ public class LogMessageServiceBase {
                 return calendar.getTime();
             }
         } catch (Exception invalidExiredDateException) {
-            logger.log(Level.INFO, "[ Invalid ExpiryDate! Use default expired time instead! ] ");
-            logger.log(Level.INFO, invalidExiredDateException.getMessage());
+            // logger.log(Level.INFO, "[ Invalid ExpiryDate! Use default expired time instead! ] ");
+            // logger.log(Level.INFO, invalidExiredDateException.getMessage());
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             calendar.add(Calendar.MONTH, LogMessageServiceBase.addNumberOfMonth);
             return calendar.getTime();

@@ -36,57 +36,65 @@ public class DatabasePartitionHelper {
     private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static Calendar calendar = Calendar.getInstance();
 
-    public static int getPartitionId() {
-        return getPartitionId(new Date());
+    public static int calculatePartitionId(String dateString) throws ParseException {
+        return DatabasePartitionHelper.calculatePartitionId(formatter.parse(dateString));
     }
 
-    public static int getPartitionId(String dateString) throws ParseException {
-        return getPartitionId(formatter.parse(dateString));
+    public static int calculatePartitionId(Date date) {
+        return calculatePartitionId(date.getTime());
     }
 
-    public static int getPartitionId(Date date) {
-        return getPartitionId(date.getTime());
+    public static int calculatePartitionId(Timestamp timestamp) {
+        return calculatePartitionId(timestamp.getTime());
     }
 
-    public static int getPartitionId(Timestamp timestamp) {
-        return getPartitionId(timestamp.getTime());
-    }
+    public static int calculatePartitionId(long milliseconds) {
 
-    public static int getPartitionId(long milliseconds) {
+        //  A.M is morning
+        int AM = 12;
         calendar.setTimeInMillis(milliseconds);
-        return calendar.get(Calendar.DAY_OF_YEAR);
+        int day = calendar.get(Calendar.DAY_OF_YEAR);
+        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+
+        // Maximum partition number = 732;
+        int partId = day * 2;
+        if (AM <= hours) {
+            partId = partId - 1;
+        }
+
+        return partId;
     }
 
     public static String getPartitionId_SQL_Syntax(String dateString) throws ParseException {
-        return new StringBuilder().append(mysql_partition_prefix).append(getPartitionId(dateString)).toString();
+        return new StringBuilder().append(mysql_partition_prefix).append(DatabasePartitionHelper.calculatePartitionId(dateString)).toString();
     }
 
     public static String getPartitionId_SQL_Syntax(Date date) {
-        return new StringBuilder().append(mysql_partition_prefix).append(getPartitionId(date)).toString();
+        return new StringBuilder().append(mysql_partition_prefix).append(DatabasePartitionHelper.calculatePartitionId(date)).toString();
     }
 
     public static String getPartitionId_SQL_Syntax(Timestamp timestamp) {
-        return new StringBuilder().append(mysql_partition_prefix).append(getPartitionId(timestamp)).toString();
+        return new StringBuilder().append(mysql_partition_prefix).append(DatabasePartitionHelper.calculatePartitionId(timestamp)).toString();
     }
 
     public static String getPartitionId_SQL_Syntax(long milliseconds) {
-        return new StringBuilder().append(mysql_partition_prefix).append(getPartitionId(milliseconds)).toString();
+        return new StringBuilder().append(mysql_partition_prefix).append(calculatePartitionId(milliseconds)).toString();
     }
 
     public static List<String> getPartitionId_SQL_SyntaxList(String fromDateString, String toDateString) throws ParseException {
-        return getPartitionSyntaxList(getPartitionId(fromDateString), getPartitionId(toDateString));
+        return getPartitionSyntaxList(DatabasePartitionHelper.calculatePartitionId(fromDateString), DatabasePartitionHelper.calculatePartitionId(toDateString));
     }
 
     public static List<String> getPartitionId_SQL_SyntaxList(Date fromDate, Date toDate) {
-        return getPartitionSyntaxList(getPartitionId(fromDate), getPartitionId(toDate));
+        return getPartitionSyntaxList(DatabasePartitionHelper.calculatePartitionId(fromDate), DatabasePartitionHelper.calculatePartitionId(toDate));
     }
 
     public static List<String> getPartitionId_SQL_SyntaxList(Timestamp fromTimestamp, Timestamp toTimestamp) {
-        return getPartitionSyntaxList(getPartitionId(fromTimestamp), getPartitionId(toTimestamp));
+        return getPartitionSyntaxList(DatabasePartitionHelper.calculatePartitionId(fromTimestamp), DatabasePartitionHelper.calculatePartitionId(toTimestamp));
     }
 
     public static List<String> getPartitionId_SQL_SyntaxList(long fromMilliseconds, long toMilliseconds) {
-        return getPartitionSyntaxList(getPartitionId(fromMilliseconds), getPartitionId(toMilliseconds));
+        return getPartitionSyntaxList(calculatePartitionId(fromMilliseconds), calculatePartitionId(toMilliseconds));
     }
 
     private static List<String> getPartitionSyntaxList(int fromPartition, int toPartition) {

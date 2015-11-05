@@ -47,7 +47,7 @@ public class LogMessageQueries {
             List<String> dataPartitionList) throws Exception {
 
         ResultSet rs = null;
-             
+
         try (Connection conn = MysqlConnection.getConnection()) {
 
             StringBuilder prepareStatement = new StringBuilder();
@@ -55,11 +55,8 @@ public class LogMessageQueries {
             prepareStatement.append("ID, PARTITION_ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
             prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
             prepareStatement.append("FROM ").append("LogMessage ");
- 
-            System.err.println("INPUT DATES=[ " + fromDate + " ] [ " + toDate + " ] ");
-            
+
             List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-            System.err.println("PARTITION SYNTAX=[ " + sqlPartitionSyntaxList + " ] ");
             prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
 
             // Between date
@@ -146,18 +143,15 @@ public class LogMessageQueries {
             prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC ");
 
             // Pagination: Assume that first page <==> 1
-            int pageOffset = page-1;
-            if ( pageOffset < 0){
+            int pageOffset = page - 1;
+            if (pageOffset < 0) {
                 pageOffset = 0;
-            }else{
+            } else {
                 pageOffset = pageOffset * pageSize;
             }
             prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
 
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
-            
-            System.err.println("PREP STMT=[ " + prepareStatement.toString() + " ] ");
-            
             rs = stmt.executeQuery();
             conn.close();
 
@@ -178,7 +172,7 @@ public class LogMessageQueries {
             int partitionId,
             List<String> dataPartitionList) {
 
-        List<ResultSet> rsList = new ArrayList<ResultSet>();
+        List<ResultSet> rsList = new ArrayList<>();
         try (Connection conn = MysqlConnection.getConnection()) {
 
             String partitionBefore = DatabasePartitionHelper.mysql_partition_prefix + (partitionId - 1);
@@ -206,7 +200,6 @@ public class LogMessageQueries {
 
                 if (rs != null) {
                     rsList.add(rs);
-                    System.err.println(rsList);
                 }
             }
 
@@ -252,12 +245,12 @@ public class LogMessageQueries {
             for (int i = 0; i < size; i++) {
 
                 String freeText = PrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
-                prepareStatement.append("LABEL LIKE ").append(freeText).append(" ");
+                prepareStatement.append("( LABEL LIKE ").append(freeText).append(" ");
                 prepareStatement.append("OR ");
-                prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ");
+                prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ) ");
 
                 if (i < size - 1) {
-                    prepareStatement.append("OR ");
+                    prepareStatement.append("AND ");
                 }
             }
 
@@ -304,18 +297,47 @@ public class LogMessageQueries {
                 for (int i = 0; i < size; i++) {
 
                     String freeText = PrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
-                    prepareStatement.append("LABEL LIKE ").append(freeText).append(" ");
+                    prepareStatement.append("( LABEL LIKE ").append(freeText).append(" ");
                     prepareStatement.append("OR ");
-                    prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ");
+                    prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ) ");
 
                     if (i < size - 1) {
-                        prepareStatement.append("OR ");
+                        prepareStatement.append("AND ");
                     }
                 }
 
                 prepareStatement.append(") ");
 
             }
+
+            CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
+            rs = stmt.executeQuery();
+            conn.close();
+
+        } catch (SQLException sqlError) {
+            sqlError.printStackTrace();
+            return rs;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return rs;
+
+        }
+        return rs;
+
+    }
+
+    public ResultSet search_ApplicationNames(
+            String fromDate,
+            String toDate,
+            List<String> applicationNames) {
+
+        ResultSet rs = null;
+        try (Connection conn = MysqlConnection.getConnection()) {
+            
+            StringBuilder prepareStatement = search_logMessagesFromApplicationNames(
+                    fromDate,
+                    toDate,
+                    applicationNames);
 
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
@@ -351,12 +373,15 @@ public class LogMessageQueries {
 
         // Between date
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
-
+        
         for (String applicationName : applicationNames) {
             prepareStatement.append("AND ");
+            
+            System.err.println("APP NAME={ " +applicationName+ " }");
             prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
         }
 
+        System.err.println("APP NAMES=[ " +prepareStatement.toString()+ " ]");
         return prepareStatement;
 
     }
@@ -382,7 +407,7 @@ public class LogMessageQueries {
 
         for (String flowName : flowNames) {
             prepareStatement.append("AND ");
-            prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(flowName)).append(" ");
+            prepareStatement.append("FLOWNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(flowName)).append(" ");
         }
 
         return prepareStatement;
@@ -410,7 +435,7 @@ public class LogMessageQueries {
 
         for (String flowPointName : flowPointNames) {
             prepareStatement.append("AND ");
-            prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(flowPointName)).append(" ");
+            prepareStatement.append("FLOWPOINTNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(flowPointName)).append(" ");
         }
 
         return prepareStatement;

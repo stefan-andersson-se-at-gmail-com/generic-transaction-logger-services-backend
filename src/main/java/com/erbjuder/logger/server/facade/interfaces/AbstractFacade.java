@@ -17,9 +17,6 @@
 package com.erbjuder.logger.server.facade.interfaces;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  *
@@ -27,26 +24,26 @@ import javax.persistence.EntityManager;
  * @param <T>
  */
 public interface AbstractFacade<T> extends Serializable {
-
-    public int count();
-
-  
-    public void create(T entity);
-
-    public void edit(T entity);
-
-    public T find(Object id);
-
-    public List<T> findAll();
-
-    public List<T> findExpired(Date toDate);
-
-    public List<T> findRange(int[] range);
-
-  
-    public List<T> findRangeFlow(int[] range, String applicationName, String flowName, String flowPointName, String transactionReferenceId, long fromDate, long toDate, String freeText, Boolean viewError);
-
-    public EntityManager getEntityManager();
-
-    public void remove(T entity);
+//
+//    public int count();
+//
+//  
+//    public void create(T entity);
+//
+//    public void edit(T entity);
+//
+//    public T find(Object id);
+//
+//    public List<T> findAll();
+//
+//    public List<T> findExpired(Date toDate);
+//
+//    public List<T> findRange(int[] range);
+//
+//  
+//    public List<T> findRangeFlow(int[] range, String applicationName, String flowName, String flowPointName, String transactionReferenceId, long fromDate, long toDate, String freeText, Boolean viewError);
+//
+//    public EntityManager getEntityManager();
+//
+//    public void remove(T entity);
 }

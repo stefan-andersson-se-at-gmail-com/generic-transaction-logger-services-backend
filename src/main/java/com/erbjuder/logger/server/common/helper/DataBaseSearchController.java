@@ -30,7 +30,7 @@ import java.util.TreeMap;
 public class DataBaseSearchController {
 
     private List<String> selectedDatabases = new ArrayList<String>();
-    private Set<Class> treatAsSelectedDatabases = new HashSet<Class>();
+    private List<String> treatAsSelectedDatabases = new ArrayList<String>();
     private Map<String, String> databases;
 
     public static final String LBL_MAX_1MB = "Payload betweeen:  0  -  1 Megabyte";
@@ -64,11 +64,11 @@ public class DataBaseSearchController {
         this.selectedDatabases = selectedDatabases;
     }
 
-    public Set<Class> getTreatAsSelectedDatabases() {
+    public List<String> getTreatAsSelectedDatabases() {
         return treatAsSelectedDatabases;
     }
 
-    public void setTreatAsSelectedDatabases(Set<Class> treatAsSelectedDatabases) {
+    public void setTreatAsSelectedDatabases(List<String> treatAsSelectedDatabases) {
         this.treatAsSelectedDatabases = treatAsSelectedDatabases;
     }
 
@@ -76,28 +76,32 @@ public class DataBaseSearchController {
         return databases;
     }
 
-    public Set<Class> getValidDataBaseSelectionList() {
-        Set<Class> result = new HashSet<Class>();
+    public Set<String> getValidDataBaseSelectionList() {
+        Set<String> result = new HashSet<String>();
         result.addAll(getTreatAsSelectedDatabases());
 
         for (String clazz : getSelectedDatabases()) {
 
             if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_12_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_12_CLASS);
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_12_CLASS.getCanonicalName());
             } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_13_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_13_CLASS);
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_13_CLASS.getCanonicalName());
             } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_14_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_14_CLASS);
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_14_CLASS.getCanonicalName());
             } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_15_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_15_CLASS);
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_15_CLASS.getCanonicalName());
             } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_16_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_16_CLASS);
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_16_CLASS.getCanonicalName());
             } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_17_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_17_CLASS);
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_17_CLASS.getCanonicalName());
             }
         }
 
         return result;
+    }
+
+    public List<String> getDataBaseSelectedList() {
+        return new ArrayList<>(getValidDataBaseSelectionList());
     }
 
 }
