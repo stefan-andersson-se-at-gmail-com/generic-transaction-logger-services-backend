@@ -21,6 +21,8 @@
         <servlet-name>TransactionLogAsynchronousService</servlet-name>
         <url-pattern>/TransactionLogAsynchronousService</url-pattern>
     </servlet-mapping>
+    
+    
     <session-config>
         <session-timeout>
             30

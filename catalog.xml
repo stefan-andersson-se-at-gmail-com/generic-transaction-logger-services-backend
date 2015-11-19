@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="file:/home/server-1/Programs/NetBeansProjects/LOGGER/generic-transaction-logger-services-backend/src/main/wsdl/Log_Service_Asynchronous/Log_Service_Asynchronous.xsd" uri="src/main/resources/jaxb/binding/Log_Service_Asynchronous.xsd"/>
+</catalog>

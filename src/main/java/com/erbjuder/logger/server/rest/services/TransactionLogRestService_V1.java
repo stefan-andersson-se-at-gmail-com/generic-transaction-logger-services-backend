@@ -19,6 +19,7 @@ package com.erbjuder.logger.server.rest.services;
 import com.erbjuder.logger.server.common.helper.DataBase;
 import com.erbjuder.logger.server.common.helper.LogMessageQueries;
 import com.erbjuder.logger.server.common.helper.ResultSetConverter;
+import com.generic.global.transactionlogger.Transactions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,7 +40,6 @@ import org.json.simple.JSONArray;
  */
 @Path("/v1/rest/logmsg")
 public class TransactionLogRestService_V1 {
-
 
 // http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/rest/logmsg/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false
 // http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/rest/logmsg/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false&search=534_   
@@ -79,7 +79,7 @@ public class TransactionLogRestService_V1 {
 
             LogMessageQueries loggerSchema = new LogMessageQueries();
             ResultSetConverter converter = new ResultSetConverter();
-            JSONArray jsonResult = converter.toJSONArray(loggerSchema.search_logMessageList(
+            JSONArray jsonResult = converter.toJSONArray(loggerSchema.fetch_logMessageList(
                     fromDate,
                     toDate,
                     page,
@@ -143,8 +143,10 @@ public class TransactionLogRestService_V1 {
     @POST
     @Path("/persist")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response persist() {
+    public Response persist(Transactions transactions) {
+
+        System.err.println("[ Got REST call POST ]");
+        System.err.println("Transactions=[" + transactions + "]");
 
         return Response.ok("OK").build();
     }
