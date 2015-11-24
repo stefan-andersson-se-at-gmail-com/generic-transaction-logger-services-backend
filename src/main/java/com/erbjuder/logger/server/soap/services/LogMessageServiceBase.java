@@ -128,8 +128,8 @@ public class LogMessageServiceBase {
         Timestamp utcClientTimestamp = this.getUTCClientTimestamp(transaction);
 
         // Optional fields
-        String flowName = "";
-        String flowPointName = "";
+        String flowName = null;
+        String flowPointName = null;
         java.sql.Date expiredDate = new java.sql.Date(this.getExpiredDate(transaction).getTime());
         if (transaction.getTransactionLogPointInfo() != null
                 && transaction.getTransactionLogPointInfo().getFlowName() != null

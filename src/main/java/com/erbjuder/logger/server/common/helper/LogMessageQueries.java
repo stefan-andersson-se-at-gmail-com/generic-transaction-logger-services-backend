@@ -216,7 +216,6 @@ public class LogMessageQueries {
             }
             prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
 
-            System.err.println("log_msg=[ " + prepareStatement.toString() + " ] ");
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
             conn.close();
@@ -248,8 +247,6 @@ public class LogMessageQueries {
             sqlPartitionSyntaxList.add(partitionBefore);
             sqlPartitionSyntaxList.add(partition);
             sqlPartitionSyntaxList.add(partitionAfter);
-
-            System.err.println(sqlPartitionSyntaxList);
 
             for (String databaseSizePartition : dataSizePartitionList) {
 
