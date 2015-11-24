@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class LogMessageQueries {
 
-    public static ResultSet fetch_ApplicationNames(
+    public ResultSet fetch_ApplicationNames(
             String fromDate,
             String toDate,
             List<String> applicationNames) {
@@ -38,6 +38,50 @@ public class LogMessageQueries {
         StringBuilder prepareStatement;
         try (final Connection conn = MysqlConnection.getConnection()) {
             prepareStatement = LogMessagePrepareStatements.search_logMessagesFromApplicationNames(fromDate, toDate, applicationNames);
+            CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
+            rs = stmt.executeQuery();
+            conn.close();
+        } catch (SQLException sqlError) {
+            sqlError.printStackTrace();
+            return rs;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return rs;
+        }
+        return rs;
+    }
+
+    public ResultSet fetch_FlowNames(
+            String fromDate,
+            String toDate,
+            List<String> flowNames) {
+
+        ResultSet rs = null;
+        StringBuilder prepareStatement;
+        try (final Connection conn = MysqlConnection.getConnection()) {
+            prepareStatement = LogMessagePrepareStatements.search_logMessagesFromFlowNames(fromDate, toDate, flowNames);
+            CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
+            rs = stmt.executeQuery();
+            conn.close();
+        } catch (SQLException sqlError) {
+            sqlError.printStackTrace();
+            return rs;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return rs;
+        }
+        return rs;
+    }
+
+    public ResultSet fetch_FlowPointNames(
+            String fromDate,
+            String toDate,
+            List<String> flowNames) {
+
+        ResultSet rs = null;
+        StringBuilder prepareStatement;
+        try (final Connection conn = MysqlConnection.getConnection()) {
+            prepareStatement = LogMessagePrepareStatements.search_logMessagesFromFlowPointNames(fromDate, toDate, flowNames);
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
             conn.close();
@@ -205,23 +249,25 @@ public class LogMessageQueries {
             sqlPartitionSyntaxList.add(partition);
             sqlPartitionSyntaxList.add(partitionAfter);
 
-            for (String databasePartition : dataSizePartitionList) {
+            System.err.println(sqlPartitionSyntaxList);
+
+            for (String databaseSizePartition : dataSizePartitionList) {
 
                 StringBuilder prepareStatement = new StringBuilder();
                 prepareStatement.append("SELECT ");
                 prepareStatement.append("ID, PARTITION_ID, CONTENT, LABEL, MIMETYPE, MODIFIED, ");
                 prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID ");
-                prepareStatement.append("FROM ").append(databasePartition).append(" ");
+                prepareStatement.append("FROM ").append(databaseSizePartition).append(" ");
 
                 prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" ");
                 prepareStatement.append("WHERE LOGMESSAGE_ID = ").append(logMessageId);
 
-                ResultSet rs = null;
                 CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
-                rs = stmt.executeQuery();
+                ResultSet rs = stmt.executeQuery();
 
                 if (rs != null) {
                     rsList.add(rs);
+
                 }
             }
 

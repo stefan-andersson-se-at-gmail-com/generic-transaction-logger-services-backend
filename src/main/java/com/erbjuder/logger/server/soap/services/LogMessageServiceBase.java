@@ -29,12 +29,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jws.soap.SOAPBinding;
@@ -160,67 +163,129 @@ public class LogMessageServiceBase {
             Transactions.Transaction transaction,
             long startPK
     ) throws SQLException {
+        return presistLogMessageData_Batch(logMessageId, connection, transaction, startPK);
+    }
 
-        long accumulated_batch_size = 0L;
-        PreparedStatement preparedStatement = null;
+    private long presistLogMessageData_NoBatch(
+            long logMessageId,
+            Connection connection,
+            Transactions.Transaction transaction,
+            long startPK) {
+
         java.sql.Date expiredDate = new java.sql.Date(this.getExpiredDate(transaction).getTime());
+        Timestamp utcClientTimestamp = this.getUTCClientTimestamp(transaction);
+
         for (Transactions.Transaction.TransactionLogData transactionLogData : transaction.getTransactionLogData()) {
+            InternalTransactionLogData internalTransactionLogData
+                    = new InternalTransactionLogData(startPK, utcClientTimestamp, transactionLogData);
 
-            long primaryKey = startPK;
-            Timestamp utcServerTimestamp = TimeStampUtils.createSystemNanoTimeStamp();
-            Timestamp utcClientTimestamp = this.getUTCClientTimestamp(transaction);
-
-            String label = StringEscapeUtils.unescapeXml(transactionLogData.getContentLabel().trim());
-            String mimeType = transactionLogData.getContentMimeType().trim();
-            String content = transactionLogData.getContent();
-            long contentSize = 0;
-            
-            // 
-            // Decode all messages
             try {
 
-                content = new String(Base64.getDecoder().decode(content.getBytes()));
-                contentSize = content.getBytes().length;
-                accumulated_batch_size = accumulated_batch_size + contentSize;
-            } catch (Exception e) {
-                
-                content = StringEscapeUtils.unescapeXml(content);
-                contentSize = content.getBytes().length;
-                accumulated_batch_size = accumulated_batch_size + contentSize;
+                String logMessageDataSizePrepareStatementString
+                        = getLogMessageDataPrepaterStatementMysql_Insert(
+                                internalTransactionLogData.getDatabaseName());
+
+                PreparedStatement preparedStatement = connection.prepareStatement(logMessageDataSizePrepareStatementString);
+                preparedStatement.setLong(1, internalTransactionLogData.getPrimaryKey());
+                preparedStatement.setInt(2, internalTransactionLogData.getPartitionId());
+                preparedStatement.setString(3, internalTransactionLogData.getContentLabel());
+                preparedStatement.setString(4, internalTransactionLogData.getContentMimeType());
+                preparedStatement.setString(5, internalTransactionLogData.getContent());
+                preparedStatement.setLong(6, internalTransactionLogData.getContentSize());
+                preparedStatement.setBoolean(7, false);
+                preparedStatement.setBoolean(8, true);
+                preparedStatement.setTimestamp(9, internalTransactionLogData.getUtcClientTimestamp());
+                preparedStatement.setTimestamp(10, internalTransactionLogData.getUtcServerTimestamp());
+                preparedStatement.setDate(11, expiredDate);
+                preparedStatement.setLong(12, logMessageId);
+
+                preparedStatement.execute();
+
+            } catch (SQLException ex) {
+                Logger.getLogger(LogMessageServiceBase.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-            // Iff accumulated WILL be larger than MAX ==> execute
-            if (accumulated_batch_size >= LogMessageServiceBase.mysql_max_allowed_packet && preparedStatement != null) {
-                preparedStatement.executeBatch();
-                accumulated_batch_size = 0L;
-            }
-
-            String logMessageDataPrepareStatementString = getLogMessageDataPrepaterStatementMysql_Insert(contentSize);
-            preparedStatement = connection.prepareStatement(logMessageDataPrepareStatementString);
-            connection.setAutoCommit(false);
-            preparedStatement.setLong(1, primaryKey);
-            preparedStatement.setInt(2, DatabasePartitionHelper.calculatePartitionId(utcServerTimestamp));
-            preparedStatement.setString(3, label);
-            preparedStatement.setString(4, mimeType);
-            preparedStatement.setString(5, content);
-            preparedStatement.setLong(6, contentSize);
-            preparedStatement.setBoolean(7, false);
-            preparedStatement.setBoolean(8, true);
-            preparedStatement.setTimestamp(9, utcClientTimestamp);
-            preparedStatement.setTimestamp(10, utcServerTimestamp);
-            preparedStatement.setDate(11, expiredDate);
-            preparedStatement.setLong(12, logMessageId);
-
-            preparedStatement.addBatch();
             startPK = startPK + 1;
 
         }
 
-        // Some prepare statements in buffer ==> execute
-        if (accumulated_batch_size > 0 && preparedStatement != null) {
-            preparedStatement.executeBatch();
-        }
         return startPK;
+    }
+
+    private long presistLogMessageData_Batch(long logMessageId,
+            Connection connection,
+            Transactions.Transaction transaction,
+            long startPK) throws SQLException {
+
+        connection.setAutoCommit(false);
+        java.sql.Date expiredDate = new java.sql.Date(this.getExpiredDate(transaction).getTime());
+        Timestamp utcClientTimestamp = this.getUTCClientTimestamp(transaction);
+
+        //
+        // Prepare data for batch load, organized by which database they belongs to
+        Map<String, ArrayList<InternalTransactionLogData>> map = new TreeMap<>();
+        for (Transactions.Transaction.TransactionLogData transactionLogData : transaction.getTransactionLogData()) {
+
+            InternalTransactionLogData internalTransactionLogData
+                    = new InternalTransactionLogData(startPK, utcClientTimestamp, transactionLogData);
+
+            String databaseName = internalTransactionLogData.getDatabaseName();
+            if (map.containsKey(databaseName)) {
+                ArrayList list = map.get(databaseName);
+                list.add(internalTransactionLogData);
+            } else {
+                ArrayList list = new ArrayList<>();
+                list.add(internalTransactionLogData);
+                map.put(databaseName, list);
+            }
+            startPK = startPK + 1;
+        }
+
+        // 
+        // Create batch prepare statement and execute
+        for (Map.Entry<String, ArrayList<InternalTransactionLogData>> entry : map.entrySet()) {
+
+            // 
+            // Init valus for this "logData"-database
+            long accumulated_batch_size = 0L;
+            String prepareStatementString = getLogMessageDataPrepaterStatementMysql_Insert(entry.getKey());
+            PreparedStatement preparedStatement = connection.prepareStatement(prepareStatementString);
+
+            // 
+            // Buid batch and execute when ready!
+            for (InternalTransactionLogData internalTransactionLogData : entry.getValue()) {
+
+                // Iff accumulated WILL be larger than MAX ==> execute
+                accumulated_batch_size = accumulated_batch_size + internalTransactionLogData.getContentSize();
+                if (accumulated_batch_size >= LogMessageServiceBase.mysql_max_allowed_packet && preparedStatement != null) {
+                    preparedStatement.executeBatch();
+                    accumulated_batch_size = 0L;
+                }
+
+                preparedStatement.setLong(1, internalTransactionLogData.getPrimaryKey());
+                preparedStatement.setInt(2, internalTransactionLogData.getPartitionId());
+                preparedStatement.setString(3, internalTransactionLogData.getContentLabel());
+                preparedStatement.setString(4, internalTransactionLogData.getContentMimeType());
+                preparedStatement.setString(5, internalTransactionLogData.getContent());
+                preparedStatement.setLong(6, internalTransactionLogData.getContentSize());
+                preparedStatement.setBoolean(7, false);
+                preparedStatement.setBoolean(8, true);
+                preparedStatement.setTimestamp(9, internalTransactionLogData.getUtcClientTimestamp());
+                preparedStatement.setTimestamp(10, internalTransactionLogData.getUtcServerTimestamp());
+                preparedStatement.setDate(11, expiredDate);
+                preparedStatement.setLong(12, logMessageId);
+
+                preparedStatement.addBatch();
+
+            }
+
+            // Some prepare statements in buffer ==> execute before next run
+            if (accumulated_batch_size > 0 && preparedStatement != null) {
+                preparedStatement.executeBatch();
+            }
+        }
+
+        return startPK;
+
     }
 
     private String getPrimaryKeySequencePrepareStatement_Fetch() {
@@ -246,10 +311,9 @@ public class LogMessageServiceBase {
         return mysqlLogMessagePrepareStatement;
     }
 
-    private String getLogMessageDataPrepaterStatementMysql_Insert(long contentSize) {
+    private String getLogMessageDataPrepaterStatementMysql_Insert(String logMessageDataSizePartitionName) {
 
-        String LogMessageDataPartitionName = this.logMessageDataPartitionNameFromContentSize(contentSize);
-        String mysqlLogMessageDataPrepareStatement = "INSERT INTO " + LogMessageDataPartitionName + " ("
+        String mysqlLogMessageDataSizePrepareStatement = "INSERT INTO " + logMessageDataSizePartitionName + " ("
                 + "ID, "
                 + "PARTITION_ID, "
                 + "LABEL, "
@@ -264,7 +328,7 @@ public class LogMessageServiceBase {
                 + "LOGMESSAGE_ID) "
                 + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
-        return mysqlLogMessageDataPrepareStatement;
+        return mysqlLogMessageDataSizePrepareStatement;
     }
 
     private Timestamp getUTCClientTimestamp(Transactions.Transaction transaction) {
@@ -375,4 +439,88 @@ public class LogMessageServiceBase {
 
     }
 
+    // 
+    // Temporary internal class
+    private class InternalTransactionLogData {
+
+        private final long primaryKey;
+        private String label;
+        private String mimeType;
+        private String content;
+        private long contentSize;
+        private Timestamp utcServerTimestamp;
+        private Timestamp utcClientTimestamp;
+        private int partitionId;
+        private String logMessageDataPartitionNameFromContentSize;
+
+        public InternalTransactionLogData(
+                long primaryKey,
+                Timestamp utcClientTimestamp,
+                Transactions.Transaction.TransactionLogData transactionLogData) {
+            this.primaryKey = primaryKey;
+            this.utcClientTimestamp = utcClientTimestamp;
+            this.processTransactionLogData(transactionLogData);
+        }
+
+        public long getPrimaryKey() {
+            return primaryKey;
+        }
+
+        public String getContentLabel() {
+            return label;
+        }
+
+        public String getContentMimeType() {
+            return mimeType;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public long getContentSize() {
+            return contentSize;
+        }
+
+        public Timestamp getUtcServerTimestamp() {
+            return utcServerTimestamp;
+        }
+
+        public Timestamp getUtcClientTimestamp() {
+            return utcClientTimestamp;
+        }
+
+        public int getPartitionId() {
+            return partitionId;
+        }
+
+        public String getDatabaseName() {
+            return this.logMessageDataPartitionNameFromContentSize;
+        }
+
+        private void processTransactionLogData(Transactions.Transaction.TransactionLogData transactionLogData) {
+
+            this.utcServerTimestamp = TimeStampUtils.createSystemNanoTimeStamp();
+            this.partitionId = DatabasePartitionHelper.calculatePartitionId(this.utcServerTimestamp);
+
+            this.label = StringEscapeUtils.unescapeXml(transactionLogData.getContentLabel().trim());
+            this.mimeType = transactionLogData.getContentMimeType().trim();
+            this.content = transactionLogData.getContent();
+            this.contentSize = 0;
+
+            // 
+            // Decode all messages
+            try {
+                content = new String(Base64.getDecoder().decode(content.getBytes()));
+                contentSize = content.getBytes().length;
+            } catch (Exception e) {
+
+                content = StringEscapeUtils.unescapeXml(content);
+                contentSize = content.getBytes().length;
+            }
+
+            this.logMessageDataPartitionNameFromContentSize = logMessageDataPartitionNameFromContentSize(contentSize);
+        }
+
+    }
 }

@@ -320,9 +320,9 @@ public class ResultSetConverter {
                         obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
                     }
 
-//                    if (column_name.equals("LOGMESSAGE_ID")) {
-//                        obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
-//                    }
+                    if (column_name.equals("LOGMESSAGE_ID")) {
+                        obj.setLogMessageId(rs.getLong(column_name));
+                    }
                 }//end foreach
                 logMessageData.add(obj);
             }//end while

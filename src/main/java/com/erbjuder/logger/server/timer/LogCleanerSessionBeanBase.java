@@ -74,87 +74,87 @@ public class LogCleanerSessionBeanBase {
             logMessagePreparedStatement.setDate(1, sqlDate);
             logMessagePreparedStatement.executeQuery();
 
-            String deletePartition_1 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_01_CLASS.getSimpleName());
+            String deletePartition_1 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_01_NAME);
             PreparedStatement preparedStatementDeletePartition_1 = connection.prepareStatement(deletePartition_1);
             preparedStatementDeletePartition_1.setDate(1, sqlDate);
             preparedStatementDeletePartition_1.executeQuery();
 
-            String deletePartition_2 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_02_CLASS.getSimpleName());
+            String deletePartition_2 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_02_NAME);
             PreparedStatement preparedStatementDeletePartition_2 = connection.prepareStatement(deletePartition_2);
             preparedStatementDeletePartition_2.setDate(1, sqlDate);
             preparedStatementDeletePartition_2.executeQuery();
 
-            String deletePartition_3 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_03_CLASS.getSimpleName());
+            String deletePartition_3 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_03_NAME);
             PreparedStatement preparedStatementDeletePartition_3 = connection.prepareStatement(deletePartition_3);
             preparedStatementDeletePartition_3.setDate(1, sqlDate);
             preparedStatementDeletePartition_3.executeQuery();
 
-            String deletePartition_4 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_04_CLASS.getSimpleName());
+            String deletePartition_4 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_04_NAME);
             PreparedStatement preparedStatementDeletePartition_4 = connection.prepareStatement(deletePartition_4);
             preparedStatementDeletePartition_4.setDate(1, sqlDate);
             preparedStatementDeletePartition_4.executeQuery();
 
-            String deletePartition_5 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_05_CLASS.getSimpleName());
+            String deletePartition_5 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_05_NAME);
             PreparedStatement preparedStatementDeletePartition_5 = connection.prepareStatement(deletePartition_5);
             preparedStatementDeletePartition_5.setDate(1, sqlDate);
             preparedStatementDeletePartition_5.executeQuery();
 
-            String deletePartition_6 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_06_CLASS.getSimpleName());
+            String deletePartition_6 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_06_NAME);
             PreparedStatement preparedStatementDeletePartition_6 = connection.prepareStatement(deletePartition_6);
             preparedStatementDeletePartition_6.setDate(1, sqlDate);
             preparedStatementDeletePartition_6.executeQuery();
 
-            String deletePartition_7 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_07_CLASS.getSimpleName());
+            String deletePartition_7 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_07_NAME);
             PreparedStatement preparedStatementDeletePartition_7 = connection.prepareStatement(deletePartition_7);
             preparedStatementDeletePartition_7.setDate(1, sqlDate);
             preparedStatementDeletePartition_7.executeQuery();
 
-            String deletePartition_8 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_08_CLASS.getSimpleName());
+            String deletePartition_8 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_08_NAME);
             PreparedStatement preparedStatementDeletePartition_8 = connection.prepareStatement(deletePartition_8);
             preparedStatementDeletePartition_8.setDate(1, sqlDate);
             preparedStatementDeletePartition_8.executeQuery();
 
-            String deletePartition_9 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_09_CLASS.getSimpleName());
+            String deletePartition_9 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_09_NAME);
             PreparedStatement preparedStatementDeletePartition_9 = connection.prepareStatement(deletePartition_9);
             preparedStatementDeletePartition_9.setDate(1, sqlDate);
             preparedStatementDeletePartition_9.executeQuery();
 
-            String deletePartition_10 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_10_CLASS.getSimpleName());
+            String deletePartition_10 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_10_NAME);
             PreparedStatement preparedStatementDeletePartition_10 = connection.prepareStatement(deletePartition_10);
             preparedStatementDeletePartition_10.setDate(1, sqlDate);
             preparedStatementDeletePartition_10.executeQuery();
 
-            String deletePartition_11 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_11_CLASS.getSimpleName());
+            String deletePartition_11 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_11_NAME);
             PreparedStatement preparedStatementDeletePartition_11 = connection.prepareStatement(deletePartition_11);
             preparedStatementDeletePartition_11.setDate(1, sqlDate);
             preparedStatementDeletePartition_11.executeQuery();
 
-            String deletePartition_12 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_12_CLASS.getSimpleName());
+            String deletePartition_12 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_12_NAME);
             PreparedStatement preparedStatementDeletePartition_12 = connection.prepareStatement(deletePartition_12);
             preparedStatementDeletePartition_12.setDate(1, sqlDate);
             preparedStatementDeletePartition_12.executeQuery();
 
-            String deletePartition_13 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_13_CLASS.getSimpleName());
+            String deletePartition_13 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_13_NAME);
             PreparedStatement preparedStatementDeletePartition_13 = connection.prepareStatement(deletePartition_13);
             preparedStatementDeletePartition_13.setDate(1, sqlDate);
             preparedStatementDeletePartition_13.executeQuery();
 
-            String deletePartition_14 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_14_CLASS.getSimpleName());
+            String deletePartition_14 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_14_NAME);
             PreparedStatement preparedStatementDeletePartition_14 = connection.prepareStatement(deletePartition_14);
             preparedStatementDeletePartition_14.setDate(1, sqlDate);
             preparedStatementDeletePartition_14.executeQuery();
 
-            String deletePartition_15 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_15_CLASS.getSimpleName());
+            String deletePartition_15 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_15_NAME);
             PreparedStatement preparedStatementDeletePartition_15 = connection.prepareStatement(deletePartition_15);
             preparedStatementDeletePartition_15.setDate(1, sqlDate);
             preparedStatementDeletePartition_15.executeQuery();
 
-            String deletePartition_16 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_16_CLASS.getSimpleName());
+            String deletePartition_16 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_16_NAME);
             PreparedStatement preparedStatementDeletePartition_16 = connection.prepareStatement(deletePartition_16);
             preparedStatementDeletePartition_16.setDate(1, sqlDate);
             preparedStatementDeletePartition_16.executeQuery();
 
-            String deletePartition_17 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_17_CLASS.getSimpleName());
+            String deletePartition_17 = getLogMessageDataPrepaterStatementMysqlDelete(DataBase.LOGMESSAGEDATA_PARTITION_17_NAME);
             PreparedStatement preparedStatementDeletePartition_17 = connection.prepareStatement(deletePartition_17);
             preparedStatementDeletePartition_17.setDate(1, sqlDate);
             preparedStatementDeletePartition_17.executeQuery();

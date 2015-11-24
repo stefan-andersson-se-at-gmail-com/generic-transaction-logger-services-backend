@@ -48,12 +48,12 @@ public class DataBaseSearchController {
 
     private void init() {
         databases = new TreeMap<String, String>();
-        databases.put(LBL_MAX_3MB, DataBase.LOGMESSAGEDATA_PARTITION_12_CLASS.toString());
-        databases.put(LBL_MAX_4MB, DataBase.LOGMESSAGEDATA_PARTITION_13_CLASS.toString());
-        databases.put(LBL_MAX_5MB, DataBase.LOGMESSAGEDATA_PARTITION_14_CLASS.toString());
-        databases.put(LBL_MAX_10MB, DataBase.LOGMESSAGEDATA_PARTITION_15_CLASS.toString());
-        databases.put(LBL_MAX_16MB, DataBase.LOGMESSAGEDATA_PARTITION_16_CLASS.toString());
-        databases.put(LBL_MAX_4GB, DataBase.LOGMESSAGEDATA_PARTITION_17_CLASS.toString());
+        databases.put(LBL_MAX_3MB, DataBase.LOGMESSAGEDATA_PARTITION_12_NAME);
+        databases.put(LBL_MAX_4MB, DataBase.LOGMESSAGEDATA_PARTITION_13_NAME);
+        databases.put(LBL_MAX_5MB, DataBase.LOGMESSAGEDATA_PARTITION_14_NAME);
+        databases.put(LBL_MAX_10MB, DataBase.LOGMESSAGEDATA_PARTITION_15_NAME);
+        databases.put(LBL_MAX_16MB, DataBase.LOGMESSAGEDATA_PARTITION_16_NAME);
+        databases.put(LBL_MAX_4GB, DataBase.LOGMESSAGEDATA_PARTITION_17_NAME);
     }
 
     public List<String> getSelectedDatabases() {
@@ -82,18 +82,18 @@ public class DataBaseSearchController {
 
         for (String clazz : getSelectedDatabases()) {
 
-            if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_12_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_12_CLASS.getCanonicalName());
-            } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_13_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_13_CLASS.getCanonicalName());
-            } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_14_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_14_CLASS.getCanonicalName());
-            } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_15_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_15_CLASS.getCanonicalName());
-            } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_16_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_16_CLASS.getCanonicalName());
-            } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_17_CLASS.toString())) {
-                result.add(DataBase.LOGMESSAGEDATA_PARTITION_17_CLASS.getCanonicalName());
+            if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_12_NAME)) {
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_12_NAME);
+            } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_13_NAME)) {
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_13_NAME);
+            } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_14_NAME)) {
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_14_NAME);
+            } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_15_NAME)) {
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_15_NAME);
+            } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_16_NAME)) {
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_16_NAME);
+            } else if (clazz.equals(DataBase.LOGMESSAGEDATA_PARTITION_17_NAME)) {
+                result.add(DataBase.LOGMESSAGEDATA_PARTITION_17_NAME);
             }
         }
 
