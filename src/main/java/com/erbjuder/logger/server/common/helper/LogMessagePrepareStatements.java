@@ -25,13 +25,13 @@ import java.util.List;
  */
 public class LogMessagePrepareStatements {
 
-    public static StringBuilder search_LogMessageIdsFromPartition(
-            String fromDate, 
-            String toDate, 
-            String logMessageIdLabel, 
-            String logMessageDataSizePartition, 
+    public static StringBuilder fetch_LogMessageIdsFromPartition(
+            String fromDate,
+            String toDate,
+            String logMessageIdLabel,
+            String logMessageDataSizePartition,
             List<String> freeTextSearchList
-        ) throws ParseException {
+    ) throws ParseException {
         StringBuilder prepareStatement = new StringBuilder();
         String partitionID = logMessageDataSizePartition + "_ID";
         prepareStatement.append("SELECT ");
@@ -60,7 +60,7 @@ public class LogMessagePrepareStatements {
         return prepareStatement;
     }
 
-    public static StringBuilder search_logMessagesFromApplicationNames(
+    public static StringBuilder fetch_logMessagesFromApplicationNames(
             String fromDate,
             String toDate,
             List<String> applicationNames
@@ -74,17 +74,34 @@ public class LogMessagePrepareStatements {
                 prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
             }
         }
+        return prepareStatement;
+    }
+
+    public static StringBuilder fetch_ApplicationNames(
+            String fromDate,
+            String toDate,
+            List<String> applicationNames
+    ) throws ParseException {
+
+        StringBuilder prepareStatement = LogMessagePrepareStatements.getPrepareStatementApplicationNames(fromDate, toDate);
+        if (applicationNames != null && !applicationNames.isEmpty()) {
+            for (String applicationName : applicationNames) {
+                prepareStatement.append("AND ");
+                System.err.println("APP NAME={ " + applicationName + " }");
+                prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+            }
+        }
         System.err.println("APP NAMES=[ " + prepareStatement.toString() + " ]");
         return prepareStatement;
     }
 
-    public static StringBuilder search_logMessagesFromFlowNames(
+    public static StringBuilder fetch_logMessagesFromFlowNames(
             String fromDate,
             String toDate,
             List<String> flowNames
     ) throws ParseException {
-        
-        StringBuilder prepareStatement = LogMessagePrepareStatements.getPrepareStatementLogMessageHeader(fromDate, toDate);
+
+        StringBuilder prepareStatement = LogMessagePrepareStatements.getPrepareStatementFlowNames(fromDate, toDate);
         if (flowNames != null && !flowNames.isEmpty()) {
             for (String flowName : flowNames) {
                 prepareStatement.append("AND ");
@@ -94,13 +111,13 @@ public class LogMessagePrepareStatements {
         return prepareStatement;
     }
 
-    public static StringBuilder search_logMessagesFromFlowPointNames(
+    public static StringBuilder fetch_logMessagesFromFlowPointNames(
             String fromDate,
             String toDate,
             List<String> flowPointNames
     ) throws ParseException {
-        
-        StringBuilder prepareStatement = LogMessagePrepareStatements.getPrepareStatementLogMessageHeader(fromDate, toDate);
+
+        StringBuilder prepareStatement = LogMessagePrepareStatements.getPrepareStatementFlowPointsNames(fromDate, toDate);
         if (flowPointNames != null && !flowPointNames.isEmpty()) {
             for (String flowPointName : flowPointNames) {
                 prepareStatement.append("AND ");
@@ -110,7 +127,7 @@ public class LogMessagePrepareStatements {
         return prepareStatement;
     }
 
-    public static StringBuilder search_PartitionContainsValue(
+    public static StringBuilder fetch_PartitionContainsValue(
             String fromDate,
             String toDate,
             String freeText,
@@ -143,6 +160,48 @@ public class LogMessagePrepareStatements {
         prepareStatement.append("SELECT ");
         prepareStatement.append("ID, PARTITION_ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
         prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
+        prepareStatement.append("FROM ").append("LogMessage ").append(" ");
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        return prepareStatement;
+    }
+
+    private static StringBuilder getPrepareStatementApplicationNames(
+            String fromDate,
+            String toDate) throws ParseException {
+
+        StringBuilder prepareStatement = new StringBuilder();
+        prepareStatement.append("SELECT ");
+        prepareStatement.append("APPLICATIONNAME ");
+        prepareStatement.append("FROM ").append("LogMessage ").append(" ");
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        return prepareStatement;
+    }
+
+    private static StringBuilder getPrepareStatementFlowNames(
+            String fromDate,
+            String toDate) throws ParseException {
+
+        StringBuilder prepareStatement = new StringBuilder();
+        prepareStatement.append("SELECT ");
+        prepareStatement.append("FLOWNAME ");
+        prepareStatement.append("FROM ").append("LogMessage ").append(" ");
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        return prepareStatement;
+    }
+
+    private static StringBuilder getPrepareStatementFlowPointsNames(
+            String fromDate,
+            String toDate) throws ParseException {
+
+        StringBuilder prepareStatement = new StringBuilder();
+        prepareStatement.append("SELECT ");
+        prepareStatement.append("FLOWPOINTNAME ");
         prepareStatement.append("FROM ").append("LogMessage ").append(" ");
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
         prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");

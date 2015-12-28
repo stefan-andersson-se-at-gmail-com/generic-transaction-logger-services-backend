@@ -37,7 +37,7 @@ public class LogMessageQueries {
         ResultSet rs = null;
         StringBuilder prepareStatement;
         try (final Connection conn = MysqlConnection.getConnection()) {
-            prepareStatement = LogMessagePrepareStatements.search_logMessagesFromApplicationNames(fromDate, toDate, applicationNames);
+            prepareStatement = LogMessagePrepareStatements.fetch_ApplicationNames(fromDate, toDate, applicationNames);
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
             conn.close();
@@ -59,7 +59,7 @@ public class LogMessageQueries {
         ResultSet rs = null;
         StringBuilder prepareStatement;
         try (final Connection conn = MysqlConnection.getConnection()) {
-            prepareStatement = LogMessagePrepareStatements.search_logMessagesFromFlowNames(fromDate, toDate, flowNames);
+            prepareStatement = LogMessagePrepareStatements.fetch_logMessagesFromFlowNames(fromDate, toDate, flowNames);
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
             conn.close();
@@ -81,7 +81,7 @@ public class LogMessageQueries {
         ResultSet rs = null;
         StringBuilder prepareStatement;
         try (final Connection conn = MysqlConnection.getConnection()) {
-            prepareStatement = LogMessagePrepareStatements.search_logMessagesFromFlowPointNames(fromDate, toDate, flowNames);
+            prepareStatement = LogMessagePrepareStatements.fetch_logMessagesFromFlowPointNames(fromDate, toDate, flowNames);
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
             conn.close();
@@ -184,7 +184,7 @@ public class LogMessageQueries {
                 for (int i = 0; i < size; i++) {
 
                     String logMessageDataPartition = dataSizePartitionList.get(i);
-                    StringBuilder partitionBuilder = LogMessagePrepareStatements.search_LogMessageIdsFromPartition(
+                    StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition(
                             fromDate,
                             toDate,
                             "ID",
@@ -205,7 +205,11 @@ public class LogMessageQueries {
 
             // 
             // Order by
-            prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC ");
+            if (transactionReferenceId == null || transactionReferenceId.isEmpty()) {
+                prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC, UTCLOCALTIMESTAMP DESC ");
+            } else {
+                prepareStatement.append("ORDER BY UTCLOCALTIMESTAMP DESC, UTCSERVERTIMESTAMP DESC ");
+            }
 
             // Pagination: Assume that first page <==> 1
             int pageOffset = page - 1;
