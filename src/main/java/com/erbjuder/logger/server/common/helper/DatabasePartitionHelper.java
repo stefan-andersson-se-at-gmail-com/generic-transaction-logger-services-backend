@@ -58,10 +58,9 @@ public class DatabasePartitionHelper {
 
         // Maximum partition number = 732;
         int partId = day * 2;
-        if (AM <= hours) {
+        if (AM >= hours) {
             partId = partId - 1;
         }
-
         return partId;
     }
 
