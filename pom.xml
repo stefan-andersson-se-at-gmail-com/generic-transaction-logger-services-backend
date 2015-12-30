@@ -17,11 +17,11 @@
     
     
     <!-- Git --> 
-    <scm>
+<!--    <scm>
         <url>https://github.com/stefan-andersson-se-at-gmail-com/generic-transaction-logger-services-backend.git</url>
         <connection>scm:git:git://github.com/stefan-andersson-se-at-gmail-com/generic-transaction-logger-services-backend.git</connection>
         <developerConnection>scm:git:git@github.com:stefan-andersson-se-at-gmail-com/generic-transaction-logger-services-backend.git</developerConnection>
-    </scm>
+    </scm>-->
 
     <!-- Nexus ( user name and PWD in maven -> settings.xml )-->
     <distributionManagement>
