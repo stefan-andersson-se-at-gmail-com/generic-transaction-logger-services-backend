@@ -32,7 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class MysqlConnection {
 
-    private static String persistenceUnitName = "TransactionLogger";
+    private static final String persistenceUnitName = "TransactionLogger";
     private static DataSource dataSource = null;
     private static Context context = null;
 

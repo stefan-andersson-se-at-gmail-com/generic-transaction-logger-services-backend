@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.erbjuder.logger.server.common.helper;
+package com.erbjuder.logger.server.common.services;
 
 //import org.codehaus.jettison.json.JSONArray;
 //import org.codehaus.jettison.json.JSONObject;
+import com.erbjuder.logger.server.common.helper.DataBase;
+import com.erbjuder.logger.server.common.helper.TimeStampUtils;
 import com.erbjuder.logger.server.entity.impl.LogMessage;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_01;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_02;

@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.erbjuder.logger.server.common.helper;
+package com.erbjuder.logger.server.common.services;
 
+import com.erbjuder.logger.server.common.helper.DatabasePartitionHelper;
+import com.erbjuder.logger.server.common.helper.MysqlConnection;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -101,7 +103,7 @@ public class LogMessageQueries {
             Integer page,
             Integer pageSize,
             String transactionReferenceId,
-            Boolean viewError,
+            Integer viewError, // 0=false, 1= true and null skip
             List<String> viewApplicationNames,
             List<String> viewFlowNames,
             List<String> viewFlowPointNames,

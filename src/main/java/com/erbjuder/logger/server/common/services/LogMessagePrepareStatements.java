@@ -1,5 +1,6 @@
-package com.erbjuder.logger.server.common.helper;
+package com.erbjuder.logger.server.common.services;
 
+import com.erbjuder.logger.server.common.helper.DatabasePartitionHelper;
 import java.text.ParseException;
 import java.util.List;
 

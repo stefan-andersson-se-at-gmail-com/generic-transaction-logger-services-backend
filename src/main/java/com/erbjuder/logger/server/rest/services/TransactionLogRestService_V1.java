@@ -17,8 +17,9 @@
 package com.erbjuder.logger.server.rest.services;
 
 import com.erbjuder.logger.server.common.helper.DataBase;
-import com.erbjuder.logger.server.common.helper.LogMessageQueries;
-import com.erbjuder.logger.server.common.helper.ResultSetConverter;
+import com.erbjuder.logger.server.common.services.LogMessageQueries;
+import com.erbjuder.logger.server.common.services.LogMessageServiceBase;
+import com.erbjuder.logger.server.common.services.ResultSetConverter;
 import com.generic.global.transactionlogger.Transactions;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class TransactionLogRestService_V1 {
             @QueryParam("page") Integer page,
             @QueryParam("pageSize") Integer pageSize,
             @QueryParam("transactionReferenceId") String transactionReferenceId,
-            @QueryParam("viewError") Boolean viewError,
+            @QueryParam("viewError") Integer viewError,
             @QueryParam("viewAppName") List<String> viewApplicationNames,
             @QueryParam("viewFlowName") List<String> viewFlowNames,
             @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
@@ -64,19 +65,19 @@ public class TransactionLogRestService_V1 {
     ) {
         try {
 
-            System.err.println("[ Got REST call ]");
-            System.err.println("fromDate=[" + fromDate + "]");
-            System.err.println("toDate=[" + toDate + "]");
-            System.err.println("transactionReferenceId=[" + transactionReferenceId + "]");
-            System.err.println("applicationNameList=[" + viewApplicationNames + "]");
-            System.err.println("viewError[" + viewError + "]");
+//            System.err.println("[ Got REST call ]");
+//            System.err.println("fromDate=[" + fromDate + "]");
+//            System.err.println("toDate=[" + toDate + "]");
+//            System.err.println("transactionReferenceId=[" + transactionReferenceId + "]");
+//            System.err.println("applicationNameList=[" + viewApplicationNames + "]");
+//            System.err.println("viewError[" + viewError + "]");
 
             // 
             // Use dafault if no partition list are provided
             if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
                 dataBaseSearchList = getDefaultSearchableDatabases();
             }
-
+            
             LogMessageQueries loggerSchema = new LogMessageQueries();
             ResultSetConverter converter = new ResultSetConverter();
             JSONArray jsonResult = converter.toJSONArray(loggerSchema.fetch_logMessageList(
@@ -120,10 +121,10 @@ public class TransactionLogRestService_V1 {
             if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
                 dataBaseSearchList = getDefaultSearchableDatabases();
             }
-
-            System.err.println("[ Got REST call ]");
-            System.err.println("logMessageId=[" + logMessageId + "]");
-            System.err.println("dataBaseSearchList=[" + dataBaseSearchList + "]");
+//
+//            System.err.println("[ Got REST call ]");
+//            System.err.println("logMessageId=[" + logMessageId + "]");
+//            System.err.println("dataBaseSearchList=[" + dataBaseSearchList + "]");
 
             LogMessageQueries loggerSchema = new LogMessageQueries();
             ResultSetConverter converter = new ResultSetConverter();
@@ -146,9 +147,13 @@ public class TransactionLogRestService_V1 {
     public Response persist(Transactions transactions) {
 
         System.err.println("[ Got REST call POST ]");
-        System.err.println("Transactions=[" + transactions + "]");
 
-        return Response.ok("OK").build();
+        com.generic.global.transactionlogger.Response serviceResponse = new LogMessageServiceBase().create(transactions);
+        if (serviceResponse.isReturn()) {
+            return Response.status(Response.Status.OK).build();
+        } else {
+            return Response.serverError().build();
+        }
     }
 
     private List<String> getDefaultSearchableDatabases() {

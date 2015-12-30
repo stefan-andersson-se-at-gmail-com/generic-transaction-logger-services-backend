@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.erbjuder.logger.server.common.helper;
+package com.erbjuder.logger.server.common.services;
 
 import java.util.List;
 

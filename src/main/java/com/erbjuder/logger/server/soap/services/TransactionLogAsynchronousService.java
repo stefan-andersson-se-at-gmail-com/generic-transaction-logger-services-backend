@@ -16,6 +16,7 @@
  */
 package com.erbjuder.logger.server.soap.services;
 
+import com.erbjuder.logger.server.common.services.LogMessageServiceBase;
 import com.generic.global.transactionlogger.Transactions;
 import java.util.logging.Logger;
 import javax.jws.WebParam;

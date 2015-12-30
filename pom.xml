@@ -32,8 +32,6 @@
         </repository>
     </distributionManagement>
 
-
-    
     
     <dependencies>
         <dependency>
@@ -132,48 +130,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
-           
-           
-<!--            <plugin>
-                <groupId>org.jvnet.jaxb2.maven2</groupId>
-                <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.8.0</version>
-                <configuration>
-                    <schemaDirectory>src/main/wsdl/Log_Service_Asynchronous/</schemaDirectory>
-                    <bindingDirectory>src/main/wsdl/Log_Service_Asynchronous/</bindingDirectory>
-                    <generatePackage>target.generated.sources.jaxb2</generatePackage>
-                    <strict>false</strict>
-                    <extension>true</extension>
-
-                    <plugins>
-                        <plugin>
-                            <groupId>org.jvnet.jaxb2_commons</groupId>
-                            <artifactId>jaxb2-basics</artifactId>
-                            <version>0.6.2</version>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.jvnet.jaxb2_commons</groupId>
-                            <artifactId>jaxb2-basics-annotate</artifactId>
-                            <version>0.6.2</version>
-                        </plugin>
-                    </plugins>
-                    <args>
-                        <arg>-Xannotate</arg>
-                        <arg>-XtoString</arg>
-                    </args>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>generate</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
-
- 
+        
             
             
             <plugin>
@@ -332,7 +289,6 @@
                 </executions>
             </plugin>
             
-                   
             
             <plugin>
                  
