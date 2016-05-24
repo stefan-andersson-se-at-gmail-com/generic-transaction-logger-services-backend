@@ -49,7 +49,16 @@ public class PrepareStatementHelper {
         return builder.toString();
     }
 
-    public static String toSQL_Partition_List(List<String> list) {
+    public static String toSQL_Partition_List_Syntax(String partitionId) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        builder.append(partitionId);
+        builder.append(")");
+
+        return builder.toString();
+    }
+
+    public static String toSQL_Partition_List_Syntax(List<String> list) {
         StringBuilder builder = new StringBuilder();
 
         if (!list.isEmpty()) {

@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class LogMessagePrepareStatements {
 
-    public static StringBuilder fetch_LogMessageIdsFromPartition(
+    public static StringBuilder fetch_LogMessageIdsFromPartition_IdVariable(
             String fromDate,
             String toDate,
             String logMessageIdLabel,
@@ -39,10 +39,45 @@ public class LogMessagePrepareStatements {
         prepareStatement.append("DISTINCT ( LOGMESSAGE_ID ) as ").append(partitionID).append(" ");
         prepareStatement.append("FROM ").append(logMessageDataSizePartition).append(" ");
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
         prepareStatement.append("AND ");
         prepareStatement.append(logMessageDataSizePartition).append(".LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageIdLabel).append(" ");
+
+        if (freeTextSearchList != null && freeTextSearchList.size() > 0) {
+            int size = freeTextSearchList.size();
+            prepareStatement.append("AND ( ");
+            for (int i = 0; i < size; i++) {
+                String freeText = PrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
+                prepareStatement.append("( LABEL LIKE ").append(freeText).append(" ");
+                prepareStatement.append("OR ");
+                prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ) ");
+                if (i < size - 1) {
+                    prepareStatement.append("AND ");
+                }
+            }
+            prepareStatement.append(" ) ");
+        }
+        return prepareStatement;
+    }
+
+    public static StringBuilder fetch_LogMessageIdsFromPartition_IdValue(
+            String fromDate,
+            String toDate,
+            Long logMessageIdValue,
+            String logMessageDataSizePartition,
+            List<String> freeTextSearchList
+    ) throws ParseException {
+        StringBuilder prepareStatement = new StringBuilder();
+        String partitionID = logMessageDataSizePartition + "_ID";
+        prepareStatement.append("SELECT ");
+        prepareStatement.append("DISTINCT ( LOGMESSAGE_ID ) as ").append(partitionID).append(" ");
+        prepareStatement.append("FROM ").append(logMessageDataSizePartition).append(" ");
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+        prepareStatement.append("AND ");
+        prepareStatement.append(logMessageDataSizePartition).append(".LOGMESSAGE_ID = ").append(logMessageIdValue).append(" ");
 
         if (freeTextSearchList != null && freeTextSearchList.size() > 0) {
             int size = freeTextSearchList.size();
@@ -141,7 +176,7 @@ public class LogMessagePrepareStatements {
         prepareStatement.append("FROM ").append(databaseSizePartition).append(" ");
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
 
-        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
         prepareStatement.append("AND ");
         prepareStatement.append("( ");
@@ -163,7 +198,7 @@ public class LogMessagePrepareStatements {
         prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
         prepareStatement.append("FROM ").append("LogMessage ").append(" ");
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
         return prepareStatement;
     }
@@ -174,10 +209,10 @@ public class LogMessagePrepareStatements {
 
         StringBuilder prepareStatement = new StringBuilder();
         prepareStatement.append("SELECT ");
-        prepareStatement.append("APPLICATIONNAME ");
+        prepareStatement.append("DISTINCT APPLICATIONNAME ");
         prepareStatement.append("FROM ").append("LogMessage ").append(" ");
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
         return prepareStatement;
     }
@@ -188,10 +223,10 @@ public class LogMessagePrepareStatements {
 
         StringBuilder prepareStatement = new StringBuilder();
         prepareStatement.append("SELECT ");
-        prepareStatement.append("FLOWNAME ");
+        prepareStatement.append("DISTINCT FLOWNAME ");
         prepareStatement.append("FROM ").append("LogMessage ").append(" ");
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
         return prepareStatement;
     }
@@ -202,10 +237,10 @@ public class LogMessagePrepareStatements {
 
         StringBuilder prepareStatement = new StringBuilder();
         prepareStatement.append("SELECT ");
-        prepareStatement.append("FLOWPOINTNAME ");
+        prepareStatement.append("DISTINCT FLOWPOINTNAME ");
         prepareStatement.append("FROM ").append("LogMessage ").append(" ");
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+        prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
         prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
         return prepareStatement;
     }

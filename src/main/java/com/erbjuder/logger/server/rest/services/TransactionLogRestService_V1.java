@@ -39,15 +39,71 @@ import org.json.simple.JSONArray;
  *
  * @author server-1
  */
-@Path("/v1/rest/logmsg")
+@Path("/v1/logmsg")
 public class TransactionLogRestService_V1 {
 
-// http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/rest/logmsg/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false
-// http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/rest/logmsg/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false&search=534_   
+// http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/logmsg/json/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false
+// http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/logmsg/jsonp/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false&search=534_   
+    private JSONArray logMessageSearch(
+            Long id,
+            Integer partitionId,
+            String fromDate,
+            String toDate,
+            Integer page,
+            Integer pageSize,
+            String transactionReferenceId,
+            Integer viewError,
+            List<String> viewApplicationNames,
+            List<String> viewFlowNames,
+            List<String> viewFlowPointName,
+            List<String> notViewApplicationNames,
+            List<String> notViewFlowNames,
+            List<String> notViewFlowPointName,
+            List<String> freeTextSearchList,
+            List<String> dataBaseSearchList
+    ) throws Exception {
+
+//            System.err.println("[ Got REST call ]");
+//            System.err.println("fromDate=[" + fromDate + "]");
+//            System.err.println("toDate=[" + toDate + "]");
+//            System.err.println("transactionReferenceId=[" + transactionReferenceId + "]");
+//            System.err.println("applicationNameList=[" + viewApplicationNames + "]");
+//            System.err.println("viewError[" + viewError + "]");
+        // 
+        // Use dafault if no partition list are provided
+        if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
+            dataBaseSearchList = getDefaultSearchableDatabases();
+        }
+
+        LogMessageQueries loggerSchema = new LogMessageQueries();
+        ResultSetConverter converter = new ResultSetConverter();
+        return converter.toJSONArray(loggerSchema.fetch_logMessageList(
+                id,
+                partitionId,
+                fromDate,
+                toDate,
+                page,
+                pageSize,
+                transactionReferenceId,
+                viewError,
+                viewApplicationNames,
+                viewFlowNames,
+                viewFlowPointName,
+                notViewApplicationNames,
+                notViewFlowNames,
+                notViewFlowPointName,
+                freeTextSearchList,
+                dataBaseSearchList
+        ));
+
+    }
+
     @GET
-    @Path("/search")
+    @Path("json/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response search(
+    public Response jsonSearch(
+            @QueryParam("Id") Long id,
+            @QueryParam("partitionId") Integer partitionId,
             @QueryParam("fromDate") String fromDate,
             @QueryParam("toDate") String toDate,
             @QueryParam("page") Integer page,
@@ -64,23 +120,9 @@ public class TransactionLogRestService_V1 {
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
         try {
-
-//            System.err.println("[ Got REST call ]");
-//            System.err.println("fromDate=[" + fromDate + "]");
-//            System.err.println("toDate=[" + toDate + "]");
-//            System.err.println("transactionReferenceId=[" + transactionReferenceId + "]");
-//            System.err.println("applicationNameList=[" + viewApplicationNames + "]");
-//            System.err.println("viewError[" + viewError + "]");
-
-            // 
-            // Use dafault if no partition list are provided
-            if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
-                dataBaseSearchList = getDefaultSearchableDatabases();
-            }
-            
-            LogMessageQueries loggerSchema = new LogMessageQueries();
-            ResultSetConverter converter = new ResultSetConverter();
-            JSONArray jsonResult = converter.toJSONArray(loggerSchema.fetch_logMessageList(
+            JSONArray jsonResult = this.logMessageSearch(
+                    id,
+                    partitionId,
                     fromDate,
                     toDate,
                     page,
@@ -95,7 +137,7 @@ public class TransactionLogRestService_V1 {
                     notViewFlowPointName,
                     freeTextSearchList,
                     dataBaseSearchList
-            ));
+            );
 
             return Response.ok(jsonResult.toString()).build();
 
@@ -105,33 +147,105 @@ public class TransactionLogRestService_V1 {
         }
     }
 
-    // http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/rest/logmsg/view?logMessageId=16877&logMessagePartitionId=304
     @GET
-    @Path("/view")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response search(
-            @QueryParam("logMessageId") String logMessageId,
-            @QueryParam("logMessagePartitionId") int logMessagePartitionId,
+    @Path("jsonp/search")
+    @Produces("application/javascript")
+    public Response jsonpSearch(
+            @QueryParam("callback") String callback,
+            @QueryParam("Id") Long id,
+            @QueryParam("partitionId") Integer partitionId,
+            @QueryParam("fromDate") String fromDate,
+            @QueryParam("toDate") String toDate,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize,
+            @QueryParam("transactionReferenceId") String transactionReferenceId,
+            @QueryParam("viewError") Integer viewError,
+            @QueryParam("viewAppName") List<String> viewApplicationNames,
+            @QueryParam("viewFlowName") List<String> viewFlowNames,
+            @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
+            @QueryParam("notViewFlowName") List<String> notViewFlowNames,
+            @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("search") List<String> freeTextSearchList,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
+
         try {
 
-            // 
-            // Use dafault if no partition list are provided
-            if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
-                dataBaseSearchList = getDefaultSearchableDatabases();
+            String internalCallbackName = "callback";
+            if (callback != null && !callback.isEmpty()) {
+                internalCallbackName = callback;
             }
+
+            JSONArray jsonResult = this.logMessageSearch(
+                    id,
+                    partitionId,
+                    fromDate,
+                    toDate,
+                    page,
+                    pageSize,
+                    transactionReferenceId,
+                    viewError,
+                    viewApplicationNames,
+                    viewFlowNames,
+                    viewFlowPointName,
+                    notViewApplicationNames,
+                    notViewFlowNames,
+                    notViewFlowPointName,
+                    freeTextSearchList,
+                    dataBaseSearchList
+            );
+
+            return Response.ok(internalCallbackName + "(" + jsonResult.toString() + ")").build();
+
+        } catch (Exception ex) {
+            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            return Response.serverError().build();
+        }
+
+    }
+
+    // http://localhost:8080/log_message_services_one_dev/resources/v1/logmsg/json/view?logMessageId=16877&logMessagePartitionId=304
+    // http://localhost:8080/log_message_services_one_dev/resources/v1/logmsg/jsonp/view?logMessageId=16877&logMessagePartitionId=304
+    // http://erbjuder.com/log_message_services_one_dev/resources/v1/logmsg/jsonp/view?logMessageId=11658273&logMessagePartitionId=103
+    private JSONArray logMessageDataView(
+            Long logMessageId,
+            Integer logMessagePartitionId,
+            List<String> dataBaseSearchList) throws Exception {
+        // 
+        // Use dafault if no partition list are provided
+        if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
+            dataBaseSearchList = getDefaultSearchableDatabases();
+        }
 //
 //            System.err.println("[ Got REST call ]");
 //            System.err.println("logMessageId=[" + logMessageId + "]");
 //            System.err.println("dataBaseSearchList=[" + dataBaseSearchList + "]");
 
-            LogMessageQueries loggerSchema = new LogMessageQueries();
-            ResultSetConverter converter = new ResultSetConverter();
-            JSONArray jsonResult = converter.toJSONArray(loggerSchema.fetch_LogMessageData(
+        LogMessageQueries loggerSchema = new LogMessageQueries();
+        ResultSetConverter converter = new ResultSetConverter();
+        return converter.toJSONArray(loggerSchema.fetch_LogMessageData(
+                logMessageId,
+                logMessagePartitionId,
+                dataBaseSearchList));
+
+    }
+
+    @GET
+    @Path("json/view")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response dataView(
+            @QueryParam("logMessageId") Long logMessageId,
+            @QueryParam("logMessagePartitionId") Integer logMessagePartitionId,
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
+    ) {
+        try {
+
+            JSONArray jsonResult = this.logMessageDataView(
                     logMessageId,
                     logMessagePartitionId,
-                    dataBaseSearchList));
+                    dataBaseSearchList
+            );
 
             return Response.ok(jsonResult.toString()).build();
 
@@ -141,10 +255,473 @@ public class TransactionLogRestService_V1 {
         }
     }
 
+    @GET
+    @Path("jsonp/view")
+    @Produces("application/javascript")
+    public Response dataView(
+            @QueryParam("callback") String callback,
+            @QueryParam("logMessageId") Long logMessageId,
+            @QueryParam("logMessagePartitionId") Integer logMessagePartitionId,
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
+    ) {
+
+        try {
+
+            String internalCallbackName = "callback";
+            if (callback != null && !callback.isEmpty()) {
+                internalCallbackName = callback;
+            }
+
+            JSONArray jsonResult = this.logMessageDataView(
+                    logMessageId,
+                    logMessagePartitionId,
+                    dataBaseSearchList
+            );
+
+            return Response.ok(internalCallbackName + "(" + jsonResult.toString() + ")").build();
+
+        } catch (Exception ex) {
+            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            return Response.serverError().build();
+        }
+
+    }
+
+    private JSONArray flowPointNameSearch(
+            String fromDate,
+            String toDate,
+            Integer page,
+            Integer pageSize,
+            String transactionReferenceId,
+            Integer viewError,
+            List<String> viewApplicationNames,
+            List<String> viewFlowNames,
+            List<String> viewFlowPointName,
+            List<String> notViewApplicationNames,
+            List<String> notViewFlowNames,
+            List<String> notViewFlowPointName,
+            List<String> freeTextSearchList,
+            List<String> dataBaseSearchList
+    ) throws Exception {
+
+        // 
+        // Use dafault if no partition list are provided
+        if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
+            dataBaseSearchList = getDefaultSearchableDatabases();
+        }
+
+        LogMessageQueries loggerSchema = new LogMessageQueries();
+        ResultSetConverter converter = new ResultSetConverter();
+        return converter.toJSONArray(loggerSchema.fetch_FlowPointNames(
+                fromDate,
+                toDate,
+                page,
+                pageSize,
+                transactionReferenceId,
+                viewError,
+                viewApplicationNames,
+                viewFlowNames,
+                viewFlowPointName,
+                notViewApplicationNames,
+                notViewFlowNames,
+                notViewFlowPointName,
+                freeTextSearchList,
+                dataBaseSearchList
+        ));
+
+    }
+
+    @GET
+    @Path("json/flowPointNames")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response jsonFlowPointNameSearch(
+            @QueryParam("fromDate") String fromDate,
+            @QueryParam("toDate") String toDate,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize,
+            @QueryParam("transactionReferenceId") String transactionReferenceId,
+            @QueryParam("viewError") Integer viewError,
+            @QueryParam("viewAppName") List<String> viewApplicationNames,
+            @QueryParam("viewFlowName") List<String> viewFlowNames,
+            @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
+            @QueryParam("notViewFlowName") List<String> notViewFlowNames,
+            @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("search") List<String> freeTextSearchList,
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
+    ) {
+        try {
+            JSONArray jsonResult = this.flowPointNameSearch(
+                    fromDate,
+                    toDate,
+                    page,
+                    pageSize,
+                    transactionReferenceId,
+                    viewError,
+                    viewApplicationNames,
+                    viewFlowNames,
+                    viewFlowPointName,
+                    notViewApplicationNames,
+                    notViewFlowNames,
+                    notViewFlowPointName,
+                    freeTextSearchList,
+                    dataBaseSearchList
+            );
+
+            return Response.ok(jsonResult.toString()).build();
+
+        } catch (Exception ex) {
+            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            return Response.serverError().build();
+        }
+    }
+
+    @GET
+    @Path("jsonp/flowPointNames")
+    @Produces("application/javascript")
+    public Response jsonpFlowPointNameSearch(
+            @QueryParam("callback") String callback,
+            @QueryParam("fromDate") String fromDate,
+            @QueryParam("toDate") String toDate,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize,
+            @QueryParam("transactionReferenceId") String transactionReferenceId,
+            @QueryParam("viewError") Integer viewError,
+            @QueryParam("viewAppName") List<String> viewApplicationNames,
+            @QueryParam("viewFlowName") List<String> viewFlowNames,
+            @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
+            @QueryParam("notViewFlowName") List<String> notViewFlowNames,
+            @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("search") List<String> freeTextSearchList,
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
+    ) {
+
+        try {
+
+            String internalCallbackName = "callback";
+            if (callback != null && !callback.isEmpty()) {
+                internalCallbackName = callback;
+            }
+
+            JSONArray jsonResult = this.flowPointNameSearch(
+                    fromDate,
+                    toDate,
+                    page,
+                    pageSize,
+                    transactionReferenceId,
+                    viewError,
+                    viewApplicationNames,
+                    viewFlowNames,
+                    viewFlowPointName,
+                    notViewApplicationNames,
+                    notViewFlowNames,
+                    notViewFlowPointName,
+                    freeTextSearchList,
+                    dataBaseSearchList
+            );
+
+            return Response.ok(internalCallbackName + "(" + jsonResult.toString() + ")").build();
+
+        } catch (Exception ex) {
+            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            return Response.serverError().build();
+        }
+
+    }
+
+    private JSONArray flowNameSearch(
+            String fromDate,
+            String toDate,
+            Integer page,
+            Integer pageSize,
+            String transactionReferenceId,
+            Integer viewError,
+            List<String> viewApplicationNames,
+            List<String> viewFlowNames,
+            List<String> viewFlowPointName,
+            List<String> notViewApplicationNames,
+            List<String> notViewFlowNames,
+            List<String> notViewFlowPointName,
+            List<String> freeTextSearchList,
+            List<String> dataBaseSearchList
+    ) throws Exception {
+
+        // 
+        // Use dafault if no partition list are provided
+        if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
+            dataBaseSearchList = getDefaultSearchableDatabases();
+        }
+
+        LogMessageQueries loggerSchema = new LogMessageQueries();
+        ResultSetConverter converter = new ResultSetConverter();
+        return converter.toJSONArray(loggerSchema.fetch_FlowNames(
+                fromDate,
+                toDate,
+                page,
+                pageSize,
+                transactionReferenceId,
+                viewError,
+                viewApplicationNames,
+                viewFlowNames,
+                viewFlowPointName,
+                notViewApplicationNames,
+                notViewFlowNames,
+                notViewFlowPointName,
+                freeTextSearchList,
+                dataBaseSearchList
+        ));
+
+    }
+
+    @GET
+    @Path("json/flowNames")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response jsonFlowNameSearch(
+            @QueryParam("fromDate") String fromDate,
+            @QueryParam("toDate") String toDate,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize,
+            @QueryParam("transactionReferenceId") String transactionReferenceId,
+            @QueryParam("viewError") Integer viewError,
+            @QueryParam("viewAppName") List<String> viewApplicationNames,
+            @QueryParam("viewFlowName") List<String> viewFlowNames,
+            @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
+            @QueryParam("notViewFlowName") List<String> notViewFlowNames,
+            @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("search") List<String> freeTextSearchList,
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
+    ) {
+        try {
+            JSONArray jsonResult = this.flowNameSearch(
+                    fromDate,
+                    toDate,
+                    page,
+                    pageSize,
+                    transactionReferenceId,
+                    viewError,
+                    viewApplicationNames,
+                    viewFlowNames,
+                    viewFlowPointName,
+                    notViewApplicationNames,
+                    notViewFlowNames,
+                    notViewFlowPointName,
+                    freeTextSearchList,
+                    dataBaseSearchList
+            );
+
+            return Response.ok(jsonResult.toString()).build();
+
+        } catch (Exception ex) {
+            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            return Response.serverError().build();
+        }
+    }
+
+    @GET
+    @Path("jsonp/flowNames")
+    @Produces("application/javascript")
+    public Response jsonpFlowNameSearch(
+            @QueryParam("callback") String callback,
+            @QueryParam("fromDate") String fromDate,
+            @QueryParam("toDate") String toDate,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize,
+            @QueryParam("transactionReferenceId") String transactionReferenceId,
+            @QueryParam("viewError") Integer viewError,
+            @QueryParam("viewAppName") List<String> viewApplicationNames,
+            @QueryParam("viewFlowName") List<String> viewFlowNames,
+            @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
+            @QueryParam("notViewFlowName") List<String> notViewFlowNames,
+            @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("search") List<String> freeTextSearchList,
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
+    ) {
+
+        try {
+
+            String internalCallbackName = "callback";
+            if (callback != null && !callback.isEmpty()) {
+                internalCallbackName = callback;
+            }
+
+            JSONArray jsonResult = this.flowNameSearch(
+                    fromDate,
+                    toDate,
+                    page,
+                    pageSize,
+                    transactionReferenceId,
+                    viewError,
+                    viewApplicationNames,
+                    viewFlowNames,
+                    viewFlowPointName,
+                    notViewApplicationNames,
+                    notViewFlowNames,
+                    notViewFlowPointName,
+                    freeTextSearchList,
+                    dataBaseSearchList
+            );
+
+            return Response.ok(internalCallbackName + "(" + jsonResult.toString() + ")").build();
+
+        } catch (Exception ex) {
+            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            return Response.serverError().build();
+        }
+
+    }
+
+    private JSONArray applicationNameSearch(
+            String fromDate,
+            String toDate,
+            Integer page,
+            Integer pageSize,
+            String transactionReferenceId,
+            Integer viewError,
+            List<String> viewApplicationNames,
+            List<String> viewFlowNames,
+            List<String> viewFlowPointName,
+            List<String> notViewApplicationNames,
+            List<String> notViewFlowNames,
+            List<String> notViewFlowPointName,
+            List<String> freeTextSearchList,
+            List<String> dataBaseSearchList
+    ) throws Exception {
+
+        // 
+        // Use dafault if no partition list are provided
+        if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
+            dataBaseSearchList = getDefaultSearchableDatabases();
+        }
+
+        LogMessageQueries loggerSchema = new LogMessageQueries();
+        ResultSetConverter converter = new ResultSetConverter();
+        return converter.toJSONArray(loggerSchema.fetch_ApplicationNames(
+                fromDate,
+                toDate,
+                page,
+                pageSize,
+                transactionReferenceId,
+                viewError,
+                viewApplicationNames,
+                viewFlowNames,
+                viewFlowPointName,
+                notViewApplicationNames,
+                notViewFlowNames,
+                notViewFlowPointName,
+                freeTextSearchList,
+                dataBaseSearchList
+        ));
+
+    }
+
+    @GET
+    @Path("json/applicationNames")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response jsonApplicationNameSearch(
+            @QueryParam("fromDate") String fromDate,
+            @QueryParam("toDate") String toDate,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize,
+            @QueryParam("transactionReferenceId") String transactionReferenceId,
+            @QueryParam("viewError") Integer viewError,
+            @QueryParam("viewAppName") List<String> viewApplicationNames,
+            @QueryParam("viewFlowName") List<String> viewFlowNames,
+            @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
+            @QueryParam("notViewFlowName") List<String> notViewFlowNames,
+            @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("search") List<String> freeTextSearchList,
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
+    ) {
+        try {
+            JSONArray jsonResult = this.applicationNameSearch(
+                    fromDate,
+                    toDate,
+                    page,
+                    pageSize,
+                    transactionReferenceId,
+                    viewError,
+                    viewApplicationNames,
+                    viewFlowNames,
+                    viewFlowPointName,
+                    notViewApplicationNames,
+                    notViewFlowNames,
+                    notViewFlowPointName,
+                    freeTextSearchList,
+                    dataBaseSearchList
+            );
+
+            return Response.ok(jsonResult.toString()).build();
+
+        } catch (Exception ex) {
+            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            return Response.serverError().build();
+        }
+    }
+
+    @GET
+    @Path("jsonp/applicationNames")
+    @Produces("application/javascript")
+    public Response jsonpApplicationNameSearch(
+            @QueryParam("callback") String callback,
+            @QueryParam("fromDate") String fromDate,
+            @QueryParam("toDate") String toDate,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize,
+            @QueryParam("transactionReferenceId") String transactionReferenceId,
+            @QueryParam("viewError") Integer viewError,
+            @QueryParam("viewAppName") List<String> viewApplicationNames,
+            @QueryParam("viewFlowName") List<String> viewFlowNames,
+            @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
+            @QueryParam("notViewFlowName") List<String> notViewFlowNames,
+            @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("search") List<String> freeTextSearchList,
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
+    ) {
+
+        try {
+
+            String internalCallbackName = "callback";
+            if (callback != null && !callback.isEmpty()) {
+                internalCallbackName = callback;
+            }
+
+            JSONArray jsonResult = this.applicationNameSearch(
+                    fromDate,
+                    toDate,
+                    page,
+                    pageSize,
+                    transactionReferenceId,
+                    viewError,
+                    viewApplicationNames,
+                    viewFlowNames,
+                    viewFlowPointName,
+                    notViewApplicationNames,
+                    notViewFlowNames,
+                    notViewFlowPointName,
+                    freeTextSearchList,
+                    dataBaseSearchList
+            );
+
+            return Response.ok(internalCallbackName + "(" + jsonResult.toString() + ")").build();
+
+        } catch (Exception ex) {
+            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            return Response.serverError().build();
+        }
+
+    }
+
     @POST
-    @Path("/persist")
+    @Path("persist")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response persist(Transactions transactions) {
+
+    public Response persist(Transactions transactions
+    ) {
 
         System.err.println("[ Got REST call POST ]");
 
@@ -157,7 +734,7 @@ public class TransactionLogRestService_V1 {
     }
 
     private List<String> getDefaultSearchableDatabases() {
-        List<String> defaultSearchableDatabases = new ArrayList<String>();
+        List<String> defaultSearchableDatabases = new ArrayList<>();
         defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_01_NAME);
         defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_02_NAME);
         defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_03_NAME);

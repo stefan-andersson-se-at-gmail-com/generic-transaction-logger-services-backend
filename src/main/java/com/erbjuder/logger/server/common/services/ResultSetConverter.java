@@ -19,7 +19,6 @@ package com.erbjuder.logger.server.common.services;
 //import org.codehaus.jettison.json.JSONArray;
 //import org.codehaus.jettison.json.JSONObject;
 import com.erbjuder.logger.server.common.helper.DataBase;
-import com.erbjuder.logger.server.common.helper.TimeStampUtils;
 import com.erbjuder.logger.server.entity.impl.LogMessage;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_01;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_02;
@@ -57,7 +56,7 @@ public class ResultSetConverter {
      */
     public List<String> toStringList(ResultSet rs) throws Exception {
 
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         try {
 
             // we will need the column names, this will save the table meta-data like column nmae.
@@ -104,7 +103,7 @@ public class ResultSetConverter {
 //                        temp = ESAPI.encoder().encodeForHTML(temp); //encoding to be browser safe
 //                        obj.put(column_name, temp); //putting data into JSON object
 //                    
-                        builder.append(rs.getNString(column_name));
+                        builder.append(rs.getString(column_name));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TINYINT) {
                         builder.append(rs.getInt(column_name));
@@ -131,6 +130,7 @@ public class ResultSetConverter {
                 }//end foreach
                 list.add(builder.toString());
             }//end while
+            rs.close();
         } catch (Exception ex) {
             Logger.getLogger(ResultSetConverter.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
@@ -139,7 +139,7 @@ public class ResultSetConverter {
     }
 
     public List<LogMessage> toLogMessages(List<ResultSet> rsList) throws Exception {
-        List<LogMessage> logMessages = new ArrayList<LogMessage>();
+        List<LogMessage> logMessages = new ArrayList<>();
         for (ResultSet rs : rsList) {
             logMessages = toLogMessageInternal(rs, logMessages);
         }
@@ -147,7 +147,7 @@ public class ResultSetConverter {
     }
 
     public List<LogMessage> toLogMessages(ResultSet rs) throws Exception {
-        return toLogMessageInternal(rs, new ArrayList<LogMessage>());
+        return toLogMessageInternal(rs, new ArrayList<>());
     }
 
     private List<LogMessage> toLogMessageInternal(ResultSet rs, List<LogMessage> logMessages) {
@@ -211,6 +211,7 @@ public class ResultSetConverter {
                 }//end foreach
                 logMessages.add(obj);
             }//end while
+            rs.close();
         } catch (Exception ex) {
             Logger.getLogger(ResultSetConverter.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
@@ -219,7 +220,7 @@ public class ResultSetConverter {
     }
 
     public List<LogMessageData> toLogMessageData(List<ResultSet> rsList) throws Exception {
-        List<LogMessageData> logMessageData = new ArrayList<LogMessageData>();
+        List<LogMessageData> logMessageData = new ArrayList<>();
         for (ResultSet rs : rsList) {
             logMessageData = toLogMessageDataInternal(rs, logMessageData);
         }
@@ -227,7 +228,7 @@ public class ResultSetConverter {
     }
 
     public List<LogMessageData> toLogMessageData(ResultSet rs) throws Exception {
-        return toLogMessageDataInternal(rs, new ArrayList<LogMessageData>());
+        return toLogMessageDataInternal(rs, new ArrayList<>());
     }
 
     private List<LogMessageData> toLogMessageDataInternal(ResultSet rs, List<LogMessageData> logMessageData) {
@@ -328,6 +329,7 @@ public class ResultSetConverter {
                 }//end foreach
                 logMessageData.add(obj);
             }//end while
+            rs.close();
         } catch (Exception ex) {
             Logger.getLogger(ResultSetConverter.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
@@ -410,7 +412,7 @@ public class ResultSetConverter {
 //                        temp = ESAPI.encoder().encodeForHTML(temp); //encoding to be browser safe
 //                        obj.put(column_name, temp); //putting data into JSON object
 //                    
-                        obj.put(column_name, rs.getNString(column_name));
+                        obj.put(column_name, rs.getString(column_name));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TINYINT) {
                         obj.put(column_name, ((Integer) rs.getInt(column_name)).toString());
@@ -419,13 +421,13 @@ public class ResultSetConverter {
                         obj.put(column_name, ((Integer) rs.getInt(column_name)).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.DATE) {
-                        obj.put(column_name, rs.getDate(column_name).toString());
+                        obj.put(column_name, rs.getString(column_name) );//rs.getDate(column_name).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TIME) {
-                        obj.put(column_name, TimeStampUtils.dateTimeToString(rs.getTime(column_name)));
+                        obj.put(column_name, rs.getString(column_name) ); // TimeStampUtils.dateTimeToString(rs.getTime(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TIMESTAMP) {
-                        obj.put(column_name, TimeStampUtils.timeStampToString(rs.getTimestamp(column_name)));
+                        obj.put(column_name, rs.getString(column_name) ); // TimeStampUtils.timeStampToString(rs.getTimestamp(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.NUMERIC) {
                         obj.put(column_name, rs.getBigDecimal(column_name).toString());
@@ -437,6 +439,7 @@ public class ResultSetConverter {
                 }//end foreach
                 json.add(obj);
             }//end while
+            rs.close();
         } catch (Exception ex) {
             Logger.getLogger(ResultSetConverter.class.getName()).log(Level.SEVERE, ex.getMessage());
         }

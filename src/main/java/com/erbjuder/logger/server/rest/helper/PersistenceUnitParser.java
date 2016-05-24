@@ -39,9 +39,9 @@ public class PersistenceUnitParser {
     public static final String PERSISTENCE_JAR_PATH = "META-INF/" + FILE_NAME;
     public static final String PERSISTENCE_WAR_PATH_1 = "WEB-INF/classes/" + FILE_NAME;
     public static final String PERSISTENCE_WAR_PATH_2 = "WEB-INF/classes/" + PERSISTENCE_JAR_PATH;
-                                                            
+
     private String unitName = "";
-    private static PersistenceUnitImpl persistenceUnit = null;
+    private static JPAHandler handler = null;
 
     public PersistenceUnitParser(String unitName) {
         this.unitName = unitName;
@@ -51,14 +51,21 @@ public class PersistenceUnitParser {
     public String getDataSourceString() throws ParserConfigurationException {
         String dataSource = null;
 
-        String dataJtaDataSourceString = persistenceUnit.getJtaDataSource();
-        String nonJtaDataSourceString = persistenceUnit.getNonJtaDataSource();
-        if (!dataJtaDataSourceString.isEmpty()) {
-            dataSource = dataJtaDataSourceString;
-        } else if (!nonJtaDataSourceString.isEmpty()) {
-            dataSource = nonJtaDataSourceString;
-        } else {
-            throw new ParserConfigurationException();
+        try {
+
+            PersistenceUnitImpl persistenceUnit = handler.getPersistenceUnitsByName(unitName);
+            String dataJtaDataSourceString = persistenceUnit.getJtaDataSource();
+            String nonJtaDataSourceString = persistenceUnit.getNonJtaDataSource();
+            if (!dataJtaDataSourceString.isEmpty()) {
+                dataSource = dataJtaDataSourceString;
+            } else if (!nonJtaDataSourceString.isEmpty()) {
+                dataSource = nonJtaDataSourceString;
+            } else {
+                throw new ParserConfigurationException();
+            }
+
+        } catch (NullPointerException e) {
+            throw new ParserConfigurationException("property file not found in the classpath ==> JPAHandler is null");
         }
 
         return dataSource;
@@ -69,65 +76,59 @@ public class PersistenceUnitParser {
         Exception jarEx = null;
         //
         // Parse Path(s)
-        if (persistenceUnit == null) { 
+        if (handler == null) {
             try {
-                JPAHandler handler = this.parserPath(PersistenceUnitParser.FILE_NAME);
-                persistenceUnit = handler.getPersistenceUnitsByName(unitName);
+                handler = this.parserPath(PersistenceUnitParser.FILE_NAME);
             } catch (NullPointerException | SAXException | ParserConfigurationException | IOException | IllegalArgumentException ex) {
                 Logger.getLogger(PersistenceUnitParser.class.getName()).log(Level.SEVERE, null, ex);
                 warEx = ex;
-                persistenceUnit = null;
+                handler = null;
             }
         }
 
         //
         // Parse Path(s)
-        if (persistenceUnit == null) {
+        if (handler == null) {
 
             try {
-                JPAHandler handler = this.parserPath(PersistenceUnitParser.PERSISTENCE_JAR_PATH);
-                persistenceUnit = handler.getPersistenceUnitsByName(unitName);
+                handler = this.parserPath(PersistenceUnitParser.PERSISTENCE_JAR_PATH);
             } catch (NullPointerException | SAXException | ParserConfigurationException | IOException | IllegalArgumentException ex) {
                 Logger.getLogger(PersistenceUnitParser.class.getName()).log(Level.SEVERE, null, ex);
                 warEx = ex;
-                persistenceUnit = null;
+                handler = null;
             }
         }
 
         //
         // Parse Path(s)
-        if (persistenceUnit == null) {
+        if (handler == null) {
 
             try {
-                JPAHandler handler = this.parserPath(PersistenceUnitParser.PERSISTENCE_WAR_PATH_1);
-                persistenceUnit = handler.getPersistenceUnitsByName(unitName);
+                handler = this.parserPath(PersistenceUnitParser.PERSISTENCE_WAR_PATH_1);
             } catch (NullPointerException | SAXException | ParserConfigurationException | IOException | IllegalArgumentException ex) {
                 Logger.getLogger(PersistenceUnitParser.class.getName()).log(Level.SEVERE, null, ex);
                 warEx = ex;
-                persistenceUnit = null;
+                handler = null;
             }
         }
 
         //
         // Parse Path(s)
-        if (persistenceUnit == null) {
+        if (handler == null) {
 
             try {
-                JPAHandler handler = this.parserPath(PersistenceUnitParser.PERSISTENCE_WAR_PATH_2);
-                persistenceUnit = handler.getPersistenceUnitsByName(unitName);
+                handler = this.parserPath(PersistenceUnitParser.PERSISTENCE_WAR_PATH_2);
             } catch (NullPointerException | SAXException | ParserConfigurationException | IOException | IllegalArgumentException ex) {
                 Logger.getLogger(PersistenceUnitParser.class.getName()).log(Level.SEVERE, null, ex);
                 warEx = ex;
-                persistenceUnit = null;
+                handler = null;
             }
         }
 
         // 
-        // Still null? Write exceptione
-        if (persistenceUnit == null) {
+        // Still null? Write exception
+        if (handler == null) {
             Logger.getLogger(PersistenceUnitParser.class.getName()).log(Level.SEVERE, "PersistanceUnit still NULL");
-            Logger.getLogger(PersistenceUnitParser.class.getName()).log(Level.SEVERE, null, warEx);
-            Logger.getLogger(PersistenceUnitParser.class.getName()).log(Level.SEVERE, null, jarEx);
         }
     }
 
@@ -143,7 +144,7 @@ public class PersistenceUnitParser {
         return saxParser;
     }
 
-    private JPAHandler parserPath(String path) throws FileNotFoundException, MalformedURLException, SAXException, ParserConfigurationException, IOException  {
+    private JPAHandler parserPath(String path) throws FileNotFoundException, MalformedURLException, SAXException, ParserConfigurationException, IOException {
 
         InputStream in = this.getClass().getClassLoader().getResourceAsStream(path);
         if (in != null) {
@@ -151,23 +152,19 @@ public class PersistenceUnitParser {
             JPAHandler handler = new JPAHandler(new Bundle(xml, xml), "1.0");
             getSAxParser().parse(in, handler);
             return handler;
-        } 
-        
-        
-         
+        }
+
         in = Thread.currentThread().getContextClassLoader().getResourceAsStream(PERSISTENCE_JAR_PATH);
         if (in != null) {
             URL xml = new File(path).toURI().toURL();
             JPAHandler handler = new JPAHandler(new Bundle(xml, xml), "1.0");
             getSAxParser().parse(in, handler);
             return handler;
-        } 
-        else {
+        } else {
 
             throw new FileNotFoundException("property file '" + path
                     + "' not found in the classpath");
         }
 
     }
-
 }

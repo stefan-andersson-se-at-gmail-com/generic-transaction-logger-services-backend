@@ -57,8 +57,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 public class LogMessageServiceBase {
 
     private static final Logger logger = Logger.getLogger(LogMessageServiceBase.class.getName());
-    private static final int addNumberOfMonth = 3;
-    private static final long mysql_max_allowed_packet = 4294967296L;
+    private static final int addNumberOfMonth = 12;
+    private static final long mysql_max_allowed_packet = 16000000L;//16MB ( MAX LONG = 4294967296L );
 
     public Response create(Transactions transactions) throws WebServiceException {
 
@@ -70,7 +70,7 @@ public class LogMessageServiceBase {
         Transactions.Transaction[] transactionArray = tmpTransactionList.toArray(new Transaction[tmpTransactionList.size()]);
         Arrays.sort(transactionArray, new TransactionComparator());
 
-        try (Connection connection = MysqlConnection.getConnection()) {
+        try (Connection connection = MysqlConnection.getConnectionWrite()) {
 
             // Prepare
             PrimaryKeySequence primaryKeySequence = fetchPrimaryKeySequence(connection, transactionArray);
@@ -150,8 +150,7 @@ public class LogMessageServiceBase {
                     flowName = header.getTransactionLogPointInfo().getFlowName().trim();
                     flowPointName = header.getTransactionLogPointInfo().getFlowPointName().trim();
                 }
-                
-                
+
                 // Prepare statement
                 preparedStatement.setLong(1, startPK);
                 preparedStatement.setInt(2, DatabasePartitionHelper.calculatePartitionId(utcServerTimestamp));
@@ -163,13 +162,14 @@ public class LogMessageServiceBase {
                 preparedStatement.setBoolean(8, isError);
                 preparedStatement.setString(9, flowName);
                 preparedStatement.setString(10, flowPointName);
-                
+
                 preparedStatement.addBatch();
                 tmpKeySequence.setStartPK(startPK + header.getTransactionLogData().size() + 1);
             }
 
             // persist the last one to
             preparedStatement.executeBatch();
+            preparedStatement.clearBatch();
         }
 
     }
@@ -179,6 +179,7 @@ public class LogMessageServiceBase {
             Transactions.Transaction[] transactionArray,
             Map<Transactions.Transaction, Long> hederPrimaryKeyMappning
     ) throws SQLException {
+
 
         // Prepare log message data, sort on content size
         Map<String, ArrayList<InternalTransactionLogData>> dbContentSizeMap = new HashMap();
@@ -190,7 +191,6 @@ public class LogMessageServiceBase {
         // For all items in [dbContentSizeMap]
         for (Map.Entry<String, ArrayList<InternalTransactionLogData>> entry : dbContentSizeMap.entrySet()) {
 
-             
             // 
             // Build batch and execute when ready!
             long accumulated_batch_size = 0L;
@@ -227,6 +227,7 @@ public class LogMessageServiceBase {
 
                 // Some prepare statements in buffer ==> execute before next run
                 preparedStatement.executeBatch();
+                preparedStatement.clearBatch();
             }
         }
 
@@ -237,7 +238,6 @@ public class LogMessageServiceBase {
             long startPK,
             Transactions.Transaction transaction,
             Map<String, ArrayList<InternalTransactionLogData>> map) {
-
 
         //
         // Prepare data for batch load, organized by which database they belongs to
@@ -304,7 +304,7 @@ public class LogMessageServiceBase {
                 + "UTCLOCALTIMESTAMP, "
                 + "UTCSERVERTIMESTAMP, "
                 + "EXPIREDDATE, "
-                + "LOGMESSAGE_ID) "
+                + "LOGMESSAGE_ID ) "
                 + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
         return mysqlLogMessageDataSizePrepareStatement;
@@ -375,10 +375,7 @@ public class LogMessageServiceBase {
         //  MEDIUMTEXT  |    16,777,215 (224−1) bytes = 16 MiB
         //  LONGTEXT    | 4,294,967,295 (232−1) bytes =  4 GiB
         String partitionName = "";
-        if (contentSize == 0) {
-            // continue;
-
-        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_20B) {
+        if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_20B) {
             partitionName = DataBase.LOGMESSAGEDATA_PARTITION_01_NAME;
         } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_40B) {
             partitionName = DataBase.LOGMESSAGEDATA_PARTITION_02_NAME;
@@ -513,6 +510,23 @@ public class LogMessageServiceBase {
 
         public String getDatabaseName() {
             return this.logMessageDataPartitionNameFromContentSize;
+        }
+
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("primaryKey = [ ").append(primaryKey).append(" ] ");
+            builder.append("foreignKey = [ ").append(foreignKey).append(" ] ");
+            builder.append("label = [ ").append(label).append(" ] ");
+            builder.append("mimeType = [ ").append(mimeType).append(" ] ");
+            builder.append("contentSize = [ ").append(contentSize).append(" ] ");
+            builder.append("utcServerTimestamp = [ ").append(utcServerTimestamp).append(" ] ");
+            builder.append("utcClientTimestamp = [ ").append(utcClientTimestamp).append(" ] ");
+            builder.append("partitionId = [ ").append(partitionId).append(" ] ");
+            builder.append("expiredDate = [ ").append(expiredDate).append(" ] ");
+            builder.append("logMessageDataPartitionNameFromContentSize = [ ").append(logMessageDataPartitionNameFromContentSize).append(" ] ");
+            builder.append("content = [ ").append(content).append(" ] ");
+            return builder.toString();
+
         }
 
         private void processTransactionLogData(Transactions.Transaction.TransactionLogData transactionLogData) {

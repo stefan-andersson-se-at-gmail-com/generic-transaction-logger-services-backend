@@ -34,43 +34,282 @@ public class LogMessageQueries {
     public ResultSet fetch_ApplicationNames(
             String fromDate,
             String toDate,
-            List<String> applicationNames) {
+            Integer page,
+            Integer pageSize,
+            String transactionReferenceId,
+            Integer viewError, // 0=false, 1= true and null skip
+            List<String> viewApplicationNames,
+            List<String> viewFlowNames,
+            List<String> viewFlowPointNames,
+            List<String> notViewApplicationNames,
+            List<String> notViewFlowNames,
+            List<String> notViewFlowPointNames,
+            List<String> freeTextSearchList,
+            List<String> dataSizePartitionList) {
 
         ResultSet rs = null;
-        StringBuilder prepareStatement;
-        try (final Connection conn = MysqlConnection.getConnection()) {
-            prepareStatement = LogMessagePrepareStatements.fetch_ApplicationNames(fromDate, toDate, applicationNames);
+
+        try (Connection conn = MysqlConnection.getConnectionRead()) {
+
+            StringBuilder prepareStatement = new StringBuilder();
+            prepareStatement.append("SELECT ");
+            prepareStatement.append("DISTINCT APPLICATIONNAME ");
+            prepareStatement.append("FROM ").append("LogMessage ");
+
+            List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
+
+            // Between date
+            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+
+            // Transaction ref ID
+            if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+            }
+
+            // view error
+            if (viewError != null) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+            }
+
+            // application names
+            if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                for (String applicationName : viewApplicationNames) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                }
+            }
+
+            // not application names
+            if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+            }
+
+            // flow names
+            if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+            }
+
+            // not flow names
+            if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+            }
+
+            // flow point names
+            if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+            }
+
+            // not flow point names
+            if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+            }
+
+            // Free text search
+            if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
+                    && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+
+                prepareStatement.append("AND ( ");
+                int size = dataSizePartitionList.size();
+                for (int i = 0; i < size; i++) {
+
+                    String logMessageDataPartition = dataSizePartitionList.get(i);
+                    StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                            fromDate,
+                            toDate,
+                            "ID",
+                            logMessageDataPartition,
+                            freeTextSearchList
+                    );
+
+                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                    if (i < size - 1) {
+                        prepareStatement.append("OR ");
+                    }
+
+                }
+
+                prepareStatement.append(" ) ");
+            }
+
+//            // 
+//            // Order by
+//            if (transactionReferenceId == null || transactionReferenceId.isEmpty()) {
+//                prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC, UTCLOCALTIMESTAMP DESC ");
+//            } else {
+//                prepareStatement.append("ORDER BY UTCLOCALTIMESTAMP DESC, UTCSERVERTIMESTAMP DESC ");
+//            }
+            // Pagination: Assume that first page <==> 1
+            int pageOffset = page - 1;
+            if (pageOffset < 0) {
+                pageOffset = 0;
+            } else {
+                pageOffset = pageOffset * pageSize;
+            }
+            prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
+
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
+            stmt.close();
             conn.close();
+
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
             return rs;
         } catch (Exception e) {
             e.printStackTrace();
             return rs;
+
         }
         return rs;
+
     }
 
     public ResultSet fetch_FlowNames(
             String fromDate,
             String toDate,
-            List<String> flowNames) {
+            Integer page,
+            Integer pageSize,
+            String transactionReferenceId,
+            Integer viewError, // 0=false, 1= true and null skip
+            List<String> viewApplicationNames,
+            List<String> viewFlowNames,
+            List<String> viewFlowPointNames,
+            List<String> notViewApplicationNames,
+            List<String> notViewFlowNames,
+            List<String> notViewFlowPointNames,
+            List<String> freeTextSearchList,
+            List<String> dataSizePartitionList) {
 
         ResultSet rs = null;
-        StringBuilder prepareStatement;
-        try (final Connection conn = MysqlConnection.getConnection()) {
-            prepareStatement = LogMessagePrepareStatements.fetch_logMessagesFromFlowNames(fromDate, toDate, flowNames);
+
+        try (Connection conn = MysqlConnection.getConnectionRead()) {
+
+            StringBuilder prepareStatement = new StringBuilder();
+            prepareStatement.append("SELECT ");
+            prepareStatement.append("DISTINCT FLOWNAME ");
+            prepareStatement.append("FROM ").append("LogMessage ");
+
+            List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
+
+            // Between date
+            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+
+            // Transaction ref ID
+            if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+            }
+
+            // view error
+            if (viewError != null) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+            }
+
+            // application names
+            if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("APPLICATIONNAME IN ").append(PrepareStatementHelper.toSQLList(viewApplicationNames)).append(" ");
+            }
+
+            // not application names
+            if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+            }
+
+            // flow names
+            if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                for (String flowName : viewFlowNames) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(flowName)).append(" ");
+                }
+            }
+
+            // not flow names
+            if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+            }
+
+            // flow point names
+            if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+            }
+
+            // not flow point names
+            if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+            }
+
+            // Free text search
+            if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
+                    && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+
+                prepareStatement.append("AND ( ");
+                int size = dataSizePartitionList.size();
+                for (int i = 0; i < size; i++) {
+
+                    String logMessageDataPartition = dataSizePartitionList.get(i);
+                    StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                            fromDate,
+                            toDate,
+                            "ID",
+                            logMessageDataPartition,
+                            freeTextSearchList
+                    );
+
+                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                    if (i < size - 1) {
+                        prepareStatement.append("OR ");
+                    }
+
+                }
+
+                prepareStatement.append(" ) ");
+            }
+
+//            // 
+//            // Order by
+//            if (transactionReferenceId == null || transactionReferenceId.isEmpty()) {
+//                prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC, UTCLOCALTIMESTAMP DESC ");
+//            } else {
+//                prepareStatement.append("ORDER BY UTCLOCALTIMESTAMP DESC, UTCSERVERTIMESTAMP DESC ");
+//            }
+            // Pagination: Assume that first page <==> 1
+            int pageOffset = page - 1;
+            if (pageOffset < 0) {
+                pageOffset = 0;
+            } else {
+                pageOffset = pageOffset * pageSize;
+            }
+            prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
+
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
+            stmt.close();
             conn.close();
+
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
             return rs;
         } catch (Exception e) {
             e.printStackTrace();
             return rs;
+
         }
         return rs;
     }
@@ -78,26 +317,148 @@ public class LogMessageQueries {
     public ResultSet fetch_FlowPointNames(
             String fromDate,
             String toDate,
-            List<String> flowNames) {
+            Integer page,
+            Integer pageSize,
+            String transactionReferenceId,
+            Integer viewError, // 0=false, 1= true and null skip
+            List<String> viewApplicationNames,
+            List<String> viewFlowNames,
+            List<String> viewFlowPointNames,
+            List<String> notViewApplicationNames,
+            List<String> notViewFlowNames,
+            List<String> notViewFlowPointNames,
+            List<String> freeTextSearchList,
+            List<String> dataSizePartitionList) {
 
         ResultSet rs = null;
-        StringBuilder prepareStatement;
-        try (final Connection conn = MysqlConnection.getConnection()) {
-            prepareStatement = LogMessagePrepareStatements.fetch_logMessagesFromFlowPointNames(fromDate, toDate, flowNames);
+
+        try (Connection conn = MysqlConnection.getConnectionRead()) {
+
+            StringBuilder prepareStatement = new StringBuilder();
+            prepareStatement.append("SELECT ");
+            prepareStatement.append("DISTINCT FLOWPOINTNAME ");
+            prepareStatement.append("FROM ").append("LogMessage ");
+
+            List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
+
+            // Between date
+            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+
+            // Transaction ref ID
+            if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+            }
+
+            // view error
+            if (viewError != null) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+            }
+
+            // application names
+            if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("APPLICATIONNAME IN ").append(PrepareStatementHelper.toSQLList(viewApplicationNames)).append(" ");
+            }
+
+            // not application names
+            if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+            }
+
+            // flow names
+            if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+            }
+
+            // not flow names
+            if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+            }
+
+            // flow point names
+            if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                for (String flowPointName : viewFlowPointNames) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(flowPointName)).append(" ");
+                }
+            }
+
+            // not flow point names
+            if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                prepareStatement.append("AND ");
+                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+            }
+
+            // Free text search
+            if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
+                    && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+
+                prepareStatement.append("AND ( ");
+                int size = dataSizePartitionList.size();
+                for (int i = 0; i < size; i++) {
+
+                    String logMessageDataPartition = dataSizePartitionList.get(i);
+                    StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                            fromDate,
+                            toDate,
+                            "ID",
+                            logMessageDataPartition,
+                            freeTextSearchList
+                    );
+
+                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                    if (i < size - 1) {
+                        prepareStatement.append("OR ");
+                    }
+
+                }
+
+                prepareStatement.append(" ) ");
+            }
+
+//            // 
+//            // Order by
+//            if (transactionReferenceId == null || transactionReferenceId.isEmpty()) {
+//                prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC, UTCLOCALTIMESTAMP DESC ");
+//            } else {
+//                prepareStatement.append("ORDER BY UTCLOCALTIMESTAMP DESC, UTCSERVERTIMESTAMP DESC ");
+//            }
+            // Pagination: Assume that first page <==> 1
+            int pageOffset = page - 1;
+            if (pageOffset < 0) {
+                pageOffset = 0;
+            } else {
+                pageOffset = pageOffset * pageSize;
+            }
+            prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
+
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
+            stmt.close();
             conn.close();
+
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
             return rs;
         } catch (Exception e) {
             e.printStackTrace();
             return rs;
+
         }
         return rs;
+
     }
 
     public ResultSet fetch_logMessageList(
+            Long id,
+            Integer partitionId,
             String fromDate,
             String toDate,
             Integer page,
@@ -115,7 +476,7 @@ public class LogMessageQueries {
 
         ResultSet rs = null;
 
-        try (Connection conn = MysqlConnection.getConnection()) {
+        try (Connection conn = MysqlConnection.getConnectionRead()) {
 
             StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
@@ -123,8 +484,18 @@ public class LogMessageQueries {
             prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
             prepareStatement.append("FROM ").append("LogMessage ");
 
-            List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+            if (partitionId != null) {
+                String sqlPartitionSyntax = DatabasePartitionHelper.getPartitionSyntax(partitionId);
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntax)).append(" WHERE ");
+            } else {
+                List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
+            }
+
+            if (id != null) {
+                prepareStatement.append("ID = ").append(id).append(" ");
+                prepareStatement.append("AND ");
+            }
 
             // Between date
             prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -186,13 +557,27 @@ public class LogMessageQueries {
                 for (int i = 0; i < size; i++) {
 
                     String logMessageDataPartition = dataSizePartitionList.get(i);
-                    StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition(
-                            fromDate,
-                            toDate,
-                            "ID",
-                            logMessageDataPartition,
-                            freeTextSearchList
-                    );
+
+                    StringBuilder partitionBuilder;
+                    if (id != null) {
+
+                        partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdValue(
+                                fromDate,
+                                toDate,
+                                id,
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+
+                    } else {
+                        partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+                    }
 
                     prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
 
@@ -208,9 +593,11 @@ public class LogMessageQueries {
             // 
             // Order by
             if (transactionReferenceId == null || transactionReferenceId.isEmpty()) {
-                prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC, UTCLOCALTIMESTAMP DESC ");
+                // prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC, UTCLOCALTIMESTAMP DESC ");
+                prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC ");
             } else {
-                prepareStatement.append("ORDER BY UTCLOCALTIMESTAMP DESC, UTCSERVERTIMESTAMP DESC ");
+                // prepareStatement.append("ORDER BY UTCLOCALTIMESTAMP DESC, UTCSERVERTIMESTAMP DESC ");
+                prepareStatement.append("ORDER BY UTCLOCALTIMESTAMP DESC ");
             }
 
             // Pagination: Assume that first page <==> 1
@@ -224,6 +611,7 @@ public class LogMessageQueries {
 
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
+            stmt.close();
             conn.close();
 
         } catch (SQLException sqlError) {
@@ -239,16 +627,34 @@ public class LogMessageQueries {
     }
 
     public List<ResultSet> fetch_LogMessageData(
-            String logMessageId,
-            int partitionId,
+            Long logMessageId,
+            Integer partitionId,
             List<String> dataSizePartitionList) {
 
         List<ResultSet> rsList = new ArrayList<>();
-        try (Connection conn = MysqlConnection.getConnection()) {
+        try (Connection conn = MysqlConnection.getConnectionRead()) {
 
-            String partitionBefore = DatabasePartitionHelper.mysql_partition_prefix + (partitionId - 1);
-            String partition = DatabasePartitionHelper.mysql_partition_prefix + (partitionId);
-            String partitionAfter = DatabasePartitionHelper.mysql_partition_prefix + (partitionId + 1);
+            // should be from propertie file 
+            String partitionBefore;
+            String partition;
+            String partitionAfter;
+
+            int partitionNumber = 732;
+            int modulo = partitionId % partitionNumber;
+            if (modulo == 0) {
+                partitionBefore = DatabasePartitionHelper.mysql_partition_prefix + (partitionId - 1);
+                partition = DatabasePartitionHelper.mysql_partition_prefix + (partitionId);
+                partitionAfter = DatabasePartitionHelper.mysql_partition_prefix + (1);
+            } else if (modulo == 1) {
+                partitionBefore = DatabasePartitionHelper.mysql_partition_prefix + (partitionNumber);
+                partition = DatabasePartitionHelper.mysql_partition_prefix + (partitionId);
+                partitionAfter = DatabasePartitionHelper.mysql_partition_prefix + (partitionId + 1);
+            } else {
+                partitionBefore = DatabasePartitionHelper.mysql_partition_prefix + (partitionId - 1);
+                partition = DatabasePartitionHelper.mysql_partition_prefix + (partitionId);
+                partitionAfter = DatabasePartitionHelper.mysql_partition_prefix + (partitionId + 1);
+            }
+
             List<String> sqlPartitionSyntaxList = new ArrayList();
             sqlPartitionSyntaxList.add(partitionBefore);
             sqlPartitionSyntaxList.add(partition);
@@ -262,19 +668,21 @@ public class LogMessageQueries {
                 prepareStatement.append("CONTENTSIZE, SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID ");
                 prepareStatement.append("FROM ").append(databaseSizePartition).append(" ");
 
-                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" ");
-                prepareStatement.append("WHERE LOGMESSAGE_ID = ").append(logMessageId);
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" ");
+                prepareStatement.append("WHERE LOGMESSAGE_ID = ").append(logMessageId.toString());
 
                 CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
                 ResultSet rs = stmt.executeQuery();
 
                 if (rs != null) {
                     rsList.add(rs);
+                    stmt.close();
 
                 }
             }
-
-            conn.close();
+            
+              
+             conn.close();
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
             return rsList;
@@ -295,7 +703,7 @@ public class LogMessageQueries {
     ) throws Exception {
 
         ResultSet rs = null;
-        try (Connection conn = MysqlConnection.getConnection()) {
+        try (Connection conn = MysqlConnection.getConnectionRead()) {
 
             StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
@@ -304,7 +712,7 @@ public class LogMessageQueries {
             prepareStatement.append("FROM ").append(logMessageDataSizePartition).append(" ");
 
             List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List(sqlPartitionSyntaxList)).append(" WHERE ");
+            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
 
             // Between date
             prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
@@ -336,6 +744,7 @@ public class LogMessageQueries {
 
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             rs = stmt.executeQuery();
+            stmt.close();
             conn.close();
 
         } catch (SQLException sqlError) {

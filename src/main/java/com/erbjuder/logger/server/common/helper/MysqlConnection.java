@@ -32,39 +32,76 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class MysqlConnection {
 
-    private static final String persistenceUnitName = "TransactionLogger";
-    private static DataSource dataSource = null;
-    private static Context context = null;
+    private static final String persistenceUnitNameRead = "TransactionLoggerRead";
+    private static final String persistenceUnitNameWrite = "TransactionLoggerWrite";
+    private static DataSource dataSourceRead = null;
+    private static DataSource dataSourceWrite = null;
+    private static Context contextRead = null;
+    private static Context contextWrite = null;
 
-    private static DataSource DataSource() throws Exception {
+    private static DataSource DataSourceRead() throws Exception {
         /**
          * check to see if the database object is already defined... if it is,
          * then return the connection, no need to look it up again.
          */
-        if (dataSource != null) {
-            return dataSource;
+        if (dataSourceRead != null) {
+            return dataSourceRead;
         }
         try {
             /**
              * This only needs to run one time to get the database object.
              * context is used to lookup the database object
              */
-            if (context == null) {
-                context = new InitialContext();
+            if (contextRead == null) {
+                contextRead = new InitialContext();
             }
-
-            dataSource = (DataSource) context.lookup(new PersistenceUnitParser(persistenceUnitName).getDataSourceString());
+            System.err.println("Shoud be Read : " + new PersistenceUnitParser(persistenceUnitNameRead).getDataSourceString());
+            dataSourceRead = (DataSource) contextRead.lookup(new PersistenceUnitParser(persistenceUnitNameRead).getDataSourceString());
         } catch (NamingException | ParserConfigurationException ex) {
             Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return dataSource;
+        return dataSourceRead;
     }
 
-    public static Connection getConnection() {
+    private static DataSource DataSourceWrite() throws Exception {
+        /**
+         * check to see if the database object is already defined... if it is,
+         * then return the connection, no need to look it up again.
+         */
+        if (dataSourceWrite != null) {
+            return dataSourceWrite;
+        }
+        try {
+            /**
+             * This only needs to run one time to get the database object.
+             * context is used to lookup the database object
+             */
+            if (contextWrite == null) {
+                contextWrite = new InitialContext();
+            }
+
+            System.err.println("Shoud be Write : " + new PersistenceUnitParser(persistenceUnitNameWrite).getDataSourceString());
+            dataSourceWrite = (DataSource) contextWrite.lookup(new PersistenceUnitParser(persistenceUnitNameWrite).getDataSourceString());
+        } catch (NamingException | ParserConfigurationException ex) {
+            Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return dataSourceWrite;
+    }
+
+    public static Connection getConnectionRead() {
         Connection conn = null;
         try {
-            conn = MysqlConnection.DataSource().getConnection();
-            return conn;
+            conn = MysqlConnection.DataSourceRead().getConnection();
+        } catch (Exception ex) {
+            Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return conn;
+    }
+
+    public static Connection getConnectionWrite() {
+        Connection conn = null;
+        try {
+            conn = MysqlConnection.DataSourceWrite().getConnection();
         } catch (Exception ex) {
             Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
         }

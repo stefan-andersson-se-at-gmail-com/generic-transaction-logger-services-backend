@@ -28,17 +28,19 @@ import java.util.Date;
 public class LogMessageData_Incomplete implements Serializable, LogMessageData {
 
     private static final long serialVersionUID = 1L;
+
     private Long id;
-    private Class fromClass;
-    protected String label;
-    protected String mimeType;
-    protected String content = "";
-    protected java.sql.Timestamp utcLocalTimeStamp;
-    protected java.sql.Timestamp utcServerTimeStamp;
-    protected boolean modified = false;
-    protected boolean searchable = true;
-    protected long contentSize;
-    protected LogMessage logMessage;
+    private int partitionId;
+    private Long logMessageId;
+    private String label;
+    private String mimeType;
+    private java.sql.Timestamp utcLocalTimeStamp;
+    private java.sql.Timestamp utcServerTimeStamp;
+    private Date expiredDate;
+    private boolean modified = false;
+    private boolean searchable = true;
+    private long contentSize;
+    protected String content;
 
     public LogMessageData_Incomplete() {
         super();
@@ -52,20 +54,14 @@ public class LogMessageData_Incomplete implements Serializable, LogMessageData {
             boolean modified,
             boolean searchable,
             java.sql.Timestamp utcServerTimeStamp,
-            java.sql.Timestamp utcLocalTimeStamp,
-            LogMessage logMessage,
-            Class fromClass
+            java.sql.Timestamp utcLocalTimeStamp
     ) {
         this.id = id;
-        this.fromClass = fromClass;
-        //
-        // Super
         this.label = label;
         this.contentSize = contentSize;
         this.mimeType = mimeType;
         this.modified = modified;
         this.searchable = searchable;
-        this.logMessage = logMessage;
         this.utcLocalTimeStamp = utcLocalTimeStamp;
         this.utcServerTimeStamp = utcServerTimeStamp;
 
@@ -79,14 +75,6 @@ public class LogMessageData_Incomplete implements Serializable, LogMessageData {
     @Override
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Class getFromClass() {
-        return fromClass;
-    }
-
-    public void setFromClass(Class fromClass) {
-        this.fromClass = fromClass;
     }
 
     @Override
@@ -139,7 +127,7 @@ public class LogMessageData_Incomplete implements Serializable, LogMessageData {
         this.contentSize = contentSize;
     }
 
-       @Override
+    @Override
     public Timestamp getUtcLocalTimeStamp() {
         return utcLocalTimeStamp;
     }
@@ -157,15 +145,6 @@ public class LogMessageData_Incomplete implements Serializable, LogMessageData {
     @Override
     public void setUtcServerTimeStamp(Timestamp utcServerTimeStamp) {
         this.utcServerTimeStamp = utcServerTimeStamp;
-    }
-     
-    public LogMessage getLogMessage() {
-        return logMessage;
-    }
-
- 
-    public void setLogMessage(LogMessage logMessage) {
-        this.logMessage = logMessage;
     }
 
     @Override
@@ -210,32 +189,32 @@ public class LogMessageData_Incomplete implements Serializable, LogMessageData {
 
     @Override
     public int getPartitionId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.partitionId;
     }
 
     @Override
-    public void setPartitionId(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setPartitionId(int partitionId) {
+        this.partitionId = partitionId;
     }
 
     @Override
     public Long getLogMessageId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.logMessageId;
     }
 
     @Override
     public void setLogMessageId(Long logMessageId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.logMessageId = logMessageId;
     }
 
     @Override
     public Date getExpiredDate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.expiredDate;
     }
 
     @Override
-    public void setExpiredDate(Date date) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setExpiredDate(Date expiredDate) {
+        this.expiredDate = expiredDate;
     }
 
 }
