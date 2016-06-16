@@ -125,7 +125,7 @@
                                 <wsdlFile>ApplicationFlowConfiguration/ApplicationFlowConfiguration.wsdl</wsdlFile>
                                 <wsdlFile>GlobalFlowConfiguration/GlobalFlowConfiguration.wsdl</wsdlFile>
                                 <wsdlFile>GlobalFlowPointBinding/GlobalFlowPointBinding.wsdl</wsdlFile>  
-                                
+                                <wsdlFile>Sandvik_TransactionLogger_Service/Transactionlogger.wsdl</wsdlFile>  
                             </wsdlFiles>
                         </configuration>
                     </execution>

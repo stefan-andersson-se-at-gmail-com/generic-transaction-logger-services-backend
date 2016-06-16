@@ -19,7 +19,7 @@ package com.erbjuder.logger.server.rest.services;
 import com.erbjuder.logger.server.common.helper.DataBase;
 import com.erbjuder.logger.server.common.services.LogMessageQueries;
 import com.erbjuder.logger.server.common.services.LogMessageServiceBase;
-import com.erbjuder.logger.server.common.services.ResultSetConverter;
+import com.erbjuder.logger.server.common.services.ResultSetConverterJSONArray;
 import com.generic.global.transactionlogger.Transactions;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,8 +76,8 @@ public class TransactionLogRestService_V1 {
         }
 
         LogMessageQueries loggerSchema = new LogMessageQueries();
-        ResultSetConverter converter = new ResultSetConverter();
-        return converter.toJSONArray(loggerSchema.fetch_logMessageList(
+        ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
+        loggerSchema.fetch_logMessageList(
                 id,
                 partitionId,
                 fromDate,
@@ -93,8 +93,11 @@ public class TransactionLogRestService_V1 {
                 notViewFlowNames,
                 notViewFlowPointName,
                 freeTextSearchList,
-                dataBaseSearchList
-        ));
+                dataBaseSearchList,
+                converter
+        );
+
+        return converter.getResult();
 
     }
 
@@ -223,12 +226,14 @@ public class TransactionLogRestService_V1 {
 //            System.err.println("dataBaseSearchList=[" + dataBaseSearchList + "]");
 
         LogMessageQueries loggerSchema = new LogMessageQueries();
-        ResultSetConverter converter = new ResultSetConverter();
-        return converter.toJSONArray(loggerSchema.fetch_LogMessageData(
+        ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
+        loggerSchema.fetch_LogMessageData(
                 logMessageId,
                 logMessagePartitionId,
-                dataBaseSearchList));
+                dataBaseSearchList,
+                converter);
 
+        return converter.getResult();
     }
 
     @GET
@@ -311,8 +316,8 @@ public class TransactionLogRestService_V1 {
         }
 
         LogMessageQueries loggerSchema = new LogMessageQueries();
-        ResultSetConverter converter = new ResultSetConverter();
-        return converter.toJSONArray(loggerSchema.fetch_FlowPointNames(
+        ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
+        loggerSchema.fetch_FlowPointNames(
                 fromDate,
                 toDate,
                 page,
@@ -326,8 +331,11 @@ public class TransactionLogRestService_V1 {
                 notViewFlowNames,
                 notViewFlowPointName,
                 freeTextSearchList,
-                dataBaseSearchList
-        ));
+                dataBaseSearchList,
+                converter
+        );
+
+        return converter.getResult();
 
     }
 
@@ -454,8 +462,8 @@ public class TransactionLogRestService_V1 {
         }
 
         LogMessageQueries loggerSchema = new LogMessageQueries();
-        ResultSetConverter converter = new ResultSetConverter();
-        return converter.toJSONArray(loggerSchema.fetch_FlowNames(
+        ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
+        loggerSchema.fetch_FlowNames(
                 fromDate,
                 toDate,
                 page,
@@ -469,8 +477,11 @@ public class TransactionLogRestService_V1 {
                 notViewFlowNames,
                 notViewFlowPointName,
                 freeTextSearchList,
-                dataBaseSearchList
-        ));
+                dataBaseSearchList,
+                converter
+        );
+
+        return converter.getResult();
 
     }
 
@@ -597,8 +608,8 @@ public class TransactionLogRestService_V1 {
         }
 
         LogMessageQueries loggerSchema = new LogMessageQueries();
-        ResultSetConverter converter = new ResultSetConverter();
-        return converter.toJSONArray(loggerSchema.fetch_ApplicationNames(
+        ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
+        loggerSchema.fetch_ApplicationNames(
                 fromDate,
                 toDate,
                 page,
@@ -612,8 +623,11 @@ public class TransactionLogRestService_V1 {
                 notViewFlowNames,
                 notViewFlowPointName,
                 freeTextSearchList,
-                dataBaseSearchList
-        ));
+                dataBaseSearchList,
+                converter
+        );
+
+        return converter.getResult();
 
     }
 

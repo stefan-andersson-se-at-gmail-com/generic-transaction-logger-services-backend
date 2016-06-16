@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class LogMessageQueries {
 
-    public ResultSet fetch_ApplicationNames(
+    public ResultSetConverter fetch_ApplicationNames(
             String fromDate,
             String toDate,
             Integer page,
@@ -45,9 +45,10 @@ public class LogMessageQueries {
             List<String> notViewFlowNames,
             List<String> notViewFlowPointNames,
             List<String> freeTextSearchList,
-            List<String> dataSizePartitionList) {
+            List<String> dataSizePartitionList,
+            ResultSetConverter converter) {
 
-        ResultSet rs = null;
+         
 
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
@@ -157,23 +158,25 @@ public class LogMessageQueries {
             prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
 
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
-            rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
+            converter.convert(rs);
+            rs.close();
             stmt.close();
             conn.close();
 
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
-            return rs;
+            return converter;
         } catch (Exception e) {
             e.printStackTrace();
-            return rs;
+            return converter;
 
         }
-        return rs;
+        return converter;
 
     }
 
-    public ResultSet fetch_FlowNames(
+    public ResultSetConverter fetch_FlowNames(
             String fromDate,
             String toDate,
             Integer page,
@@ -187,9 +190,10 @@ public class LogMessageQueries {
             List<String> notViewFlowNames,
             List<String> notViewFlowPointNames,
             List<String> freeTextSearchList,
-            List<String> dataSizePartitionList) {
+            List<String> dataSizePartitionList,
+            ResultSetConverter converter) {
 
-        ResultSet rs = null;
+        
 
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
@@ -299,22 +303,24 @@ public class LogMessageQueries {
             prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
 
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
-            rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
+            converter.convert(rs);
+            rs.close();
             stmt.close();
             conn.close();
 
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
-            return rs;
+            return converter;
         } catch (Exception e) {
             e.printStackTrace();
-            return rs;
+            return converter;
 
         }
-        return rs;
+        return converter;
     }
 
-    public ResultSet fetch_FlowPointNames(
+    public ResultSetConverter fetch_FlowPointNames(
             String fromDate,
             String toDate,
             Integer page,
@@ -328,9 +334,10 @@ public class LogMessageQueries {
             List<String> notViewFlowNames,
             List<String> notViewFlowPointNames,
             List<String> freeTextSearchList,
-            List<String> dataSizePartitionList) {
+            List<String> dataSizePartitionList,
+            ResultSetConverter converter) {
 
-        ResultSet rs = null;
+         
 
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
@@ -440,23 +447,25 @@ public class LogMessageQueries {
             prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
 
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
-            rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
+            converter.convert(rs);
+            rs.close();
             stmt.close();
             conn.close();
 
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
-            return rs;
+            return converter;
         } catch (Exception e) {
             e.printStackTrace();
-            return rs;
+            return converter;
 
         }
-        return rs;
+        return converter;
 
     }
 
-    public ResultSet fetch_logMessageList(
+    public ResultSetConverter fetch_logMessageList(
             Long id,
             Integer partitionId,
             String fromDate,
@@ -472,9 +481,10 @@ public class LogMessageQueries {
             List<String> notViewFlowNames,
             List<String> notViewFlowPointNames,
             List<String> freeTextSearchList,
-            List<String> dataSizePartitionList) throws Exception {
+            List<String> dataSizePartitionList,
+            ResultSetConverter converter) throws Exception {
 
-        ResultSet rs = null;
+         
 
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
@@ -610,28 +620,31 @@ public class LogMessageQueries {
             prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
 
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
-            rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
+            converter.convert(rs);
+            rs.close();
             stmt.close();
             conn.close();
 
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
-            return rs;
+            return converter;
         } catch (Exception e) {
             e.printStackTrace();
-            return rs;
+            return converter;
 
         }
-        return rs;
+        return converter;
 
     }
 
-    public List<ResultSet> fetch_LogMessageData(
+    public ResultSetConverter fetch_LogMessageData(
             Long logMessageId,
             Integer partitionId,
-            List<String> dataSizePartitionList) {
+            List<String> dataSizePartitionList,
+            ResultSetConverter converter) {
 
-        List<ResultSet> rsList = new ArrayList<>();
+        
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
             // should be from propertie file 
@@ -675,34 +688,35 @@ public class LogMessageQueries {
                 ResultSet rs = stmt.executeQuery();
 
                 if (rs != null) {
-                    rsList.add(rs);
+
+                    converter.convert(rs);
+                    rs.close();
                     stmt.close();
 
                 }
             }
-            
-              
-             conn.close();
+
+            conn.close();
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
-            return rsList;
+            return converter;
         } catch (Exception e) {
             e.printStackTrace();
-            return rsList;
+            return converter;
 
         }
-        return rsList;
+        return converter;
     }
 
-    public ResultSet fetch_LogMessageDataFromSizePartition(
+    public ResultSetConverter fetch_LogMessageDataFromSizePartition(
             String fromDate,
             String toDate,
             String logMessageId,
             String logMessageDataSizePartition,
-            List<String> freeTextSearchList
+            List<String> freeTextSearchList,
+            ResultSetConverter converter
     ) throws Exception {
 
-        ResultSet rs = null;
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
             StringBuilder prepareStatement = new StringBuilder();
@@ -743,19 +757,21 @@ public class LogMessageQueries {
             }
 
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
-            rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
+            converter.convert(rs);
+            rs.close();
             stmt.close();
             conn.close();
 
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
-            return rs;
+            return converter;
         } catch (Exception e) {
             e.printStackTrace();
-            return rs;
+            return converter;
 
         }
-        return rs;
+        return converter;
 
     }
 
