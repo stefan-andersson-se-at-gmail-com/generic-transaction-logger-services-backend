@@ -747,6 +747,24 @@ public class TransactionLogRestService_V1 {
         }
     }
 
+    @POST
+    @Path("notificationOfApplicationName")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response notificationOfApplicationName(@QueryParam("fromDate") String fromDate,
+            @QueryParam("toDate") String toDate,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize,
+            @QueryParam("transactionReferenceId") String transactionReferenceId,
+            @QueryParam("viewError") Integer viewError,
+            @QueryParam("viewAppName") List<String> viewApplicationNames,
+            @QueryParam("viewFlowName") List<String> viewFlowNames,
+            @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
+            @QueryParam("notViewFlowName") List<String> notViewFlowNames) {
+
+        return Response.ok("()").build();
+    }
+
     private List<String> getDefaultSearchableDatabases() {
         List<String> defaultSearchableDatabases = new ArrayList<>();
         defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_01_NAME);

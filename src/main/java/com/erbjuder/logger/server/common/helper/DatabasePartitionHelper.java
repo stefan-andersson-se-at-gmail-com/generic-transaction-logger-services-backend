@@ -21,6 +21,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -62,10 +64,10 @@ public class DatabasePartitionHelper {
         int day = calendar1.get(Calendar.DAY_OF_YEAR);
         int hours = calendar1.get(Calendar.HOUR_OF_DAY);
 
-        int partitionId = day * 2;
-
+        int partitionId = (day * 2) - 1;
         if (AM >= hours) {
             partitionId = partitionId - 1;
+
         }
 
         return partitionId;
@@ -142,9 +144,11 @@ public class DatabasePartitionHelper {
         }
 
         result.addAll(set);
+        Collections.sort(result, new PartitionSyntaxListComparator());
         return result;
 
     }
+
     /*
      public static List<String> getPartitionId_SQL_SyntaxList(Date fromDate, Date toDate) {
      return getPartitionSyntaxList(DatabasePartitionHelper.calculatePartitionId(fromDate), DatabasePartitionHelper.calculatePartitionId(toDate));
@@ -158,7 +162,6 @@ public class DatabasePartitionHelper {
      return getPartitionSyntaxList(calculatePartitionId(fromMilliseconds), calculatePartitionId(toMilliseconds));
      }
      */
-
     public static List<String> getPartitionSyntaxList(int fromPartition, int toPartition) {
         Set<String> set = new HashSet<>();
         for (int i = fromPartition; i <= toPartition; i++) {
@@ -195,9 +198,37 @@ public class DatabasePartitionHelper {
         return diffInDays;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
         DatabasePartitionHelper helper = new DatabasePartitionHelper();
-        System.err.println(helper.calculatePartitionId(new Date()));
+        // System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-11-15 00:00:01", "2017-11-14 03:18:23").size());
+        // System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-11-15 00:00:01", "2017-11-14 03:18:23"));
+    
+        System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("1981-01-01 00:00:01", "1981-01-01 23:59:59"));
+        System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("1981-12-31 00:00:01", "1981-12-31 23:59:59"));
+        System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2015-01-01 00:00:01", "2015-01-01 23:59:59"));
+        System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2015-12-31 00:00:01", "2015-12-31 23:59:59"));
+        System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-01-01 00:00:01", "2016-01-01 23:59:59"));
+        System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-12-31 00:00:01", "2016-12-31 23:59:59"));
+        System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2017-01-01 00:00:01", "2017-01-01 23:59:59"));
+        System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2017-12-31 00:00:01", "2017-12-31 23:59:59"));
+    }
+
+    private static class PartitionSyntaxListComparator implements Comparator {
+
+        @Override
+        public int compare(Object o1, Object o2) {
+            int obj1 = Integer.parseInt(((String) o1).substring(1));
+            int obj2 = Integer.parseInt(((String) o2).substring(1));
+
+            if (obj1 > obj2) {
+                return 1;
+            } else if (obj1 < obj2) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+
     }
 
 }
