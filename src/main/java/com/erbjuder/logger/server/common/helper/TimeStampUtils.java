@@ -19,6 +19,13 @@ package com.erbjuder.logger.server.common.helper;
 import java.sql.Timestamp;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalField;
 import java.util.Date;
 
 /**
@@ -92,19 +99,101 @@ public class TimeStampUtils {
     }
 
     public static String dateTimeToString(Date date) {
-        Format format = getDateFormater();
+        Format format = getSimpleDateFormater();
         String timeToSeconds = format.format(date);
         return timeToSeconds;
     }
 
     public static String timeStampToString(Timestamp timestamp) {
-        Format format = TimeStampUtils.getDateFormater();
+        Format format = TimeStampUtils.getSimpleDateFormater();
         String timeToSeconds = format.format(timestamp);
         String nanoTime = Integer.toString(timestamp.getNanos());
         return timeToSeconds + "." + nanoTime;
     }
 
-    private static SimpleDateFormat getDateFormater() {
+    public static void createFloorIndexTimeStamp(
+            ZonedDateTime input,
+            TemporalField roundTo,
+            int roundIncrement
+    ) {
+
+        /* Extract the field being rounded. */
+        int field = input.get(roundTo);
+
+        /* Distance from previous floor. */
+        int r = field % roundIncrement;
+
+        /* Find floor. Truncate values to base unit of field. */
+        ZonedDateTime floor
+                = input.plus(-r, roundTo.getBaseUnit())
+                        .truncatedTo(roundTo.getBaseUnit());
+
+        /*
+         * Do a half-up rounding.
+         *  
+         * If (input - floor) < (ceiling - input) 
+         * (i.e. floor is closer to input than ceiling)
+         *  then return floor, otherwise return ceiling.
+         */
+        // ZonedDateTime roundedTime = Duration.between(floor, input).compareTo(Duration.between(input, ceiling)) < 0 ? floor : ceiling;
+        DateTimeFormatter formatter
+                = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        String formatted = floor.format(formatter);
+        System.out.println(formatted);
+
+    }
+
+    public static BetweenIndexFromTimeStamp createBetweenIndexFromTimeStamp(
+            Timestamp timeStamp,
+            TemporalField roundTo, // position, iex minutes
+            int roundIncrement // time iex 5
+    ) {
+
+        ZonedDateTime input = ZonedDateTime.ofInstant(timeStamp.toInstant(), ZoneId.of("UTC"));
+
+        /* Extract the field being rounded. */
+        int field = input.get(roundTo);
+
+        /* Distance from previous floor. */
+        int r = field % roundIncrement;
+
+        /* Find floor. Truncate values to base unit of field. */
+        ZonedDateTime floor
+                = input.plus(-r, roundTo.getBaseUnit())
+                        .truncatedTo(roundTo.getBaseUnit());
+
+        /* Find ceiling. Truncate values to base unit of field. */
+        ZonedDateTime ceil
+                = input.plus(roundIncrement - r, roundTo.getBaseUnit())
+                        .truncatedTo(roundTo.getBaseUnit());
+
+        return new BetweenIndexFromTimeStamp(floor, ceil);
+
+    }
+
+    private static SimpleDateFormat getSimpleDateFormater() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
+
+    private static DateTimeFormatter getDateTimeFormatter() {
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    }
+
+    public static void main(String[] args) {
+        Timestamp now = TimeStampUtils.createSystemNanoTimeStamp();
+        BetweenIndexFromTimeStamp between_1 = TimeStampUtils.createBetweenIndexFromTimeStamp(
+                now,
+                ChronoField.MINUTE_OF_HOUR,
+                5
+        );
+
+        System.err.println(TimeStampUtils.timeStampToString(now));
+        System.err.println(TimeStampUtils.getDateTimeFormatter().format( between_1.getFloorZonedDateTime()));
+        System.err.println(TimeStampUtils.getDateTimeFormatter().format( between_1.getCeilZonedDateTime()));
+        System.err.println(TimeStampUtils.getSimpleDateFormater().format(between_1.getFloorTimestamp()));
+        System.err.println(TimeStampUtils.getSimpleDateFormater().format(between_1.getCeilTimestamp()));
+
+    }
+
 }

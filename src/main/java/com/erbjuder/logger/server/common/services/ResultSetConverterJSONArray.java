@@ -37,17 +37,20 @@ public class ResultSetConverterJSONArray implements ResultSetConverter {
     @Override
     public void convert(ResultSet rs) throws Exception {
 
-        String temp = null;
         try {
 
+ 
+            
             // we will need the column names, this will save the table meta-data like column nmae.
             java.sql.ResultSetMetaData rsmd = rs.getMetaData();
+             // System.err.println("Result set metadata " + rsmd );
+            
             //loop through the ResultSet
             while (rs.next()) {
-
+  
                 //figure out how many columns there are
                 int numColumns = rsmd.getColumnCount();
-
+ 
                 //each row in the ResultSet will be converted to a JSON Object
                 JSONObject obj = new JSONObject();
 
@@ -110,10 +113,12 @@ public class ResultSetConverterJSONArray implements ResultSetConverter {
                     }
                 }//end foreach
                 list.add(obj);
+                 
             }//end while
-
+            
+            
         } catch (Exception ex) {
-            Logger.getLogger(ResultSetConverterBase.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(ResultSetConverterJSONArray.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
 
     }

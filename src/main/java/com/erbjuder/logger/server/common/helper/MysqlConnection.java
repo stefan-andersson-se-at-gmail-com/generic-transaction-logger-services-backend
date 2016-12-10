@@ -55,7 +55,7 @@ public class MysqlConnection {
             if (contextRead == null) {
                 contextRead = new InitialContext();
             }
-            System.err.println("Shoud be Read : " + new PersistenceUnitParser(persistenceUnitNameRead).getDataSourceString());
+            //System.err.println("Shoud be Read : " + new PersistenceUnitParser(persistenceUnitNameRead).getDataSourceString());
             dataSourceRead = (DataSource) contextRead.lookup(new PersistenceUnitParser(persistenceUnitNameRead).getDataSourceString());
         } catch (NamingException | ParserConfigurationException ex) {
             Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
@@ -80,7 +80,7 @@ public class MysqlConnection {
                 contextWrite = new InitialContext();
             }
 
-            System.err.println("Shoud be Write : " + new PersistenceUnitParser(persistenceUnitNameWrite).getDataSourceString());
+            //System.err.println("Shoud be Write : " + new PersistenceUnitParser(persistenceUnitNameWrite).getDataSourceString());
             dataSourceWrite = (DataSource) contextWrite.lookup(new PersistenceUnitParser(persistenceUnitNameWrite).getDataSourceString());
         } catch (NamingException | ParserConfigurationException ex) {
             Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);

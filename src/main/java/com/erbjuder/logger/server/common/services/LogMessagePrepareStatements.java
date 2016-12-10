@@ -30,6 +30,10 @@ public class LogMessagePrepareStatements {
             String fromDate,
             String toDate,
             String logMessageIdLabel,
+            List<String> viewLables,
+            List<String> viewMimeTypes,
+            List<String> notViewLables,
+            List<String> notViewMimeTypes,
             String logMessageDataSizePartition,
             List<String> freeTextSearchList
     ) throws ParseException {
@@ -40,9 +44,33 @@ public class LogMessagePrepareStatements {
         prepareStatement.append("FROM ").append(logMessageDataSizePartition).append(" ");
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
         prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
-        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
-        prepareStatement.append("AND ");
         prepareStatement.append(logMessageDataSizePartition).append(".LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageIdLabel).append(" ");
+        prepareStatement.append("AND ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+
+        // viewLables
+        if (viewLables != null && !viewLables.isEmpty()) {
+            prepareStatement.append("AND ");
+            prepareStatement.append("LABEL IN ").append(PrepareStatementHelper.toSQLList(viewLables)).append(" ");
+        }
+
+        // viewMimeTypes
+        if (viewMimeTypes != null && !viewMimeTypes.isEmpty()) {
+            prepareStatement.append("AND ");
+            prepareStatement.append("MIMETYPE IN ").append(PrepareStatementHelper.toSQLList(viewMimeTypes)).append(" ");
+        }
+
+        // notViewLables
+        if (notViewLables != null && !notViewLables.isEmpty()) {
+            prepareStatement.append("AND ");
+            prepareStatement.append("LABEL NOT IN ").append(PrepareStatementHelper.toSQLList(notViewLables)).append(" ");
+        }
+
+        // notViewMimeTypes
+        if (notViewMimeTypes != null && !notViewMimeTypes.isEmpty()) {
+            prepareStatement.append("AND ");
+            prepareStatement.append("MIMETYPE NOT IN ").append(PrepareStatementHelper.toSQLList(notViewMimeTypes)).append(" ");
+        }
 
         if (freeTextSearchList != null && freeTextSearchList.size() > 0) {
             int size = freeTextSearchList.size();
@@ -65,6 +93,10 @@ public class LogMessagePrepareStatements {
             String fromDate,
             String toDate,
             Long logMessageIdValue,
+            List<String> viewLables,
+            List<String> viewMimeTypes,
+            List<String> notViewLables,
+            List<String> notViewMimeTypes,
             String logMessageDataSizePartition,
             List<String> freeTextSearchList
     ) throws ParseException {
@@ -75,9 +107,33 @@ public class LogMessagePrepareStatements {
         prepareStatement.append("FROM ").append(logMessageDataSizePartition).append(" ");
         List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
         prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
-        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
-        prepareStatement.append("AND ");
         prepareStatement.append(logMessageDataSizePartition).append(".LOGMESSAGE_ID = ").append(logMessageIdValue).append(" ");
+        prepareStatement.append("AND ");
+        prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+
+        // viewLables
+        if (viewLables != null && !viewLables.isEmpty()) {
+            prepareStatement.append("AND ");
+            prepareStatement.append("LABEL IN ").append(PrepareStatementHelper.toSQLList(viewLables)).append(" ");
+        }
+
+        // viewMimeTypes
+        if (viewMimeTypes != null && !viewMimeTypes.isEmpty()) {
+            prepareStatement.append("AND ");
+            prepareStatement.append("MIMETYPE IN ").append(PrepareStatementHelper.toSQLList(viewMimeTypes)).append(" ");
+        }
+
+        // notViewLables
+        if (notViewLables != null && !notViewLables.isEmpty()) {
+            prepareStatement.append("AND ");
+            prepareStatement.append("LABEL NOT IN ").append(PrepareStatementHelper.toSQLList(notViewLables)).append(" ");
+        }
+
+        // notViewMimeTypes
+        if (notViewMimeTypes != null && !notViewMimeTypes.isEmpty()) {
+            prepareStatement.append("AND ");
+            prepareStatement.append("MIMETYPE NOT IN ").append(PrepareStatementHelper.toSQLList(notViewMimeTypes)).append(" ");
+        }
 
         if (freeTextSearchList != null && freeTextSearchList.size() > 0) {
             int size = freeTextSearchList.size();

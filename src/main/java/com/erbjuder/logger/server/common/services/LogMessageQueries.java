@@ -41,14 +41,16 @@ public class LogMessageQueries {
             List<String> viewApplicationNames,
             List<String> viewFlowNames,
             List<String> viewFlowPointNames,
+            List<String> viewLables,
+            List<String> viewMimeTypes,
             List<String> notViewApplicationNames,
             List<String> notViewFlowNames,
             List<String> notViewFlowPointNames,
+            List<String> notViewLables,
+            List<String> notViewMimeTypes,
             List<String> freeTextSearchList,
             List<String> dataSizePartitionList,
             ResultSetConverter converter) {
-
-         
 
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
@@ -56,98 +58,335 @@ public class LogMessageQueries {
             prepareStatement.append("SELECT ");
             prepareStatement.append("DISTINCT APPLICATIONNAME ");
             prepareStatement.append("FROM ").append("LogMessage ");
+            prepareStatement.append("WHERE ");
 
             List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
+            int orgsqlPartitionSyntaxListSize = sqlPartitionSyntaxList.size();
 
-            // Between date
-            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+            // Fetch all application names from first partition 
+            if (orgsqlPartitionSyntaxListSize >= 1) {
+                String firstPartition = sqlPartitionSyntaxList.get(0);
+                sqlPartitionSyntaxList.remove(0);
 
-            // Transaction ref ID
-            if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
-            }
+                prepareStatement.append("APPLICATIONNAME IN ");
+                prepareStatement.append(" ( ");
+                prepareStatement.append("SELECT ");
+                prepareStatement.append("DISTINCT APPLICATIONNAME ");
+                prepareStatement.append("FROM ").append("LogMessage ");
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(firstPartition)).append(" WHERE ");
+                prepareStatement.append("UTCSERVERTIMESTAMP >= ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" ");
 
-            // view error
-            if (viewError != null) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
-            }
-
-            // application names
-            if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
-                for (String applicationName : viewApplicationNames) {
+                // Transaction ref ID
+                if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
                     prepareStatement.append("AND ");
-                    prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                    prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
                 }
-            }
 
-            // not application names
-            if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
-            }
+                // view error
+                if (viewError != null) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                }
 
-            // flow names
-            if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
-            }
+                // application names
+                if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                    for (String applicationName : viewApplicationNames) {
+                        prepareStatement.append("AND ");
+                        prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                    }
+                }
 
-            // not flow names
-            if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
-            }
+                // not application names
+                if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                }
 
-            // flow point names
-            if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
-            }
+                // flow names
+                if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                }
 
-            // not flow point names
-            if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
-            }
+                // not flow names
+                if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                }
 
-            // Free text search
-            if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
-                    && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+                // flow point names
+                if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                }
 
-                prepareStatement.append("AND ( ");
-                int size = dataSizePartitionList.size();
-                for (int i = 0; i < size; i++) {
+                // not flow point names
+                if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                }
 
-                    String logMessageDataPartition = dataSizePartitionList.get(i);
-                    StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
-                            fromDate,
-                            toDate,
-                            "ID",
-                            logMessageDataPartition,
-                            freeTextSearchList
-                    );
+                // Free text search
+                if ((freeTextSearchList != null && !freeTextSearchList.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
 
-                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+                    prepareStatement.append("AND ( ");
+                    int size = dataSizePartitionList.size();
+                    for (int i = 0; i < size; i++) {
 
-                    if (i < size - 1) {
-                        prepareStatement.append("OR ");
+                        String logMessageDataPartition = dataSizePartitionList.get(i);
+                        StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                        if (i < size - 1) {
+                            prepareStatement.append("OR ");
+                        }
+
                     }
 
+                    prepareStatement.append(" ) ");
+                }
+                prepareStatement.append(" ) ");
+
+            }
+
+            if (orgsqlPartitionSyntaxListSize >= 2) {
+                String lastPartition = sqlPartitionSyntaxList.get(sqlPartitionSyntaxList.size() - 1);
+                sqlPartitionSyntaxList.remove(sqlPartitionSyntaxList.size() - 1);
+
+                // Remove first and last
+                prepareStatement.append("OR ");
+
+                // Fetch all application names from last partition 
+                prepareStatement.append("APPLICATIONNAME IN ");
+                prepareStatement.append(" ( ");
+                prepareStatement.append("SELECT ");
+                prepareStatement.append("DISTINCT APPLICATIONNAME ");
+                prepareStatement.append("FROM ").append("LogMessage ");
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(lastPartition)).append(" WHERE ");
+                prepareStatement.append("UTCSERVERTIMESTAMP < ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+
+                // Transaction ref ID
+                if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+                }
+
+                // view error
+                if (viewError != null) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                }
+
+                // application names
+                if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                    for (String applicationName : viewApplicationNames) {
+                        prepareStatement.append("AND ");
+                        prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                    }
+                }
+
+                // not application names
+                if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                }
+
+                // flow names
+                if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                }
+
+                // not flow names
+                if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                }
+
+                // flow point names
+                if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                }
+
+                // not flow point names
+                if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                }
+
+                // Free text search
+                if ((freeTextSearchList != null && !freeTextSearchList.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+
+                    prepareStatement.append("AND ( ");
+                    int size = dataSizePartitionList.size();
+                    for (int i = 0; i < size; i++) {
+
+                        String logMessageDataPartition = dataSizePartitionList.get(i);
+                        StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                        if (i < size - 1) {
+                            prepareStatement.append("OR ");
+                        }
+
+                    }
+
+                    prepareStatement.append(" ) ");
                 }
 
                 prepareStatement.append(" ) ");
+
             }
 
-//            // 
-//            // Order by
-//            if (transactionReferenceId == null || transactionReferenceId.isEmpty()) {
-//                prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC, UTCLOCALTIMESTAMP DESC ");
-//            } else {
-//                prepareStatement.append("ORDER BY UTCLOCALTIMESTAMP DESC, UTCSERVERTIMESTAMP DESC ");
-//            }
+            if (orgsqlPartitionSyntaxListSize >= 3) {
+
+                prepareStatement.append("OR ");
+
+                // Fetch all application names in between  
+                prepareStatement.append("APPLICATIONNAME IN ");
+                prepareStatement.append(" ( ");
+                prepareStatement.append("SELECT ");
+                prepareStatement.append("DISTINCT APPLICATIONNAME ");
+                prepareStatement.append("FROM ").append("LogMessage ");
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" ");
+
+                if ((transactionReferenceId != null && !viewApplicationNames.isEmpty())
+                        || (viewFlowNames != null && !viewFlowNames.isEmpty())
+                        || (viewFlowPointNames != null && !viewFlowPointNames.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewApplicationNames != null && !notViewApplicationNames.isEmpty())
+                        || (notViewFlowNames != null && !notViewFlowNames.isEmpty())
+                        || (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        || (freeTextSearchList != null && !freeTextSearchList.isEmpty())) {
+                    prepareStatement.append("WHERE ");
+                }
+
+                // Transaction ref ID
+                if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+                }
+
+                // view error
+                if (viewError != null) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                }
+
+                // application names
+                if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                    for (String applicationName : viewApplicationNames) {
+                        prepareStatement.append("AND ");
+                        prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                    }
+                }
+
+                // not application names
+                if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                }
+
+                // flow names
+                if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                }
+
+                // not flow names
+                if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                }
+
+                // flow point names
+                if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                }
+
+                // not flow point names
+                if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                }
+
+                // Free text search
+               if ((freeTextSearchList != null && !freeTextSearchList.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+
+                    prepareStatement.append("AND ( ");
+                    int size = dataSizePartitionList.size();
+                    for (int i = 0; i < size; i++) {
+
+                        String logMessageDataPartition = dataSizePartitionList.get(i);
+                        StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                        if (i < size - 1) {
+                            prepareStatement.append("OR ");
+                        }
+
+                    }
+
+                    prepareStatement.append(" ) ");
+                }
+
+                prepareStatement.append(" ) ");
+
+            }
+
             // Pagination: Assume that first page <==> 1
             int pageOffset = page - 1;
             if (pageOffset < 0) {
@@ -157,6 +396,10 @@ public class LogMessageQueries {
             }
             prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
 
+             
+            System.err.println(prepareStatement.toString());
+            
+            
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             ResultSet rs = stmt.executeQuery();
             converter.convert(rs);
@@ -186,14 +429,16 @@ public class LogMessageQueries {
             List<String> viewApplicationNames,
             List<String> viewFlowNames,
             List<String> viewFlowPointNames,
+            List<String> viewLables,
+            List<String> viewMimeTypes,
             List<String> notViewApplicationNames,
             List<String> notViewFlowNames,
             List<String> notViewFlowPointNames,
+            List<String> notViewLables,
+            List<String> notViewMimeTypes,
             List<String> freeTextSearchList,
             List<String> dataSizePartitionList,
             ResultSetConverter converter) {
-
-        
 
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
@@ -201,98 +446,335 @@ public class LogMessageQueries {
             prepareStatement.append("SELECT ");
             prepareStatement.append("DISTINCT FLOWNAME ");
             prepareStatement.append("FROM ").append("LogMessage ");
+            prepareStatement.append("WHERE ");
 
             List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
+            int orgsqlPartitionSyntaxListSize = sqlPartitionSyntaxList.size();
 
-            // Between date
-            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+            // Fetch all application names from first partition 
+            if (orgsqlPartitionSyntaxListSize >= 1) {
+                String firstPartition = sqlPartitionSyntaxList.get(0);
+                sqlPartitionSyntaxList.remove(0);
 
-            // Transaction ref ID
-            if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
-            }
+                prepareStatement.append("FLOWNAME IN ");
+                prepareStatement.append(" ( ");
+                prepareStatement.append("SELECT ");
+                prepareStatement.append("DISTINCT FLOWNAME ");
+                prepareStatement.append("FROM ").append("LogMessage ");
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(firstPartition)).append(" WHERE ");
+                prepareStatement.append("UTCSERVERTIMESTAMP >= ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" ");
 
-            // view error
-            if (viewError != null) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
-            }
-
-            // application names
-            if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("APPLICATIONNAME IN ").append(PrepareStatementHelper.toSQLList(viewApplicationNames)).append(" ");
-            }
-
-            // not application names
-            if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
-            }
-
-            // flow names
-            if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
-                for (String flowName : viewFlowNames) {
+                // Transaction ref ID
+                if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
                     prepareStatement.append("AND ");
-                    prepareStatement.append("FLOWNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(flowName)).append(" ");
+                    prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
                 }
-            }
 
-            // not flow names
-            if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
-            }
+                // view error
+                if (viewError != null) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                }
 
-            // flow point names
-            if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
-            }
+                // application names
+                if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                    for (String applicationName : viewApplicationNames) {
+                        prepareStatement.append("AND ");
+                        prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                    }
+                }
 
-            // not flow point names
-            if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
-            }
+                // not application names
+                if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                }
 
-            // Free text search
-            if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
-                    && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+                // flow names
+                if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                }
 
-                prepareStatement.append("AND ( ");
-                int size = dataSizePartitionList.size();
-                for (int i = 0; i < size; i++) {
+                // not flow names
+                if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                }
 
-                    String logMessageDataPartition = dataSizePartitionList.get(i);
-                    StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
-                            fromDate,
-                            toDate,
-                            "ID",
-                            logMessageDataPartition,
-                            freeTextSearchList
-                    );
+                // flow point names
+                if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                }
 
-                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+                // not flow point names
+                if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                }
 
-                    if (i < size - 1) {
-                        prepareStatement.append("OR ");
+                // Free text search
+               if ((freeTextSearchList != null && !freeTextSearchList.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+
+                    prepareStatement.append("AND ( ");
+                    int size = dataSizePartitionList.size();
+                    for (int i = 0; i < size; i++) {
+
+                        String logMessageDataPartition = dataSizePartitionList.get(i);
+                        StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                        if (i < size - 1) {
+                            prepareStatement.append("OR ");
+                        }
+
                     }
 
+                    prepareStatement.append(" ) ");
+                }
+                prepareStatement.append(" ) ");
+
+            }
+
+            if (orgsqlPartitionSyntaxListSize >= 2) {
+                String lastPartition = sqlPartitionSyntaxList.get(sqlPartitionSyntaxList.size() - 1);
+                sqlPartitionSyntaxList.remove(sqlPartitionSyntaxList.size() - 1);
+
+                // Remove first and last
+                prepareStatement.append("OR ");
+
+                // Fetch all application names from last partition 
+                prepareStatement.append("FLOWNAME IN ");
+                prepareStatement.append(" ( ");
+                prepareStatement.append("SELECT ");
+                prepareStatement.append("DISTINCT FLOWNAME ");
+                prepareStatement.append("FROM ").append("LogMessage ");
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(lastPartition)).append(" WHERE ");
+                prepareStatement.append("UTCSERVERTIMESTAMP < ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+
+                // Transaction ref ID
+                if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+                }
+
+                // view error
+                if (viewError != null) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                }
+
+                // application names
+                if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                    for (String applicationName : viewApplicationNames) {
+                        prepareStatement.append("AND ");
+                        prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                    }
+                }
+
+                // not application names
+                if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                }
+
+                // flow names
+                if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                }
+
+                // not flow names
+                if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                }
+
+                // flow point names
+                if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                }
+
+                // not flow point names
+                if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                }
+
+                // Free text search
+               if ((freeTextSearchList != null && !freeTextSearchList.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+
+                    prepareStatement.append("AND ( ");
+                    int size = dataSizePartitionList.size();
+                    for (int i = 0; i < size; i++) {
+
+                        String logMessageDataPartition = dataSizePartitionList.get(i);
+                        StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                        if (i < size - 1) {
+                            prepareStatement.append("OR ");
+                        }
+
+                    }
+
+                    prepareStatement.append(" ) ");
                 }
 
                 prepareStatement.append(" ) ");
+
             }
 
-//            // 
-//            // Order by
-//            if (transactionReferenceId == null || transactionReferenceId.isEmpty()) {
-//                prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC, UTCLOCALTIMESTAMP DESC ");
-//            } else {
-//                prepareStatement.append("ORDER BY UTCLOCALTIMESTAMP DESC, UTCSERVERTIMESTAMP DESC ");
-//            }
+            if (orgsqlPartitionSyntaxListSize >= 3) {
+
+                prepareStatement.append("OR ");
+
+                // Fetch all application names in between  
+                prepareStatement.append("FLOWNAME IN ");
+                prepareStatement.append(" ( ");
+                prepareStatement.append("SELECT ");
+                prepareStatement.append("DISTINCT FLOWNAME ");
+                prepareStatement.append("FROM ").append("LogMessage ");
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" ");
+
+                if ((transactionReferenceId != null && !viewApplicationNames.isEmpty())
+                        || (viewFlowNames != null && !viewFlowNames.isEmpty())
+                        || (viewFlowPointNames != null && !viewFlowPointNames.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewApplicationNames != null && !notViewApplicationNames.isEmpty())
+                        || (notViewFlowNames != null && !notViewFlowNames.isEmpty())
+                        || (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        || (freeTextSearchList != null && !freeTextSearchList.isEmpty())) {
+                    prepareStatement.append("WHERE ");
+                }
+
+                // Transaction ref ID
+                if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+                }
+
+                // view error
+                if (viewError != null) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                }
+
+                // application names
+                if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                    for (String applicationName : viewApplicationNames) {
+                        prepareStatement.append("AND ");
+                        prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                    }
+                }
+
+                // not application names
+                if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                }
+
+                // flow names
+                if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                }
+
+                // not flow names
+                if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                }
+
+                // flow point names
+                if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                }
+
+                // not flow point names
+                if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                }
+
+                // Free text search
+              if ((freeTextSearchList != null && !freeTextSearchList.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+
+                    prepareStatement.append("AND ( ");
+                    int size = dataSizePartitionList.size();
+                    for (int i = 0; i < size; i++) {
+
+                        String logMessageDataPartition = dataSizePartitionList.get(i);
+                        StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                        if (i < size - 1) {
+                            prepareStatement.append("OR ");
+                        }
+
+                    }
+
+                    prepareStatement.append(" ) ");
+                }
+
+                prepareStatement.append(" ) ");
+
+            }
+
             // Pagination: Assume that first page <==> 1
             int pageOffset = page - 1;
             if (pageOffset < 0) {
@@ -318,6 +800,7 @@ public class LogMessageQueries {
 
         }
         return converter;
+
     }
 
     public ResultSetConverter fetch_FlowPointNames(
@@ -330,14 +813,16 @@ public class LogMessageQueries {
             List<String> viewApplicationNames,
             List<String> viewFlowNames,
             List<String> viewFlowPointNames,
+            List<String> viewLables,
+            List<String> viewMimeTypes,
             List<String> notViewApplicationNames,
             List<String> notViewFlowNames,
             List<String> notViewFlowPointNames,
+            List<String> notViewLables,
+            List<String> notViewMimeTypes,
             List<String> freeTextSearchList,
             List<String> dataSizePartitionList,
             ResultSetConverter converter) {
-
-         
 
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
@@ -345,98 +830,335 @@ public class LogMessageQueries {
             prepareStatement.append("SELECT ");
             prepareStatement.append("DISTINCT FLOWPOINTNAME ");
             prepareStatement.append("FROM ").append("LogMessage ");
+            prepareStatement.append("WHERE ");
 
             List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
-            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" WHERE ");
+            int orgsqlPartitionSyntaxListSize = sqlPartitionSyntaxList.size();
 
-            // Between date
-            prepareStatement.append("UTCSERVERTIMESTAMP BETWEEN ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" AND ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+            // Fetch all application names from first partition 
+            if (orgsqlPartitionSyntaxListSize >= 1) {
+                String firstPartition = sqlPartitionSyntaxList.get(0);
+                sqlPartitionSyntaxList.remove(0);
 
-            // Transaction ref ID
-            if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
-            }
+                prepareStatement.append("FLOWPOINTNAME IN ");
+                prepareStatement.append(" ( ");
+                prepareStatement.append("SELECT ");
+                prepareStatement.append("DISTINCT FLOWPOINTNAME ");
+                prepareStatement.append("FROM ").append("LogMessage ");
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(firstPartition)).append(" WHERE ");
+                prepareStatement.append("UTCSERVERTIMESTAMP >= ").append(PrepareStatementHelper.toSQLValue(fromDate)).append(" ");
 
-            // view error
-            if (viewError != null) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
-            }
-
-            // application names
-            if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("APPLICATIONNAME IN ").append(PrepareStatementHelper.toSQLList(viewApplicationNames)).append(" ");
-            }
-
-            // not application names
-            if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
-            }
-
-            // flow names
-            if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
-            }
-
-            // not flow names
-            if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
-            }
-
-            // flow point names
-            if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
-                for (String flowPointName : viewFlowPointNames) {
+                // Transaction ref ID
+                if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
                     prepareStatement.append("AND ");
-                    prepareStatement.append("FLOWPOINTNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(flowPointName)).append(" ");
+                    prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
                 }
-            }
 
-            // not flow point names
-            if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
-                prepareStatement.append("AND ");
-                prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
-            }
+                // view error
+                if (viewError != null) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                }
 
-            // Free text search
-            if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
-                    && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+                // application names
+                if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                    for (String applicationName : viewApplicationNames) {
+                        prepareStatement.append("AND ");
+                        prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                    }
+                }
 
-                prepareStatement.append("AND ( ");
-                int size = dataSizePartitionList.size();
-                for (int i = 0; i < size; i++) {
+                // not application names
+                if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                }
 
-                    String logMessageDataPartition = dataSizePartitionList.get(i);
-                    StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
-                            fromDate,
-                            toDate,
-                            "ID",
-                            logMessageDataPartition,
-                            freeTextSearchList
-                    );
+                // flow names
+                if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                }
 
-                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+                // not flow names
+                if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                }
 
-                    if (i < size - 1) {
-                        prepareStatement.append("OR ");
+                // flow point names
+                if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                }
+
+                // not flow point names
+                if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                }
+
+                // Free text search
+               if ((freeTextSearchList != null && !freeTextSearchList.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+
+                    prepareStatement.append("AND ( ");
+                    int size = dataSizePartitionList.size();
+                    for (int i = 0; i < size; i++) {
+
+                        String logMessageDataPartition = dataSizePartitionList.get(i);
+                        StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                        if (i < size - 1) {
+                            prepareStatement.append("OR ");
+                        }
+
                     }
 
+                    prepareStatement.append(" ) ");
+                }
+                prepareStatement.append(" ) ");
+
+            }
+
+            if (orgsqlPartitionSyntaxListSize >= 2) {
+                String lastPartition = sqlPartitionSyntaxList.get(sqlPartitionSyntaxList.size() - 1);
+                sqlPartitionSyntaxList.remove(sqlPartitionSyntaxList.size() - 1);
+
+                // Remove first and last
+                prepareStatement.append("OR ");
+
+                // Fetch all application names from last partition 
+                prepareStatement.append("FLOWPOINTNAME IN ");
+                prepareStatement.append(" ( ");
+                prepareStatement.append("SELECT ");
+                prepareStatement.append("DISTINCT FLOWPOINTNAME ");
+                prepareStatement.append("FROM ").append("LogMessage ");
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(lastPartition)).append(" WHERE ");
+                prepareStatement.append("UTCSERVERTIMESTAMP < ").append(PrepareStatementHelper.toSQLValue(toDate)).append(" ");
+
+                // Transaction ref ID
+                if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+                }
+
+                // view error
+                if (viewError != null) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                }
+
+                // application names
+                if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                    for (String applicationName : viewApplicationNames) {
+                        prepareStatement.append("AND ");
+                        prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                    }
+                }
+
+                // not application names
+                if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                }
+
+                // flow names
+                if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                }
+
+                // not flow names
+                if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                }
+
+                // flow point names
+                if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                }
+
+                // not flow point names
+                if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                }
+
+                // Free text search
+               if ((freeTextSearchList != null && !freeTextSearchList.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+                   
+                    prepareStatement.append("AND ( ");
+                    int size = dataSizePartitionList.size();
+                    for (int i = 0; i < size; i++) {
+
+                        String logMessageDataPartition = dataSizePartitionList.get(i);
+                        StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                        if (i < size - 1) {
+                            prepareStatement.append("OR ");
+                        }
+
+                    }
+
+                    prepareStatement.append(" ) ");
                 }
 
                 prepareStatement.append(" ) ");
+
             }
 
-//            // 
-//            // Order by
-//            if (transactionReferenceId == null || transactionReferenceId.isEmpty()) {
-//                prepareStatement.append("ORDER BY UTCSERVERTIMESTAMP DESC, UTCLOCALTIMESTAMP DESC ");
-//            } else {
-//                prepareStatement.append("ORDER BY UTCLOCALTIMESTAMP DESC, UTCSERVERTIMESTAMP DESC ");
-//            }
+            if (orgsqlPartitionSyntaxListSize >= 3) {
+
+                prepareStatement.append("OR ");
+
+                // Fetch all application names in between  
+                prepareStatement.append("FLOWPOINTNAME IN ");
+                prepareStatement.append(" ( ");
+                prepareStatement.append("SELECT ");
+                prepareStatement.append("DISTINCT FLOWPOINTNAME ");
+                prepareStatement.append("FROM ").append("LogMessage ");
+                prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" ");
+
+                if ((transactionReferenceId != null && !viewApplicationNames.isEmpty())
+                        || (viewFlowNames != null && !viewFlowNames.isEmpty())
+                        || (viewFlowPointNames != null && !viewFlowPointNames.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewApplicationNames != null && !notViewApplicationNames.isEmpty())
+                        || (notViewFlowNames != null && !notViewFlowNames.isEmpty())
+                        || (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        || (freeTextSearchList != null && !freeTextSearchList.isEmpty())) {
+                    prepareStatement.append("WHERE ");
+                }
+
+                // Transaction ref ID
+                if (transactionReferenceId != null && !transactionReferenceId.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("TRANSACTIONREFERENCEID LIKE ").append(PrepareStatementHelper.toSQLValue(transactionReferenceId)).append(" ");
+                }
+
+                // view error
+                if (viewError != null) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("ISERROR = ").append(PrepareStatementHelper.toSQLValue(viewError.toString())).append(" ");
+                }
+
+                // application names
+                if (viewApplicationNames != null && !viewApplicationNames.isEmpty()) {
+                    for (String applicationName : viewApplicationNames) {
+                        prepareStatement.append("AND ");
+                        prepareStatement.append("APPLICATIONNAME LIKE ").append(PrepareStatementHelper.toSQLStartsWithValue(applicationName)).append(" ");
+                    }
+                }
+
+                // not application names
+                if (notViewApplicationNames != null && !notViewApplicationNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("APPLICATIONNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewApplicationNames)).append(" ");
+                }
+
+                // flow names
+                if (viewFlowNames != null && !viewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowNames)).append(" ");
+                }
+
+                // not flow names
+                if (notViewFlowNames != null && !notViewFlowNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowNames)).append(" ");
+                }
+
+                // flow point names
+                if (viewFlowPointNames != null && !viewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME IN ").append(PrepareStatementHelper.toSQLList(viewFlowPointNames)).append(" ");
+                }
+
+                // not flow point names
+                if (notViewFlowPointNames != null && !notViewFlowPointNames.isEmpty()) {
+                    prepareStatement.append("AND ");
+                    prepareStatement.append("FLOWPOINTNAME NOT IN ").append(PrepareStatementHelper.toSQLList(notViewFlowPointNames)).append(" ");
+                }
+
+                // Free text search
+                if ((freeTextSearchList != null && !freeTextSearchList.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+
+                    prepareStatement.append("AND ( ");
+                    int size = dataSizePartitionList.size();
+                    for (int i = 0; i < size; i++) {
+
+                        String logMessageDataPartition = dataSizePartitionList.get(i);
+                        StringBuilder partitionBuilder = LogMessagePrepareStatements.fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                logMessageDataPartition,
+                                freeTextSearchList
+                        );
+
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                        if (i < size - 1) {
+                            prepareStatement.append("OR ");
+                        }
+
+                    }
+
+                    prepareStatement.append(" ) ");
+                }
+
+                prepareStatement.append(" ) ");
+
+            }
+
             // Pagination: Assume that first page <==> 1
             int pageOffset = page - 1;
             if (pageOffset < 0) {
@@ -477,14 +1199,16 @@ public class LogMessageQueries {
             List<String> viewApplicationNames,
             List<String> viewFlowNames,
             List<String> viewFlowPointNames,
+            List<String> viewLables,
+            List<String> viewMimeTypes,
             List<String> notViewApplicationNames,
             List<String> notViewFlowNames,
             List<String> notViewFlowPointNames,
+            List<String> notViewLables,
+            List<String> notViewMimeTypes,
             List<String> freeTextSearchList,
             List<String> dataSizePartitionList,
             ResultSetConverter converter) throws Exception {
-
-         
 
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
@@ -559,8 +1283,12 @@ public class LogMessageQueries {
             }
 
             // Free text search
-            if (freeTextSearchList != null && !freeTextSearchList.isEmpty()
-                    && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
+            if ((freeTextSearchList != null && !freeTextSearchList.isEmpty())
+                        || (viewLables != null && !viewLables.isEmpty())
+                        || (viewMimeTypes != null && !viewMimeTypes.isEmpty())
+                        || (notViewLables != null && !notViewLables.isEmpty())
+                        || (notViewMimeTypes != null && !notViewMimeTypes.isEmpty())
+                        && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
 
                 prepareStatement.append("AND ( ");
                 int size = dataSizePartitionList.size();
@@ -575,6 +1303,10 @@ public class LogMessageQueries {
                                 fromDate,
                                 toDate,
                                 id,
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
                                 logMessageDataPartition,
                                 freeTextSearchList
                         );
@@ -584,6 +1316,10 @@ public class LogMessageQueries {
                                 fromDate,
                                 toDate,
                                 "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
                                 logMessageDataPartition,
                                 freeTextSearchList
                         );
@@ -644,7 +1380,6 @@ public class LogMessageQueries {
             List<String> dataSizePartitionList,
             ResultSetConverter converter) {
 
-        
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
             // should be from propertie file 

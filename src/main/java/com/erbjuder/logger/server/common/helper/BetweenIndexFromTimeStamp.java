@@ -14,38 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.erbjuder.logger.server.facade.pojo;
+package com.erbjuder.logger.server.common.helper;
 
-import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
  * @author Stefan Andersson
  */
-public class FlowAndTransactionId implements Serializable{
+public class BetweenIndexFromTimeStamp {
 
-    private String flowName;
-    private String transactionReferenceId;
+    private ZonedDateTime floor = null;
+    private ZonedDateTime ceil = null;
 
- 
-    public FlowAndTransactionId(String flowName, String transactionReferenceId) {
-        this.flowName = flowName;
-        this.transactionReferenceId = transactionReferenceId;
+    BetweenIndexFromTimeStamp(ZonedDateTime floor, ZonedDateTime ceil) {
+        this.floor = floor;
+        this.ceil = ceil;
     }
 
-    public String getFlowName() {
-        return flowName;
+    public ZonedDateTime getFloorZonedDateTime() {
+        return floor;
     }
 
-    public void setFlowName(String flowName) {
-        this.flowName = flowName;
+    public ZonedDateTime getCeilZonedDateTime() {
+        return ceil;
     }
 
-    public String getTransactionReferenceId() {
-        return transactionReferenceId;
+    public Timestamp getFloorTimestamp() {
+        return new Timestamp(floor.toInstant().toEpochMilli());
     }
 
-    public void setTransactionReferenceId(String transactionReferenceId) {
-        this.transactionReferenceId = transactionReferenceId;
+    public Timestamp getCeilTimestamp() {
+        return new Timestamp(ceil.toInstant().toEpochMilli());
     }
+
 }

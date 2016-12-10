@@ -24,7 +24,7 @@ public class PrimaryKeySequence {
 
     private long startPK;
     private long endPK;
-    private int numOfPrimaryKeys;
+  
 
     public PrimaryKeySequence(long startPK, long endPK) {
         this.startPK = startPK;
@@ -51,4 +51,9 @@ public class PrimaryKeySequence {
         return getEndPK() - getStartPK();
     }
 
+     public long next() {
+        this.setStartPK(this.startPK + 1);
+        return this.startPK;
+    }
+    
 }

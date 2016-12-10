@@ -108,5 +108,53 @@ public class DataBase {
 
     }
 
-    
+     public static String logMessageDataPartitionNameFromContentSize(long contentSize) {
+
+        // Determ content partition based on size
+        //       
+        //  TINYTEXT    |           255 (2 8−1) bytes
+        //  TEXT        |        65,535 (216−1) bytes = 64 KiB
+        //  MEDIUMTEXT  |    16,777,215 (224−1) bytes = 16 MiB
+        //  LONGTEXT    | 4,294,967,295 (232−1) bytes =  4 GiB
+        String partitionName = "";
+        if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_20B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_01_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_40B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_02_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_60B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_03_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_80B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_04_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_100B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_05_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_150B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_06_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_200B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_07_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_255B) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_08_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_64KB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_09_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_1MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_10_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_2MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_11_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_3MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_12_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_4MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_13_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_5MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_14_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_10MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_15_NAME;
+        } else if (contentSize <= DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_16MB) {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_16_NAME;
+        } else {
+            partitionName = DataBase.LOGMESSAGEDATA_PARTITION_17_NAME;
+        }
+
+        return partitionName;
+
+    }
+
 }

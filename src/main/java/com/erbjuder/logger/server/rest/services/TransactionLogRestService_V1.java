@@ -19,6 +19,7 @@ package com.erbjuder.logger.server.rest.services;
 import com.erbjuder.logger.server.common.helper.DataBase;
 import com.erbjuder.logger.server.common.services.LogMessageQueries;
 import com.erbjuder.logger.server.common.services.LogMessageServiceBase;
+import com.erbjuder.logger.server.common.services.ResultSetConverter;
 import com.erbjuder.logger.server.common.services.ResultSetConverterJSONArray;
 import com.generic.global.transactionlogger.Transactions;
 import java.util.ArrayList;
@@ -56,9 +57,13 @@ public class TransactionLogRestService_V1 {
             List<String> viewApplicationNames,
             List<String> viewFlowNames,
             List<String> viewFlowPointName,
+            List<String> viewLabels,
+            List<String> viewMimeTypes,
             List<String> notViewApplicationNames,
             List<String> notViewFlowNames,
             List<String> notViewFlowPointName,
+            List<String> notViewLabels,
+            List<String> notViewMimeTypes,
             List<String> freeTextSearchList,
             List<String> dataBaseSearchList
     ) throws Exception {
@@ -77,7 +82,7 @@ public class TransactionLogRestService_V1 {
 
         LogMessageQueries loggerSchema = new LogMessageQueries();
         ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
-        loggerSchema.fetch_logMessageList(
+        converter = (ResultSetConverterJSONArray) loggerSchema.fetch_logMessageList(
                 id,
                 partitionId,
                 fromDate,
@@ -89,9 +94,13 @@ public class TransactionLogRestService_V1 {
                 viewApplicationNames,
                 viewFlowNames,
                 viewFlowPointName,
+                viewLabels,
+                viewMimeTypes,
                 notViewApplicationNames,
                 notViewFlowNames,
                 notViewFlowPointName,
+                notViewLabels,
+                notViewMimeTypes,
                 freeTextSearchList,
                 dataBaseSearchList,
                 converter
@@ -116,9 +125,13 @@ public class TransactionLogRestService_V1 {
             @QueryParam("viewAppName") List<String> viewApplicationNames,
             @QueryParam("viewFlowName") List<String> viewFlowNames,
             @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("viewLabel") List<String> viewLabels,
+            @QueryParam("viewMimeType") List<String> viewMimeTypes,
             @QueryParam("notViewAppName") List<String> notViewApplicationNames,
             @QueryParam("notViewFlowName") List<String> notViewFlowNames,
             @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("notViewLabel") List<String> notViewLabels,
+            @QueryParam("notViewMimeType") List<String> notViewMimeTypes,
             @QueryParam("search") List<String> freeTextSearchList,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
@@ -135,9 +148,13 @@ public class TransactionLogRestService_V1 {
                     viewApplicationNames,
                     viewFlowNames,
                     viewFlowPointName,
+                    viewLabels,
+                    viewMimeTypes,
                     notViewApplicationNames,
                     notViewFlowNames,
                     notViewFlowPointName,
+                    notViewLabels,
+                    notViewMimeTypes,
                     freeTextSearchList,
                     dataBaseSearchList
             );
@@ -166,9 +183,13 @@ public class TransactionLogRestService_V1 {
             @QueryParam("viewAppName") List<String> viewApplicationNames,
             @QueryParam("viewFlowName") List<String> viewFlowNames,
             @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("viewLabel") List<String> viewLabels,
+            @QueryParam("viewMimeType") List<String> viewMimeTypes,
             @QueryParam("notViewAppName") List<String> notViewApplicationNames,
             @QueryParam("notViewFlowName") List<String> notViewFlowNames,
             @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("notViewLabel") List<String> notViewLabels,
+            @QueryParam("notViewMimeType") List<String> notViewMimeTypes,
             @QueryParam("search") List<String> freeTextSearchList,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
@@ -192,9 +213,13 @@ public class TransactionLogRestService_V1 {
                     viewApplicationNames,
                     viewFlowNames,
                     viewFlowPointName,
+                    viewLabels,
+                    viewMimeTypes,
                     notViewApplicationNames,
                     notViewFlowNames,
                     notViewFlowPointName,
+                    notViewLabels,
+                    notViewMimeTypes,
                     freeTextSearchList,
                     dataBaseSearchList
             );
@@ -227,7 +252,7 @@ public class TransactionLogRestService_V1 {
 
         LogMessageQueries loggerSchema = new LogMessageQueries();
         ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
-        loggerSchema.fetch_LogMessageData(
+        converter = (ResultSetConverterJSONArray) loggerSchema.fetch_LogMessageData(
                 logMessageId,
                 logMessagePartitionId,
                 dataBaseSearchList,
@@ -302,9 +327,13 @@ public class TransactionLogRestService_V1 {
             List<String> viewApplicationNames,
             List<String> viewFlowNames,
             List<String> viewFlowPointName,
+            List<String> viewLabels,
+            List<String> viewMimeTypes,
             List<String> notViewApplicationNames,
             List<String> notViewFlowNames,
             List<String> notViewFlowPointName,
+            List<String> notViewLabels,
+            List<String> notViewMimeTypes,
             List<String> freeTextSearchList,
             List<String> dataBaseSearchList
     ) throws Exception {
@@ -317,7 +346,7 @@ public class TransactionLogRestService_V1 {
 
         LogMessageQueries loggerSchema = new LogMessageQueries();
         ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
-        loggerSchema.fetch_FlowPointNames(
+        converter = (ResultSetConverterJSONArray) loggerSchema.fetch_FlowPointNames(
                 fromDate,
                 toDate,
                 page,
@@ -327,9 +356,13 @@ public class TransactionLogRestService_V1 {
                 viewApplicationNames,
                 viewFlowNames,
                 viewFlowPointName,
+                viewLabels,
+                viewMimeTypes,
                 notViewApplicationNames,
                 notViewFlowNames,
                 notViewFlowPointName,
+                notViewLabels,
+                notViewMimeTypes,
                 freeTextSearchList,
                 dataBaseSearchList,
                 converter
@@ -352,9 +385,13 @@ public class TransactionLogRestService_V1 {
             @QueryParam("viewAppName") List<String> viewApplicationNames,
             @QueryParam("viewFlowName") List<String> viewFlowNames,
             @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("viewLabel") List<String> viewLabels,
+            @QueryParam("viewMimeType") List<String> viewMimeTypes,
             @QueryParam("notViewAppName") List<String> notViewApplicationNames,
             @QueryParam("notViewFlowName") List<String> notViewFlowNames,
             @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("notViewLabel") List<String> notViewLabels,
+            @QueryParam("notViewMimeType") List<String> notViewMimeTypes,
             @QueryParam("search") List<String> freeTextSearchList,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
@@ -369,9 +406,13 @@ public class TransactionLogRestService_V1 {
                     viewApplicationNames,
                     viewFlowNames,
                     viewFlowPointName,
+                    viewLabels,
+                    viewMimeTypes,
                     notViewApplicationNames,
                     notViewFlowNames,
                     notViewFlowPointName,
+                    notViewLabels,
+                    notViewMimeTypes,
                     freeTextSearchList,
                     dataBaseSearchList
             );
@@ -398,9 +439,13 @@ public class TransactionLogRestService_V1 {
             @QueryParam("viewAppName") List<String> viewApplicationNames,
             @QueryParam("viewFlowName") List<String> viewFlowNames,
             @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("viewLabel") List<String> viewLabels,
+            @QueryParam("viewMimeType") List<String> viewMimeTypes,
             @QueryParam("notViewAppName") List<String> notViewApplicationNames,
             @QueryParam("notViewFlowName") List<String> notViewFlowNames,
             @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("notViewLabel") List<String> notViewLabels,
+            @QueryParam("notViewMimeType") List<String> notViewMimeTypes,
             @QueryParam("search") List<String> freeTextSearchList,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
@@ -422,9 +467,13 @@ public class TransactionLogRestService_V1 {
                     viewApplicationNames,
                     viewFlowNames,
                     viewFlowPointName,
+                    viewLabels,
+                    viewMimeTypes,
                     notViewApplicationNames,
                     notViewFlowNames,
                     notViewFlowPointName,
+                    notViewLabels,
+                    notViewMimeTypes,
                     freeTextSearchList,
                     dataBaseSearchList
             );
@@ -448,9 +497,13 @@ public class TransactionLogRestService_V1 {
             List<String> viewApplicationNames,
             List<String> viewFlowNames,
             List<String> viewFlowPointName,
+            List<String> viewLabels,
+            List<String> viewMimeTypes,
             List<String> notViewApplicationNames,
             List<String> notViewFlowNames,
             List<String> notViewFlowPointName,
+            List<String> notViewLabels,
+            List<String> notViewMimeTypes,
             List<String> freeTextSearchList,
             List<String> dataBaseSearchList
     ) throws Exception {
@@ -463,7 +516,7 @@ public class TransactionLogRestService_V1 {
 
         LogMessageQueries loggerSchema = new LogMessageQueries();
         ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
-        loggerSchema.fetch_FlowNames(
+        converter = (ResultSetConverterJSONArray) loggerSchema.fetch_FlowNames(
                 fromDate,
                 toDate,
                 page,
@@ -473,9 +526,13 @@ public class TransactionLogRestService_V1 {
                 viewApplicationNames,
                 viewFlowNames,
                 viewFlowPointName,
+                viewLabels,
+                viewMimeTypes,
                 notViewApplicationNames,
                 notViewFlowNames,
                 notViewFlowPointName,
+                notViewLabels,
+                notViewMimeTypes,
                 freeTextSearchList,
                 dataBaseSearchList,
                 converter
@@ -498,9 +555,13 @@ public class TransactionLogRestService_V1 {
             @QueryParam("viewAppName") List<String> viewApplicationNames,
             @QueryParam("viewFlowName") List<String> viewFlowNames,
             @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("viewLabel") List<String> viewLabels,
+            @QueryParam("viewMimeType") List<String> viewMimeTypes,
             @QueryParam("notViewAppName") List<String> notViewApplicationNames,
             @QueryParam("notViewFlowName") List<String> notViewFlowNames,
             @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("notViewLabel") List<String> notViewLabels,
+            @QueryParam("notViewMimeType") List<String> notViewMimeTypes,
             @QueryParam("search") List<String> freeTextSearchList,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
@@ -515,9 +576,13 @@ public class TransactionLogRestService_V1 {
                     viewApplicationNames,
                     viewFlowNames,
                     viewFlowPointName,
+                    viewLabels,
+                    viewMimeTypes,
                     notViewApplicationNames,
                     notViewFlowNames,
                     notViewFlowPointName,
+                    notViewLabels,
+                    notViewMimeTypes,
                     freeTextSearchList,
                     dataBaseSearchList
             );
@@ -544,9 +609,13 @@ public class TransactionLogRestService_V1 {
             @QueryParam("viewAppName") List<String> viewApplicationNames,
             @QueryParam("viewFlowName") List<String> viewFlowNames,
             @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("viewLabel") List<String> viewLabels,
+            @QueryParam("viewMimeType") List<String> viewMimeTypes,
             @QueryParam("notViewAppName") List<String> notViewApplicationNames,
             @QueryParam("notViewFlowName") List<String> notViewFlowNames,
             @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("notViewLabel") List<String> notViewLabels,
+            @QueryParam("notViewMimeType") List<String> notViewMimeTypes,
             @QueryParam("search") List<String> freeTextSearchList,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
@@ -568,9 +637,13 @@ public class TransactionLogRestService_V1 {
                     viewApplicationNames,
                     viewFlowNames,
                     viewFlowPointName,
+                    viewLabels,
+                    viewMimeTypes,
                     notViewApplicationNames,
                     notViewFlowNames,
                     notViewFlowPointName,
+                    notViewLabels,
+                    notViewMimeTypes,
                     freeTextSearchList,
                     dataBaseSearchList
             );
@@ -594,9 +667,13 @@ public class TransactionLogRestService_V1 {
             List<String> viewApplicationNames,
             List<String> viewFlowNames,
             List<String> viewFlowPointName,
+            List<String> viewLabels,
+            List<String> viewMimeTypes,
             List<String> notViewApplicationNames,
             List<String> notViewFlowNames,
             List<String> notViewFlowPointName,
+            List<String> notViewLabels,
+            List<String> notViewMimeTypes,
             List<String> freeTextSearchList,
             List<String> dataBaseSearchList
     ) throws Exception {
@@ -609,7 +686,7 @@ public class TransactionLogRestService_V1 {
 
         LogMessageQueries loggerSchema = new LogMessageQueries();
         ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
-        loggerSchema.fetch_ApplicationNames(
+        converter = (ResultSetConverterJSONArray) loggerSchema.fetch_ApplicationNames(
                 fromDate,
                 toDate,
                 page,
@@ -619,9 +696,13 @@ public class TransactionLogRestService_V1 {
                 viewApplicationNames,
                 viewFlowNames,
                 viewFlowPointName,
+                viewLabels,
+                viewMimeTypes,
                 notViewApplicationNames,
                 notViewFlowNames,
                 notViewFlowPointName,
+                notViewLabels,
+                notViewMimeTypes,
                 freeTextSearchList,
                 dataBaseSearchList,
                 converter
@@ -644,9 +725,13 @@ public class TransactionLogRestService_V1 {
             @QueryParam("viewAppName") List<String> viewApplicationNames,
             @QueryParam("viewFlowName") List<String> viewFlowNames,
             @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("viewLabel") List<String> viewLabels,
+            @QueryParam("viewMimeType") List<String> viewMimeTypes,
             @QueryParam("notViewAppName") List<String> notViewApplicationNames,
             @QueryParam("notViewFlowName") List<String> notViewFlowNames,
             @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("notViewLabel") List<String> notViewLabels,
+            @QueryParam("notViewMimeType") List<String> notViewMimeTypes,
             @QueryParam("search") List<String> freeTextSearchList,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
@@ -661,9 +746,13 @@ public class TransactionLogRestService_V1 {
                     viewApplicationNames,
                     viewFlowNames,
                     viewFlowPointName,
+                    viewLabels,
+                    viewMimeTypes,
                     notViewApplicationNames,
                     notViewFlowNames,
                     notViewFlowPointName,
+                    notViewLabels,
+                    notViewMimeTypes,
                     freeTextSearchList,
                     dataBaseSearchList
             );
@@ -690,9 +779,13 @@ public class TransactionLogRestService_V1 {
             @QueryParam("viewAppName") List<String> viewApplicationNames,
             @QueryParam("viewFlowName") List<String> viewFlowNames,
             @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
+            @QueryParam("viewLabel") List<String> viewLabels,
+            @QueryParam("viewMimeType") List<String> viewMimeTypes,
             @QueryParam("notViewAppName") List<String> notViewApplicationNames,
             @QueryParam("notViewFlowName") List<String> notViewFlowNames,
             @QueryParam("notViewFlowPointName") List<String> notViewFlowPointName,
+            @QueryParam("notViewLabel") List<String> notViewLabels,
+            @QueryParam("notViewMimeType") List<String> notViewMimeTypes,
             @QueryParam("search") List<String> freeTextSearchList,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
@@ -714,9 +807,13 @@ public class TransactionLogRestService_V1 {
                     viewApplicationNames,
                     viewFlowNames,
                     viewFlowPointName,
+                    viewLabels,
+                    viewMimeTypes,
                     notViewApplicationNames,
                     notViewFlowNames,
                     notViewFlowPointName,
+                    notViewLabels,
+                    notViewMimeTypes,
                     freeTextSearchList,
                     dataBaseSearchList
             );
@@ -778,6 +875,9 @@ public class TransactionLogRestService_V1 {
         defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_09_NAME);
         defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_10_NAME);
         defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_11_NAME);
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_12_NAME);
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_13_NAME);
+        defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_14_NAME);
         return defaultSearchableDatabases;
 
     }

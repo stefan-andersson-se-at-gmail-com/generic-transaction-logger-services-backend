@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 /**
  *
@@ -34,11 +35,20 @@ import java.util.Set;
  */
 public class DatabasePartitionHelper {
 
-    public static final int MAX_PARTITIONS = 732; // 0...731
-    public static final String mysql_partition_prefix = "p";
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final Calendar calendar1 = Calendar.getInstance();
-    private static final Calendar calendar2 = Calendar.getInstance();
+    public static final int MAX_PARTITIONS;
+    public static final String mysql_partition_prefix;
+    private static final SimpleDateFormat formatter;
+    private static final Calendar calendar1;
+    private static final Calendar calendar2;
+    
+    static{
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        calendar1 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        calendar2 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        mysql_partition_prefix = "p";
+        MAX_PARTITIONS = 732; // 0...731
+    }
 
     private static Date dateStringToDate(String dateString) throws ParseException {
         return formatter.parse(dateString);
@@ -203,6 +213,7 @@ public class DatabasePartitionHelper {
         // System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-11-15 00:00:01", "2017-11-14 03:18:23").size());
         // System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-11-15 00:00:01", "2017-11-14 03:18:23"));
     
+        /*
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("1981-01-01 00:00:01", "1981-01-01 23:59:59"));
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("1981-12-31 00:00:01", "1981-12-31 23:59:59"));
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2015-01-01 00:00:01", "2015-01-01 23:59:59"));
@@ -211,6 +222,9 @@ public class DatabasePartitionHelper {
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-12-31 00:00:01", "2016-12-31 23:59:59"));
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2017-01-01 00:00:01", "2017-01-01 23:59:59"));
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2017-12-31 00:00:01", "2017-12-31 23:59:59"));
+    */
+        System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-11-20 14:30:24.526985", "2016-11-21 05:30:24.526985"));
+     
     }
 
     private static class PartitionSyntaxListComparator implements Comparator {
