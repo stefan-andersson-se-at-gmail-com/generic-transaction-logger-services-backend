@@ -19,9 +19,14 @@ package com.erbjuder.logger.server.rest.services;
 import com.erbjuder.logger.server.common.helper.DataBase;
 import com.erbjuder.logger.server.common.services.LogMessageQueries;
 import com.erbjuder.logger.server.common.services.LogMessageServiceBase;
-import com.erbjuder.logger.server.common.services.ResultSetConverter;
 import com.erbjuder.logger.server.common.services.ResultSetConverterJSONArray;
+import com.erbjuder.logger.server.common.services.Tuple;
+import com.erbjuder.logger.server.common.services.TupleSearchListUtil;
 import com.generic.global.transactionlogger.Transactions;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -41,7 +46,7 @@ import org.json.simple.JSONArray;
  * @author server-1
  */
 @Path("/v1/logmsg")
-public class TransactionLogRestService_V1 {
+public class RestServiceTransactionLog_V1 {
 
 // http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/logmsg/json/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false
 // http://localhost:8080/log_message_services_backend-1.10-SNAPSHOT-Dev/resources/v1/logmsg/jsonp/search?fromDate=2015-10-31%2000:00:00&toDate=2015-10-31%2023:59:59&page=1&pageSize=10&&viewError=false&search=534_   
@@ -162,7 +167,7 @@ public class TransactionLogRestService_V1 {
             return Response.ok(jsonResult.toString()).build();
 
         } catch (Exception ex) {
-            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(RestServiceTransactionLog_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
     }
@@ -227,9 +232,69 @@ public class TransactionLogRestService_V1 {
             return Response.ok(internalCallbackName + "(" + jsonResult.toString() + ")").build();
 
         } catch (Exception ex) {
-            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(RestServiceTransactionLog_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
+
+    }
+
+    @GET
+    @Path("jsonp/labelSearch")
+    @Produces("application/javascript")
+    public Response jsonpLabelSearch(
+            @QueryParam("callback") String callback,
+            @QueryParam("Id") Long id,
+            @QueryParam("partitionId") Integer partitionId,
+            @QueryParam("fromDate") String fromDate,
+            @QueryParam("toDate") String toDate,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize,
+            @QueryParam("transactionReferenceId") String transactionReferenceId,
+            @QueryParam("viewError") Integer viewError,
+            @QueryParam("viewAppName") List<String> viewApplicationNames,
+            @QueryParam("viewFlowName") List<String> viewFlowNames,
+            @QueryParam("viewFlowPointName") List<String> viewFlowPointNames,
+            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
+            @QueryParam("notViewFlowName") List<String> notViewFlowNames,
+            @QueryParam("notViewFlowPointName") List<String> notViewFlowPointNames,
+            @QueryParam("search") List<String> tupleQueryParamList, // Syntax: List of {<string>,string},[<string>,<string>] string(s)
+            @QueryParam("dbSearchList") List<String> dataBaseSearchList
+    ) {
+
+        String internalCallbackName = "callback";
+        if (callback != null && !callback.isEmpty()) {
+            internalCallbackName = callback;
+        }
+
+        // 
+        // Calculate witch db tables we should search in
+        List<Tuple> tuples = TupleSearchListUtil.queryParamTupleList2TupleList(tupleQueryParamList);
+        if (dataBaseSearchList == null || dataBaseSearchList.isEmpty()) {
+            dataBaseSearchList = TupleSearchListUtil.calculateDataBaseSearchList(tuples);
+        }
+
+        LogMessageQueries loggerSchema = new LogMessageQueries();
+        ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
+        converter = (ResultSetConverterJSONArray) loggerSchema.fetch_labelContent(
+                id,
+                partitionId,
+                fromDate,
+                toDate,
+                page,
+                pageSize,
+                transactionReferenceId,
+                viewError, // 0=false, 1= true and null skip
+                viewApplicationNames,
+                viewFlowNames,
+                viewFlowPointNames,
+                notViewApplicationNames,
+                notViewFlowNames,
+                notViewFlowPointNames,
+                tuples,
+                dataBaseSearchList,
+                converter
+        );
+        return Response.ok(internalCallbackName + "(" + converter.getResult().toString() + ")").build();
 
     }
 
@@ -238,6 +303,7 @@ public class TransactionLogRestService_V1 {
     // http://erbjuder.com/log_message_services_one_dev/resources/v1/logmsg/jsonp/view?logMessageId=11658273&logMessagePartitionId=103
     private JSONArray logMessageDataView(
             Long logMessageId,
+            String logMessageUtcServerTimestamp,
             Integer logMessagePartitionId,
             List<String> dataBaseSearchList) throws Exception {
         // 
@@ -254,6 +320,7 @@ public class TransactionLogRestService_V1 {
         ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
         converter = (ResultSetConverterJSONArray) loggerSchema.fetch_LogMessageData(
                 logMessageId,
+                logMessageUtcServerTimestamp,
                 logMessagePartitionId,
                 dataBaseSearchList,
                 converter);
@@ -266,6 +333,7 @@ public class TransactionLogRestService_V1 {
     @Produces(MediaType.APPLICATION_JSON)
     public Response dataView(
             @QueryParam("logMessageId") Long logMessageId,
+            @QueryParam("logMessageUtcServerTimestamp") String logMessageUtcServerTimestamp,
             @QueryParam("logMessagePartitionId") Integer logMessagePartitionId,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
@@ -273,6 +341,7 @@ public class TransactionLogRestService_V1 {
 
             JSONArray jsonResult = this.logMessageDataView(
                     logMessageId,
+                    logMessageUtcServerTimestamp,
                     logMessagePartitionId,
                     dataBaseSearchList
             );
@@ -280,7 +349,7 @@ public class TransactionLogRestService_V1 {
             return Response.ok(jsonResult.toString()).build();
 
         } catch (Exception ex) {
-            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(RestServiceTransactionLog_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
     }
@@ -291,6 +360,7 @@ public class TransactionLogRestService_V1 {
     public Response dataView(
             @QueryParam("callback") String callback,
             @QueryParam("logMessageId") Long logMessageId,
+            @QueryParam("logMessageUtcServerTimestamp") String logMessageUtcServerTimestamp,
             @QueryParam("logMessagePartitionId") Integer logMessagePartitionId,
             @QueryParam("dbSearchList") List<String> dataBaseSearchList
     ) {
@@ -304,6 +374,7 @@ public class TransactionLogRestService_V1 {
 
             JSONArray jsonResult = this.logMessageDataView(
                     logMessageId,
+                    logMessageUtcServerTimestamp,
                     logMessagePartitionId,
                     dataBaseSearchList
             );
@@ -311,7 +382,7 @@ public class TransactionLogRestService_V1 {
             return Response.ok(internalCallbackName + "(" + jsonResult.toString() + ")").build();
 
         } catch (Exception ex) {
-            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(RestServiceTransactionLog_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
 
@@ -420,7 +491,7 @@ public class TransactionLogRestService_V1 {
             return Response.ok(jsonResult.toString()).build();
 
         } catch (Exception ex) {
-            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(RestServiceTransactionLog_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
     }
@@ -481,7 +552,7 @@ public class TransactionLogRestService_V1 {
             return Response.ok(internalCallbackName + "(" + jsonResult.toString() + ")").build();
 
         } catch (Exception ex) {
-            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(RestServiceTransactionLog_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
 
@@ -590,7 +661,7 @@ public class TransactionLogRestService_V1 {
             return Response.ok(jsonResult.toString()).build();
 
         } catch (Exception ex) {
-            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(RestServiceTransactionLog_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
     }
@@ -651,7 +722,7 @@ public class TransactionLogRestService_V1 {
             return Response.ok(internalCallbackName + "(" + jsonResult.toString() + ")").build();
 
         } catch (Exception ex) {
-            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(RestServiceTransactionLog_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
 
@@ -760,7 +831,7 @@ public class TransactionLogRestService_V1 {
             return Response.ok(jsonResult.toString()).build();
 
         } catch (Exception ex) {
-            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(RestServiceTransactionLog_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
     }
@@ -821,20 +892,21 @@ public class TransactionLogRestService_V1 {
             return Response.ok(internalCallbackName + "(" + jsonResult.toString() + ")").build();
 
         } catch (Exception ex) {
-            Logger.getLogger(TransactionLogRestService_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(RestServiceTransactionLog_V1.class.getName()).log(Level.SEVERE, ex.getMessage());
             return Response.serverError().build();
         }
 
     }
 
+    
+    // DELET, PUT && POST can't be cross domain ( jsonp )
     @POST
-    @Path("persist")
+    @Path("json/persist")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-
     public Response persist(Transactions transactions
     ) {
 
-        System.err.println("[ Got REST call POST ]");
+        //System.err.println("[ Got REST call POST ]");
 
         com.generic.global.transactionlogger.Response serviceResponse = new LogMessageServiceBase().create(transactions);
         if (serviceResponse.isReturn()) {
@@ -844,23 +916,7 @@ public class TransactionLogRestService_V1 {
         }
     }
 
-    @POST
-    @Path("notificationOfApplicationName")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response notificationOfApplicationName(@QueryParam("fromDate") String fromDate,
-            @QueryParam("toDate") String toDate,
-            @QueryParam("page") Integer page,
-            @QueryParam("pageSize") Integer pageSize,
-            @QueryParam("transactionReferenceId") String transactionReferenceId,
-            @QueryParam("viewError") Integer viewError,
-            @QueryParam("viewAppName") List<String> viewApplicationNames,
-            @QueryParam("viewFlowName") List<String> viewFlowNames,
-            @QueryParam("viewFlowPointName") List<String> viewFlowPointName,
-            @QueryParam("notViewAppName") List<String> notViewApplicationNames,
-            @QueryParam("notViewFlowName") List<String> notViewFlowNames) {
-
-        return Response.ok("()").build();
-    }
+     
 
     private List<String> getDefaultSearchableDatabases() {
         List<String> defaultSearchableDatabases = new ArrayList<>();
@@ -879,6 +935,35 @@ public class TransactionLogRestService_V1 {
         defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_13_NAME);
         defaultSearchableDatabases.add(DataBase.LOGMESSAGEDATA_PARTITION_14_NAME);
         return defaultSearchableDatabases;
+
+    }
+
+    private String stringFromInputStream(InputStream is) {
+
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+
+        String line;
+        try {
+
+            br = new BufferedReader(new InputStreamReader(is));
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return sb.toString();
 
     }
 

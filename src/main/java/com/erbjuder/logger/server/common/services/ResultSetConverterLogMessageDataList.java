@@ -109,43 +109,43 @@ public class ResultSetConverterLogMessageDataList implements ResultSetConverter 
                     if (column_name.equals("ID")) {
                         obj.setId(rs.getBigDecimal(column_name).longValueExact());
                     }
-                    if (column_name.equals("PARTITION_ID")) {
+                    else if (column_name.equals("PARTITION_ID")) {
                         obj.setPartitionId(rs.getInt(column_name));
                     }
 
-                    if (column_name.equals("CONTENT")) {
+                    else if (column_name.equals("CONTENT")) {
                         obj.setContent(rs.getString(column_name));
                     }
 
-                    if (column_name.equals("LABEL")) {
+                    else if (column_name.equals("LABEL")) {
                         obj.setLabel(rs.getString(column_name));
                     }
 
-                    if (column_name.equals("MIMETYPE")) {
+                    else if (column_name.equals("MIMETYPE")) {
                         obj.setMimeType(rs.getString(column_name));
                     }
 
-                    if (column_name.equals("MODIFIED")) {
+                    else if (column_name.equals("MODIFIED")) {
                         obj.setModified(rs.getBoolean(column_name));
                     }
 
-                    if (column_name.equals("CONTENTSIZE")) {
+                    else if (column_name.equals("CONTENTSIZE")) {
                         obj.setContentSize(rs.getBigDecimal(column_name).longValueExact());
                     }
 
-                    if (column_name.equals("SEARCHABLE")) {
+                    else if (column_name.equals("SEARCHABLE")) {
                         obj.setSearchable(rs.getBoolean(column_name));
                     }
 
-                    if (column_name.equals("UTCLOCALTIMESTAMP")) {
+                    else if (column_name.equals("UTCLOCALTIMESTAMP")) {
                         obj.setUtcLocalTimeStamp(rs.getTimestamp(column_name));
                     }
 
-                    if (column_name.equals("UTCSERVERTIMESTAMP")) {
+                    else if (column_name.equals("UTCSERVERTIMESTAMP")) {
                         obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
                     }
 
-                    if (column_name.equals("LOGMESSAGE_ID")) {
+                    else if (column_name.equals("LOGMESSAGE_ID")) {
                         obj.setLogMessageId(rs.getLong(column_name));
                     }
                 }//end foreach

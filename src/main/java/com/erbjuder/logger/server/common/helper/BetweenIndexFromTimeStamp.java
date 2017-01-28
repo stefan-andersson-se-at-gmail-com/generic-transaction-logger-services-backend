@@ -18,7 +18,6 @@ package com.erbjuder.logger.server.common.helper;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  *

@@ -38,6 +38,7 @@ import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_15;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_16;
 import com.erbjuder.logger.server.entity.impl.LogMessageData_Partition_17;
 import com.erbjuder.logger.server.entity.interfaces.LogMessageData;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,6 +123,9 @@ public class ResultSetConverterBase {
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.NUMERIC) {
                         builder.append(rs.getBigDecimal(column_name));
+
+                    } else if (rsmd.getColumnType(i) == java.sql.Types.NULL) {
+                        builder.append("");
 
                     } else {
                         builder.append(rs.getObject(column_name));
@@ -286,44 +290,27 @@ public class ResultSetConverterBase {
 
                     if (column_name.equals("ID")) {
                         obj.setId(rs.getBigDecimal(column_name).longValueExact());
-                    }
-                    if (column_name.equals("PARTITION_ID")) {
+                    } else if (column_name.equals("PARTITION_ID")) {
                         obj.setPartitionId(rs.getInt(column_name));
-                    }
-
-                    if (column_name.equals("CONTENT")) {
+                    } else if (column_name.equals("CONTENT")) {
                         obj.setContent(rs.getString(column_name));
-                    }
-
-                    if (column_name.equals("LABEL")) {
+                    } else if (column_name.equals("LABEL")) {
                         obj.setLabel(rs.getString(column_name));
-                    }
-
-                    if (column_name.equals("MIMETYPE")) {
+                    } else if (column_name.equals("MIMETYPE")) {
                         obj.setMimeType(rs.getString(column_name));
-                    }
-
-                    if (column_name.equals("MODIFIED")) {
+                    } else if (column_name.equals("MODIFIED")) {
                         obj.setModified(rs.getBoolean(column_name));
-                    }
-
-                    if (column_name.equals("CONTENTSIZE")) {
+                    } else if (column_name.equals("CONTENTSIZE")) {
                         obj.setContentSize(rs.getBigDecimal(column_name).longValueExact());
-                    }
-
-                    if (column_name.equals("SEARCHABLE")) {
+                    } else if (column_name.equals("SEARCHABLE")) {
                         obj.setSearchable(rs.getBoolean(column_name));
                     }
 
                     if (column_name.equals("UTCLOCALTIMESTAMP")) {
                         obj.setUtcLocalTimeStamp(rs.getTimestamp(column_name));
-                    }
-
-                    if (column_name.equals("UTCSERVERTIMESTAMP")) {
+                    } else if (column_name.equals("UTCSERVERTIMESTAMP")) {
                         obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
-                    }
-
-                    if (column_name.equals("LOGMESSAGE_ID")) {
+                    } else if (column_name.equals("LOGMESSAGE_ID")) {
                         obj.setLogMessageId(rs.getLong(column_name));
                     }
                 }//end foreach
@@ -386,7 +373,7 @@ public class ResultSetConverterBase {
                         obj.put(column_name, rs.getArray(column_name).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.BIGINT) {
-                        obj.put(column_name, rs.getBigDecimal(column_name).toBigInteger().toString());
+                        obj.put(column_name, ((Long) rs.getLong(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.BOOLEAN) {
                         obj.put(column_name, ((Boolean) rs.getBoolean(column_name)).toString());
@@ -395,16 +382,19 @@ public class ResultSetConverterBase {
                         obj.put(column_name, rs.getBlob(column_name));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.DOUBLE) {
-                        obj.put(column_name, ((Double) rs.getDouble(column_name)).toString());
+                        obj.put(column_name, ((Double) rs.getDouble(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.FLOAT) {
-                        obj.put(column_name, ((Float) rs.getFloat(column_name)).toString());
+                        obj.put(column_name, ((Float) rs.getFloat(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.INTEGER) {
-                        obj.put(column_name, ((Integer) rs.getInt(column_name)).toString());
+                        obj.put(column_name, ((Integer) rs.getInt(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.NVARCHAR) {
                         obj.put(column_name, rs.getNString(column_name));
+
+                    } else if (rsmd.getColumnType(i) == java.sql.Types.CHAR) {
+                        obj.put(column_name, rs.getString(column_name));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.VARCHAR) {
 //                        temp = rs.getString(column_name); //saving column data to temp variable
@@ -412,29 +402,39 @@ public class ResultSetConverterBase {
 //                        temp = ESAPI.encoder().encodeForHTML(temp); //encoding to be browser safe
 //                        obj.put(column_name, temp); //putting data into JSON object
 //                    
+                        obj.put(column_name, (String) rs.getString(column_name));
+
+                    } else if (rsmd.getColumnType(i) == java.sql.Types.LONGNVARCHAR) {
                         obj.put(column_name, rs.getString(column_name));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TINYINT) {
-                        obj.put(column_name, ((Integer) rs.getInt(column_name)).toString());
+                        obj.put(column_name, ((Short) rs.getShort(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.SMALLINT) {
-                        obj.put(column_name, ((Integer) rs.getInt(column_name)).toString());
+                        obj.put(column_name, ((Integer) rs.getInt(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.DATE) {
-                        obj.put(column_name, rs.getString(column_name) );//rs.getDate(column_name).toString());
+                        obj.put(column_name, rs.getString(column_name));//rs.getDate(column_name).toString());
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TIME) {
-                        obj.put(column_name, rs.getString(column_name) ); // TimeStampUtils.dateTimeToString(rs.getTime(column_name)));
+                        obj.put(column_name, rs.getString(column_name)); // TimeStampUtils.dateTimeToString(rs.getTime(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.TIMESTAMP) {
-                        obj.put(column_name, rs.getString(column_name) ); // TimeStampUtils.timeStampToString(rs.getTimestamp(column_name)));
+                        obj.put(column_name, rs.getString(column_name)); // TimeStampUtils.timeStampToString(rs.getTimestamp(column_name)));
 
                     } else if (rsmd.getColumnType(i) == java.sql.Types.NUMERIC) {
-                        obj.put(column_name, rs.getBigDecimal(column_name).toString());
+                        obj.put(column_name, rs.getBigDecimal(column_name));
 
+                    } else if (rsmd.getColumnType(i) == java.sql.Types.DECIMAL) {
+                        obj.put(column_name, rs.getBigDecimal(column_name));
+
+                    } else if (rsmd.getColumnType(i) == java.sql.Types.BIT) {
+                        obj.put(column_name, rs.getInt(column_name));
+
+                    } else if (rsmd.getColumnType(i) == java.sql.Types.NULL) {
+                        obj.put(column_name, "");
                     } else {
-                        obj.put(column_name, rs.getObject(column_name));
-
+                        obj.put(column_name, rs.getString(column_name));
                     }
                 }//end foreach
                 json.add(obj);

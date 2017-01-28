@@ -30,7 +30,8 @@ import java.util.Collection;
 public class InternalTransactionHeaders implements Serializable {
 
     private ArrayList<InternalTransactionHeader> internalTransactionHeaders = new ArrayList();
-
+    private Boolean someMarkedAsError = false;
+    
     public InternalTransactionHeaders() {
     }
 
@@ -48,6 +49,14 @@ public class InternalTransactionHeaders implements Serializable {
     
     public void addAllInternalTransactionHeaders(Collection<InternalTransactionHeader> internalTransactionHeaders) {
         this.internalTransactionHeaders.addAll(internalTransactionHeaders);
+    }
+
+    public Boolean getSomeMarkedAsError() {
+        return someMarkedAsError;
+    }
+
+    public void setSomeMarkedAsError(Boolean someMarkedAsError) {
+        this.someMarkedAsError = someMarkedAsError;
     }
 
 }

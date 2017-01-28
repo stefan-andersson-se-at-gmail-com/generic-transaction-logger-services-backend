@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Stefan Andersson
+ * Copyright (C) 2017 Stefan Andersson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 package com.erbjuder.logger.server.common.services;
 
-import com.erbjuder.logger.server.entity.impl.LogMessage;
+import com.erbjuder.logger.server.bean.EmailNotification;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +27,11 @@ import java.util.logging.Logger;
  *
  * @author Stefan Andersson
  */
-public class ResultSetConverterLogMessageList implements ResultSetConverter {
+public class ResultSetConverterEmailNotificationList implements ResultSetConverter {
 
-    private final List<LogMessage> list = new ArrayList<>();
+    private final List<EmailNotification> list = new ArrayList<>();
 
-    public List<LogMessage> getResult() {
+    public List<EmailNotification> getResult() {
         return list;
     }
 
@@ -49,7 +49,7 @@ public class ResultSetConverterLogMessageList implements ResultSetConverter {
                 int numColumns = rsmd.getColumnCount();
 
                 //each row in the ResultSet will be converted to a Object
-                LogMessage obj = new LogMessage();
+                EmailNotification obj = new EmailNotification();
 
                 // loop through all the columns 
                 for (int i = 1; i < numColumns + 1; i++) {
@@ -57,51 +57,24 @@ public class ResultSetConverterLogMessageList implements ResultSetConverter {
 
                     if (column_name.equals("ID")) {
                         obj.setId(rs.getBigDecimal(column_name).longValueExact());
-                    }
-
-                    else if (column_name.equals("PARTITION_ID")) {
-                        obj.setPartitionId(rs.getInt(column_name));
-                    }
-
-                    else if (column_name.equals("APPLICATIONNAME")) {
+                    } else if (column_name.equals("NOTIFICATIONEMAIL")) {
+                        obj.setNotificationEmail(rs.getNString(column_name));
+                    } else if (column_name.equals("APPLICATIONNAME")) {
                         obj.setApplicationName(rs.getNString(column_name));
-                    }
-
-                    else if (column_name.equals("EXPIREDDATE")) {
-                        obj.setExpiredDate(rs.getDate(column_name));
-                    }
-
-                    else if (column_name.equals("FLOWNAME")) {
-                        obj.setFlowName(rs.getNString(column_name));
-                    }
-
-                    else if (column_name.equals("FLOWPOINTNAME")) {
-                        obj.setFlowPointName(rs.getNString(column_name));
-                    }
-
-                    else if (column_name.equals("ISERROR")) {
-                        obj.setIsError(rs.getBoolean(column_name));
-                    }
-
-                    else if (column_name.equals("TRANSACTIONREFERENCEID")) {
-                        obj.setTransactionReferenceID(rs.getNString(column_name));
-                    }
-
-                    else if (column_name.equals("UTCLOCALTIMESTAMP")) {
-                        obj.setUtcLocalTimeStamp(rs.getTimestamp(column_name));
-                    }
-
-                    else if (column_name.equals("UTCSERVERTIMESTAMP")) {
-                        obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
+                    } else if (column_name.equals("REGISTRATIONDATE")) {
+                        obj.setReqistrationDate(rs.getDate(column_name));
+                    } else if (column_name.equals("NOTIFICATIONSENTDATE")) {
+                        obj.setNotificationSentDate(rs.getDate(column_name));
+                    } else if (column_name.equals("NOTIFICATIONCOUNTER")) {
+                        obj.setNotificationCounter(rs.getInt(column_name));
                     }
                 }//end foreach
                 list.add(obj);
             }//end while
 
         } catch (Exception ex) {
-            Logger.getLogger(ResultSetConverterBase.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(ResultSetConverterEmailNotificationList.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
 
     }
-
 }

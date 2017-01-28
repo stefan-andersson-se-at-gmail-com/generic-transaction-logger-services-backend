@@ -18,17 +18,7 @@ package com.erbjuder.logger.server.soap.services;
 
 import com.erbjuder.logger.server.common.services.LogMessageServiceBase;
 import com.generic.global.transactionlogger.Transactions;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Resource;
-import javax.jms.JMSException;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.Topic;
-import javax.jms.TopicConnection;
-import javax.jms.TopicConnectionFactory;
-import javax.jms.TopicPublisher;
-import javax.jms.TopicSession;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlSeeAlso;
@@ -49,14 +39,10 @@ import javax.xml.ws.WebServiceException;
 })
 
 public class TransactionLogAsynchronousService extends LogMessageServiceBase {
-     
-    private static final Logger logger = Logger.getLogger(TransactionLogAsynchronousService.class.getName());
 
-    public void persist(
-            @WebParam(name = "Transactions", targetNamespace = "urn:generic.com:Global:TransactionLogger", partName = "Transactions") Transactions transactions) throws WebServiceException {
-        // logger.log(Level.SEVERE, "[ Got transaction log asynchronous event ] ");
+    public void persist(@WebParam(name = "Transactions", targetNamespace = "urn:generic.com:Global:TransactionLogger", partName = "Transactions") Transactions transactions) throws WebServiceException {
         super.create(transactions);
-         
+
     }
- 
+
 }

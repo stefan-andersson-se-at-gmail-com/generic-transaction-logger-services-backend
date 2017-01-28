@@ -17,6 +17,7 @@
 package com.erbjuder.logger.server.common.services;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -42,6 +43,19 @@ public class PrepareStatementHelper {
         if (!list.isEmpty()) {
             builder.append("(");
             for (String value : list) {
+                builder.append(PrepareStatementHelper.toSQLValue(value)).append(",");
+            }
+            builder.deleteCharAt(builder.lastIndexOf(",")).append(")");
+        }
+        return builder.toString();
+    }
+
+    public static String toSQLList(Set<String> set) {
+        StringBuilder builder = new StringBuilder();
+
+        if (!set.isEmpty()) {
+            builder.append("(");
+            for (String value : set) {
                 builder.append(PrepareStatementHelper.toSQLValue(value)).append(",");
             }
             builder.deleteCharAt(builder.lastIndexOf(",")).append(")");

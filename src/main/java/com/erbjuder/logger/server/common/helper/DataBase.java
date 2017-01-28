@@ -24,6 +24,7 @@ import java.util.Set;
  * @author Stefan Andersson
  */
 public class DataBase {
+ 
 
     public static final long LOGMESSAGEDATA_CONTENT_MAX_SIZE_20B = 20;
     public static final long LOGMESSAGEDATA_CONTENT_MAX_SIZE_40B = 40;
@@ -43,8 +44,6 @@ public class DataBase {
     public static final long LOGMESSAGEDATA_CONTENT_MAX_SIZE_16MB = 16777215;   // MEDIUMTEXT
     public static final long LOGMESSAGEDATA_CONTENT_MAX_SIZE_4GB = 4294967296l; // LONGTEXT
 
- 
-    
     public static final String LOGMESSAGEDATA_PARTITION_01_NAME = "LogMessageData_Partition_01";
     public static final String LOGMESSAGEDATA_PARTITION_02_NAME = "LogMessageData_Partition_02";
     public static final String LOGMESSAGEDATA_PARTITION_03_NAME = "LogMessageData_Partition_03";
@@ -53,7 +52,7 @@ public class DataBase {
     public static final String LOGMESSAGEDATA_PARTITION_06_NAME = "LogMessageData_Partition_06";
     public static final String LOGMESSAGEDATA_PARTITION_07_NAME = "LogMessageData_Partition_07";
     public static final String LOGMESSAGEDATA_PARTITION_08_NAME = "LogMessageData_Partition_08";
-    public static final String LOGMESSAGEDATA_PARTITION_09_NAME = "LogMessageData_Partition_09"; 
+    public static final String LOGMESSAGEDATA_PARTITION_09_NAME = "LogMessageData_Partition_09";
     public static final String LOGMESSAGEDATA_PARTITION_10_NAME = "LogMessageData_Partition_10";
     public static final String LOGMESSAGEDATA_PARTITION_11_NAME = "LogMessageData_Partition_11";
     public static final String LOGMESSAGEDATA_PARTITION_12_NAME = "LogMessageData_Partition_12";
@@ -62,10 +61,7 @@ public class DataBase {
     public static final String LOGMESSAGEDATA_PARTITION_15_NAME = "LogMessageData_Partition_15";
     public static final String LOGMESSAGEDATA_PARTITION_16_NAME = "LogMessageData_Partition_16";
     public static final String LOGMESSAGEDATA_PARTITION_17_NAME = "LogMessageData_Partition_17";
-    
-    
-    
-    
+
     public static final String LOGMESSAGEDATA_PARTITION_01_CONTENT_COLUMN_DEFINITION = "varchar(" + DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_20B + ")";
     public static final String LOGMESSAGEDATA_PARTITION_02_CONTENT_COLUMN_DEFINITION = "varchar(" + DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_40B + ")";
     public static final String LOGMESSAGEDATA_PARTITION_03_CONTENT_COLUMN_DEFINITION = "varchar(" + DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_60B + ")";
@@ -108,7 +104,7 @@ public class DataBase {
 
     }
 
-     public static String logMessageDataPartitionNameFromContentSize(long contentSize) {
+    public static String logMessageDataPartitionNameFromContentSize(long contentSize) {
 
         // Determ content partition based on size
         //       

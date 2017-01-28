@@ -19,6 +19,8 @@ package com.erbjuder.logger.server.common.helper;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -40,8 +42,8 @@ public class DatabasePartitionHelper {
     private static final SimpleDateFormat formatter;
     private static final Calendar calendar1;
     private static final Calendar calendar2;
-    
-    static{
+
+    static {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         calendar1 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         calendar2 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -91,15 +93,49 @@ public class DatabasePartitionHelper {
      public static String getPartitionId_SQL_Syntax(Date date) {
      return new StringBuilder().append(mysql_partition_prefix).append(DatabasePartitionHelper.calculatePartitionId(date)).toString();
      }
-
-     public static String getPartitionId_SQL_Syntax(Timestamp timestamp) {
-     return new StringBuilder().append(mysql_partition_prefix).append(DatabasePartitionHelper.calculatePartitionId(timestamp)).toString();
-     }
+ 
 
      public static String getPartitionId_SQL_Syntax(long milliseconds) {
      return new StringBuilder().append(mysql_partition_prefix).append(calculatePartitionId(milliseconds)).toString();
      }
      */
+    public static List<String> getPartitionId_SQL_SyntaxList(String fromDateString) {
+
+        Set<String> set = new HashSet<>();
+        List<String> result = new ArrayList<>();
+        try {
+
+            // Determ if time is closer than 30 sec to another partition
+            Timestamp timeStamp = Timestamp.valueOf(fromDateString);
+            BetweenIndexFromTimeStamp between = TimeStampUtils.createBetweenIndexFromTimeStamp(
+                    timeStamp,
+                    ChronoField.INSTANT_SECONDS,
+                    30
+            );
+
+            Timestamp floorTimeStamp = between.getFloorTimestamp();
+            Timestamp ceilTimeStamp = between.getCeilTimestamp();
+
+            // fetch partition id(s)
+            int floorPartition = DatabasePartitionHelper.calculatePartitionId(floorTimeStamp);
+            int currentPartition = DatabasePartitionHelper.calculatePartitionId(timeStamp);
+            int ceilPartition = DatabasePartitionHelper.calculatePartitionId(ceilTimeStamp);
+
+            // store
+            set.add(getPartitionSyntax(floorPartition));
+            set.add(getPartitionSyntax(currentPartition));
+            set.add(getPartitionSyntax(ceilPartition));
+
+        } catch (IllegalArgumentException iex) {
+            // invalid format! Do nothing
+        }
+
+        result.addAll(set);
+        Collections.sort(result, new PartitionSyntaxListComparator());
+        return result;
+
+    }
+
     public static List<String> getPartitionId_SQL_SyntaxList(String fromDateString, String toDateString) throws ParseException {
 
         long fromDate = DatabasePartitionHelper.dateStringToDate(fromDateString).getTime();
@@ -108,6 +144,12 @@ public class DatabasePartitionHelper {
         // Fast exist
         if (fromDate > toDate) {
             return new ArrayList<>();
+        }
+
+        // No idee to search in the future
+        long nowDate = new Date().getTime();
+        if (nowDate < toDate) {
+            toDate = nowDate;
         }
 
         // Same year?
@@ -212,7 +254,7 @@ public class DatabasePartitionHelper {
         DatabasePartitionHelper helper = new DatabasePartitionHelper();
         // System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-11-15 00:00:01", "2017-11-14 03:18:23").size());
         // System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-11-15 00:00:01", "2017-11-14 03:18:23"));
-    
+
         /*
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("1981-01-01 00:00:01", "1981-01-01 23:59:59"));
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("1981-12-31 00:00:01", "1981-12-31 23:59:59"));
@@ -222,9 +264,9 @@ public class DatabasePartitionHelper {
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-12-31 00:00:01", "2016-12-31 23:59:59"));
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2017-01-01 00:00:01", "2017-01-01 23:59:59"));
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2017-12-31 00:00:01", "2017-12-31 23:59:59"));
-    */
+         */
         System.err.println(DatabasePartitionHelper.getPartitionId_SQL_SyntaxList("2016-11-20 14:30:24.526985", "2016-11-21 05:30:24.526985"));
-     
+
     }
 
     private static class PartitionSyntaxListComparator implements Comparator {

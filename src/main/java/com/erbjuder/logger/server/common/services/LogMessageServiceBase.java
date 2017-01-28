@@ -18,7 +18,7 @@ package com.erbjuder.logger.server.common.services;
 
 import com.erbjuder.logger.server.common.helper.MysqlConnection;
 import com.erbjuder.logger.server.common.helper.TransactionComparator;
-import com.erbjuder.logger.server.queue.MessageSender;
+import com.erbjuder.logger.server.queue.TopicQueueMessageSender;
 import com.generic.global.transactionlogger.Response;
 import com.generic.global.transactionlogger.Transactions;
 import com.generic.global.transactionlogger.Transactions.Transaction;
@@ -26,7 +26,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,7 +50,7 @@ import javax.xml.ws.WebServiceException;
 public class LogMessageServiceBase {
 
     @EJB
-    MessageSender messageSender;
+    TopicQueueMessageSender messageSender;
 
     private static final Logger logger = Logger.getLogger(LogMessageServiceBase.class.getName());
     public static final int addNumberOfMonth = 12;
@@ -69,7 +68,7 @@ public class LogMessageServiceBase {
 
         try (Connection connection = MysqlConnection.getConnectionWrite()) {
 
-            // Build all obnject that we need one time    
+            // Build all objects that we need one time    
             InternalObjects internalObjects = buildInternalObjects(connection, transactionArray);
 
             // Clear as mutch we can
@@ -87,11 +86,10 @@ public class LogMessageServiceBase {
 
             // Put message on buss / topic queue.
             messageSender.produceMessages(internalObjects.getInternalTransactionHeaders());
-
-            
+       
             internalObjects.getDbContentSizeMap().clear();
-            internalObjects.setDbContentSizeMap( null );
-            
+            internalObjects.setDbContentSizeMap(null);
+
         } catch (SQLException sqlError) {
             logger.log(Level.SEVERE, sqlError.getMessage());
             return response;
@@ -336,6 +334,10 @@ public class LogMessageServiceBase {
 
             }
 
+            // If some marked as error --> save contains error.
+            if (internalHeader.getIsError()) {
+                internalTransactionHeaders.setSomeMarkedAsError(true);
+            }
             // Save to result
             internalTransactionHeaders.addInternalTransactionHeader(internalHeader);
 

@@ -1,6 +1,5 @@
-
 /*
- * Copyright (C) 2015 Stefan Andersson
+ * Copyright (C) 2016 Stefan Andersson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +16,15 @@
  */
 package com.erbjuder.logger.server.queue;
 
+import com.erbjuder.logger.server.bean.EmailService;
+import com.erbjuder.logger.server.common.services.InternalTransactionHeader;
 import com.erbjuder.logger.server.common.services.InternalTransactionHeaders;
+import com.erbjuder.logger.server.rest.services.EmailNotificationPrepareToSendBase;
+import com.erbjuder.logger.server.rest.services.EmailNotificationServiceBase;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.ActivationConfigProperty;
+import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -37,17 +43,31 @@ import javax.jms.ObjectMessage;
             @ActivationConfigProperty(propertyName = "destinationType",
                     propertyValue = "javax.jms.Topic")
         })
-public class StatisticalMessageListener implements MessageListener {
+public class EmailNotificationServiceMessageListener extends EmailNotificationServiceBase implements MessageListener {
+
+    private static final Logger logger = Logger.getLogger(EmailNotificationServiceMessageListener.class.getName());
+
+    @EJB
+    protected EmailNotificationPrepareToSendBase emailNotificationPrepareToSendBase;
 
     @Override
     public void onMessage(Message message) {
-        ObjectMessage objectMessage = (ObjectMessage) message;
+
         try {
 
+            ObjectMessage objectMessage = (ObjectMessage) message;
             InternalTransactionHeaders internalHeaders = (InternalTransactionHeaders) objectMessage.getObject();
+            if (internalHeaders.getSomeMarkedAsError()) {
 
-        } catch (JMSException e) {
-            e.printStackTrace();
+                InternalTransactionHeader header = internalHeaders.getInternalTransactionHeaders().get(0);
+                emailNotificationPrepareToSendBase.persist(
+                        header.getApplicationName(),
+                        header.getTransactionReferenceID()
+                );
+            }
+
+        } catch (JMSException | ClassCastException e) {
+            logger.log(Level.SEVERE, e.getMessage());
         }
     }
 }

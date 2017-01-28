@@ -43,12 +43,8 @@ import javax.xml.ws.WebServiceException;
 
 public class TransactionLogSynchronousService extends LogMessageServiceBase {
 
-    private static final Logger logger = Logger.getLogger(TransactionLogSynchronousService.class.getName());
-
     @WebResult(name = "Response", targetNamespace = "urn:generic.com:Global:TransactionLogger", partName = "response")
-    public Response persist(
-            @WebParam(name = "Transactions", targetNamespace = "urn:generic.com:Global:TransactionLogger", partName = "Transactions") Transactions transactions) throws WebServiceException {
-        // logger.log(Level.SEVERE, "[ Got transaction log synchronous event ] ");
+    public Response persist(@WebParam(name = "Transactions", targetNamespace = "urn:generic.com:Global:TransactionLogger", partName = "Transactions") Transactions transactions) throws WebServiceException {
         return super.create(transactions);
     }
 

@@ -118,10 +118,10 @@ public class TimeStampUtils {
     ) {
 
         /* Extract the field being rounded. */
-        int field = input.get(roundTo);
+        long field = input.getLong(roundTo);
 
         /* Distance from previous floor. */
-        int r = field % roundIncrement;
+        long r = field % roundIncrement;
 
         /* Find floor. Truncate values to base unit of field. */
         ZonedDateTime floor
@@ -153,10 +153,10 @@ public class TimeStampUtils {
         ZonedDateTime input = ZonedDateTime.ofInstant(timeStamp.toInstant(), ZoneId.of("UTC"));
 
         /* Extract the field being rounded. */
-        int field = input.get(roundTo);
+        long field = input.getLong(roundTo);
 
         /* Distance from previous floor. */
-        int r = field % roundIncrement;
+        long r = field % roundIncrement;
 
         /* Find floor. Truncate values to base unit of field. */
         ZonedDateTime floor
@@ -189,11 +189,36 @@ public class TimeStampUtils {
         );
 
         System.err.println(TimeStampUtils.timeStampToString(now));
-        System.err.println(TimeStampUtils.getDateTimeFormatter().format( between_1.getFloorZonedDateTime()));
-        System.err.println(TimeStampUtils.getDateTimeFormatter().format( between_1.getCeilZonedDateTime()));
+        System.err.println(TimeStampUtils.getDateTimeFormatter().format(between_1.getFloorZonedDateTime()));
+        System.err.println(TimeStampUtils.getDateTimeFormatter().format(between_1.getCeilZonedDateTime()));
         System.err.println(TimeStampUtils.getSimpleDateFormater().format(between_1.getFloorTimestamp()));
         System.err.println(TimeStampUtils.getSimpleDateFormater().format(between_1.getCeilTimestamp()));
 
+        Timestamp timeArg = Timestamp.valueOf("2016-12-28 16:49:33.960999");
+        BetweenIndexFromTimeStamp between_2 = TimeStampUtils.createBetweenIndexFromTimeStamp(
+                timeArg,
+                ChronoField.INSTANT_SECONDS,
+                30
+        );
+
+        System.err.println(TimeStampUtils.timeStampToString(timeArg));
+        System.err.println(TimeStampUtils.getDateTimeFormatter().format(between_2.getFloorZonedDateTime()));
+        System.err.println(TimeStampUtils.getDateTimeFormatter().format(between_2.getCeilZonedDateTime()));
+
+        try {
+            Timestamp timeArg_2 = Timestamp.valueOf("2016-12-2816:49:33");
+            BetweenIndexFromTimeStamp between_3 = TimeStampUtils.createBetweenIndexFromTimeStamp(
+                    timeArg_2,
+                    ChronoField.INSTANT_SECONDS,
+                    30
+            );
+
+            System.err.println(TimeStampUtils.timeStampToString(timeArg_2));
+            System.err.println(TimeStampUtils.getDateTimeFormatter().format(between_3.getFloorZonedDateTime()));
+            System.err.println(TimeStampUtils.getDateTimeFormatter().format(between_3.getCeilZonedDateTime()));
+        } catch (IllegalArgumentException iex) {
+            // invalid format! Do nothing
+        }
     }
 
 }

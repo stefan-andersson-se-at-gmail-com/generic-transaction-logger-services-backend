@@ -37,7 +37,7 @@ import javax.jms.TopicSession;
  * @author Stefan Andersson
  */
 @Stateless
-public class MessageSender {
+public class TopicQueueMessageSender {
 
     @Resource(mappedName = "jms/transactionLoggerTopicConnectionFactory")
     private TopicConnectionFactory topicConnectionFactory;
@@ -45,39 +45,36 @@ public class MessageSender {
     @Resource(mappedName = "jms/transactionLoggerQueueTopic")
     private Topic topic;
 
-    public void produceMessages( InternalTransactionHeaders internalTransactionHeaders ) {
+    private static final Logger logger = Logger.getLogger(TopicQueueMessageSender.class.getName());
 
-        System.err.println("Preparing to send messages");
+    public void produceMessages(InternalTransactionHeaders internalTransactionHeaders) {
+
         TopicConnection connection = null;
         try {
             connection = topicConnectionFactory.createTopicConnection();
         } catch (JMSException | NullPointerException ex) {
-            System.err.println("Exception 1 ");
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         TopicSession session = null;
         try {
             session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         } catch (JMSException | NullPointerException ex) {
-            System.err.println("Exception 2 ");
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         TopicPublisher messagePublisher = null;
         try {
             messagePublisher = session.createPublisher(topic);
         } catch (JMSException | NullPointerException ex) {
-            System.err.println("Exception 3");
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         ObjectMessage objectMessage = null;
         try {
             objectMessage = session.createObjectMessage();
         } catch (JMSException | NullPointerException ex) {
-            System.err.println("Exception 4");
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         try {
@@ -85,11 +82,11 @@ public class MessageSender {
             messagePublisher.send(objectMessage);
 
             messagePublisher.close();
+            connection.close();
+            session.close();
         } catch (JMSException | NullPointerException ex) {
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TopicQueueMessageSender.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        System.err.println("Done sending messages");
 
     }
 

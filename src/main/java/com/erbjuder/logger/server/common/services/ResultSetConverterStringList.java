@@ -18,6 +18,7 @@ package com.erbjuder.logger.server.common.services;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -115,5 +116,6 @@ public class ResultSetConverterStringList implements ResultSetConverter {
             Logger.getLogger(ResultSetConverterBase.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
 
+        Collections.sort(list);
     }
 }
