@@ -18,7 +18,7 @@ package com.erbjuder.logger.server.common.services;
 
 import com.erbjuder.logger.server.common.helper.MysqlConnection;
 import com.erbjuder.logger.server.common.helper.TransactionComparator;
-import com.erbjuder.logger.server.queue.TopicQueueMessageSender;
+// import com.erbjuder.logger.server.queue.TopicQueueMessageSender;
 import com.generic.global.transactionlogger.Response;
 import com.generic.global.transactionlogger.Transactions;
 import com.generic.global.transactionlogger.Transactions.Transaction;
@@ -49,8 +49,8 @@ import javax.xml.ws.WebServiceException;
 })
 public class LogMessageServiceBase {
 
-    @EJB
-    TopicQueueMessageSender messageSender;
+    // @EJB
+    // TopicQueueMessageSender messageSender;
 
     private static final Logger logger = Logger.getLogger(LogMessageServiceBase.class.getName());
     public static final int addNumberOfMonth = 12;
@@ -85,7 +85,7 @@ public class LogMessageServiceBase {
             connection.close();
 
             // Put message on buss / topic queue.
-            messageSender.produceMessages(internalObjects.getInternalTransactionHeaders());
+            // messageSender.produceMessages(internalObjects.getInternalTransactionHeaders());
        
             internalObjects.getDbContentSizeMap().clear();
             internalObjects.setDbContentSizeMap(null);

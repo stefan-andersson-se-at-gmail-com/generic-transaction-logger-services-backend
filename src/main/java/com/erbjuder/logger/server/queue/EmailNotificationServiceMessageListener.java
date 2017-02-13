@@ -35,6 +35,7 @@ import javax.jms.ObjectMessage;
  *
  * @author Stefan Andersson
  */
+/*
 @MessageDriven(mappedName = "jms/transactionLoggerQueueTopic",
         activationConfig = {
             @ActivationConfigProperty(propertyName = "acknowledgeMode",
@@ -71,3 +72,4 @@ public class EmailNotificationServiceMessageListener extends EmailNotificationSe
         }
     }
 }
+*/

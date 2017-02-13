@@ -39,12 +39,11 @@ public class RESTConfig extends Application {
         //resources.add(org.glassfish.jersey.jackson.JacksonFeature.class);
         //we could also use this:
         //resources.add(com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider.class);
-
         //instead let's do it manually:
         resources.add(com.erbjuder.logger.server.rest.services.RestServiceTransactionLog_V1.class);
         resources.add(com.erbjuder.logger.server.rest.services.RestServiceNotification_V1.class);
         resources.add(com.erbjuder.logger.server.rest.services.RestServiceStatistics_V1.class);
- 
+
         //==> we could also choose packages, see below getProperties()
         System.out.println("REST configuration ended successfully.");
 

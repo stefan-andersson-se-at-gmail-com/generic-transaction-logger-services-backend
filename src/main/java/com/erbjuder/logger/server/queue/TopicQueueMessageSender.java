@@ -36,6 +36,7 @@ import javax.jms.TopicSession;
  *
  * @author Stefan Andersson
  */
+/*
 @Stateless
 public class TopicQueueMessageSender {
 
@@ -91,3 +92,4 @@ public class TopicQueueMessageSender {
     }
 
 }
+*/

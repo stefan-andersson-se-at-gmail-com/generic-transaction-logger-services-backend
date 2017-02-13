@@ -52,9 +52,8 @@ public class TransactionLogStatisticBase {
             prepareStatement.append("MAX(UTCLOCALTIMESTAMP) as CLIENT_TIME_UTC_END, ");
             prepareStatement.append("MIN(UTCSERVERTIMESTAMP) as SERVER_TIME_UTC_START,  ");
             prepareStatement.append("MAX(UTCSERVERTIMESTAMP) as SERVER_TIME_UTC_END, ");
-            //prepareStatement.append("CAST( UNIX_TIMESTAMP(MAX(UTCLOCALTIMESTAMP)) - UNIX_TIMESTAMP(MIN(UTCLOCALTIMESTAMP)) as decimal(65,6) ) AS executionTime, ");
-            prepareStatement.append("CAST( MAX(UTCLOCALTIMESTAMP) - MIN(UTCLOCALTIMESTAMP) as decimal(65,6) ) AS CLIENT_EXECUTION_TIME, ");
-            prepareStatement.append("CAST( MAX(UTCSERVERTIMESTAMP) - MIN(UTCSERVERTIMESTAMP) as decimal(65,6) ) AS SERVER_EXECUTION_TIME, ");
+            prepareStatement.append("CAST( UNIX_TIMESTAMP(MAX(UTCLOCALTIMESTAMP)) - UNIX_TIMESTAMP(MIN(UTCLOCALTIMESTAMP)) as decimal(65,6) ) AS CLIENT_EXECUTION_TIME, ");
+            prepareStatement.append("CAST( UNIX_TIMESTAMP(MAX(UTCSERVERTIMESTAMP)) - UNIX_TIMESTAMP(MIN(UTCSERVERTIMESTAMP)) as decimal(65,6) ) AS SERVER_EXECUTION_TIME, ");
 
             prepareStatement.append("COUNT(*) AS NUMBER_OF_LOGMESSAGES, ");
             prepareStatement.append("MAX(isError) as HASERROR ");
