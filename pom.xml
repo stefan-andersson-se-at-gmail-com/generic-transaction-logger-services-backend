@@ -140,7 +140,7 @@
                                 <wsdlFile>ApplicationFlowConfiguration/ApplicationFlowConfiguration.wsdl</wsdlFile>
                                 <wsdlFile>GlobalFlowConfiguration/GlobalFlowConfiguration.wsdl</wsdlFile>
                                 <wsdlFile>GlobalFlowPointBinding/GlobalFlowPointBinding.wsdl</wsdlFile>  
-                                 
+                                
                             </wsdlFiles>
                         </configuration>
                     </execution>
