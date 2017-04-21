@@ -72,9 +72,9 @@ public class LogCleanerSessionBean {
     @Timeout
     public void programmaticTimeout(Timer timer) {
         stop();
-        System.err.println("[Clean Start " + LogCleanerSessionBean.class.getName() + " ]");
+        // System.err.println("[Clean Start " + LogCleanerSessionBean.class.getName() + " ]");
         clean();
-        System.err.println("[Clean End " + LogCleanerSessionBean.class.getName() + " ]");
+        // System.err.println("[Clean End " + LogCleanerSessionBean.class.getName() + " ]");
         start();
     }
 
@@ -113,8 +113,8 @@ public class LogCleanerSessionBean {
             timerConfig.setPersistent(false);
             timerConfig.setInfo(LogCleanerSessionBean.class.getName());
             ScheduleExpression expression = new ScheduleExpression();
-            //expression.year(EVERY).month(EVERY).dayOfMonth(EVERY).hour(timeRange[timePos]).minute(EVERY).second(EVERY);
-            expression.year(EVERY).month(EVERY).dayOfMonth(EVERY).hour(EVERY).minute(EVERY).second("*/30");
+            expression.year(EVERY).month(EVERY).dayOfMonth(EVERY).hour(timeRange[timePos]).minute(EVERY).second(EVERY);
+            //expression.year(EVERY).month(EVERY).dayOfMonth(EVERY).hour(EVERY).minute(EVERY).second("*/30");
             timerService.createCalendarTimer(expression, timerConfig);
 
         } catch (IllegalArgumentException | IllegalStateException | EJBException ex) {
@@ -127,21 +127,27 @@ public class LogCleanerSessionBean {
     public void cleanLogMessages(Connection readConn, Connection writeConn) throws SQLException, Exception {
 
         int page = 1;
-        int pageSize = 200;
+        int pageSize = 1000;
         boolean done = false;
 
         // Select     
         ResultSetConverterStringList converter = new ResultSetConverterStringList();
         fetchLogMessages(readConn, page, pageSize, converter);
+        readConn.commit();
+
         if (converter.getResult().size() > 0) {
             deleteLogMessages(writeConn, converter.getResult());
-
             writeConn.commit();
-            readConn.commit();
 
+            // Delete all related data-triple(s) 
+            ResultSetConverterStringList converterData = new ResultSetConverterStringList();
             for (String databaseName : DataBase.getAllDatabaseNames()) {
-                deleteLogMessageData(writeConn, databaseName, converter.getResult());
-                writeConn.commit();
+                fetchLogMessageDate(readConn, databaseName, converter.getResult(), converterData);
+                if (converterData.getResult().size() > 0) {
+                    deleteLogMessageData(writeConn, databaseName, converterData.getResult());
+                    converterData.getResult().clear();
+                    writeConn.commit();
+                }
             }
 
             // Still more to do?
@@ -152,20 +158,24 @@ public class LogCleanerSessionBean {
 
                 } else {
 
-                    // page += 1;
+                    // Eat the rest
                     converter.getResult().clear();
+                    converterData.getResult().clear();
                     fetchLogMessages(readConn, page, pageSize, converter);
+                    readConn.commit();
                     if (converter.getResult().size() > 0) {
                         deleteLogMessages(writeConn, converter.getResult());
-
                         writeConn.commit();
-                        readConn.commit();
 
+                        // Delete all related data-triple(s) 
                         for (String databaseName : DataBase.getAllDatabaseNames()) {
-                            deleteLogMessageData(writeConn, databaseName, converter.getResult());
-                            writeConn.commit();
+                            fetchLogMessageDate(readConn, databaseName, converter.getResult(), converterData);
+                            if (converterData.getResult().size() > 0) {
+                                deleteLogMessageData(writeConn, databaseName, converterData.getResult());
+                                converterData.getResult().clear();
+                                writeConn.commit();
+                            }
                         }
-
                     }
                 }
             }
@@ -198,6 +208,22 @@ public class LogCleanerSessionBean {
         return converter;
     }
 
+    private ResultSetConverter fetchLogMessageDate(Connection conn, String database, List<String> idList, ResultSetConverter converter) throws SQLException, Exception {
+
+        // Select     
+        StringBuilder prepaterStatement_select = getLogMessageDataPrepaterStatementMysql_Select(database);
+        prepaterStatement_select.append(PrepareStatementHelper.toSQLList(idList));
+        try (PreparedStatement stmt_select = conn.prepareStatement(prepaterStatement_select.toString())) {
+            try (ResultSet rs = stmt_select.executeQuery()) {
+                converter.convert(rs);
+                rs.close();
+            }
+            stmt_select.close();
+        }
+
+        return converter;
+    }
+
     private void deleteLogMessages(Connection conn, List<String> idList) throws SQLException, Exception {
 
         StringBuilder prepaterStatement_delete = getLogMessagePrepaterStatementMysql_Delete();
@@ -206,71 +232,7 @@ public class LogCleanerSessionBean {
             stmt_delete.executeUpdate();
             stmt_delete.close();
         }
-    }
 
-    public void cleanLogMessageData(Connection readConn, Connection writeConn, String database) throws SQLException, Exception {
-
-        int page = 1;
-        int pageSize = 200;
-        boolean done = false;
-
-        // Select     
-        ResultSetConverterStringList converter = new ResultSetConverterStringList();
-        fetchLogMessageData(readConn, database, page, pageSize, converter);
-
-        if (converter.getResult().size() > 0) {
-            deleteLogMessageData(writeConn, database, converter.getResult());
-
-            writeConn.commit();
-            readConn.commit();
-
-            // Still more to do?
-            while (!done) {
-
-                if (converter.getResult().isEmpty()) {
-                    done = true;
-
-                } else {
-
-                    // page += 1;
-                    converter.getResult().clear();
-                    fetchLogMessageData(readConn, database, page, pageSize, converter);
-                    if (converter.getResult().size() > 0) {
-                        deleteLogMessageData(writeConn, database, converter.getResult());
-
-                        writeConn.commit();
-                        readConn.commit();
-
-                    }
-                }
-            }
-        }
-    }
-
-    private ResultSetConverter fetchLogMessageData(Connection conn, String database, int page, int pageSize, ResultSetConverter converter) throws SQLException, Exception {
-
-        int pageOffset = page - 1;
-        if (pageOffset < 0) {
-            pageOffset = 0;
-        } else {
-            pageOffset = pageOffset * pageSize;
-        }
-
-        // Select     
-        String prepaterStatement_select = getLogMessageDataPrepaterStatementMysql_Select(database);
-        try (PreparedStatement stmt_select = conn.prepareStatement(prepaterStatement_select)) {
-            stmt_select.setDate(1, new java.sql.Date(new Date().getTime()));
-            stmt_select.setInt(2, pageSize);
-            stmt_select.setInt(3, pageOffset);
-            try (ResultSet rs = stmt_select.executeQuery()) {
-                converter.convert(rs);
-                rs.close();
-
-            }
-            stmt_select.close();
-        }
-
-        return converter;
     }
 
     private void deleteLogMessageData(Connection conn, String database, List<String> idList) throws SQLException, Exception {
@@ -281,6 +243,7 @@ public class LogCleanerSessionBean {
             stmt_delete.executeUpdate();
             stmt_delete.close();
         }
+
     }
 
     public void clean() {
@@ -291,18 +254,22 @@ public class LogCleanerSessionBean {
             Connection readConn = MysqlConnection.getConnectionReadNonTransaction();
             if (writeConn != null && readConn != null) {
 
+                // Turn off 
                 writeConn.setAutoCommit(false);
                 readConn.setAutoCommit(false);
 
+                // Execute, [ delete all logMessage(s) and related data-triple(s) ]
                 cleanLogMessages(readConn, writeConn);
 
-                // Close
+                // Clean up
                 writeConn.commit();
                 readConn.commit();
 
+                // Restore
                 writeConn.setAutoCommit(true);
                 readConn.setAutoCommit(true);
 
+                // Closing
                 writeConn.close();
                 readConn.close();
 
@@ -323,10 +290,10 @@ public class LogCleanerSessionBean {
         return prepareStatement.toString();
     }
 
-    private String getLogMessageDataPrepaterStatementMysql_Select(String partitionName) {
+    private StringBuilder getLogMessageDataPrepaterStatementMysql_Select(String partitionName) {
         StringBuilder prepareStatement = new StringBuilder();
-        prepareStatement.append("SELECT ID FROM ").append(partitionName).append(" WHERE EXPIREDDATE <= ? LIMIT ? OFFSET ? ");
-        return prepareStatement.toString();
+        prepareStatement.append("SELECT ID FROM ").append(partitionName).append(" WHERE LOGMESSAGE_ID IN ");
+        return prepareStatement;
     }
 
     private StringBuilder getLogMessagePrepaterStatementMysql_Delete() {
@@ -338,7 +305,7 @@ public class LogCleanerSessionBean {
     private StringBuilder getLogMessageDataPrepaterStatementMysql_Delete(String partitionName) {
 
         StringBuilder prepareStatement = new StringBuilder();
-        prepareStatement.append("DELETE LOW_PRIORITY FROM ").append(partitionName).append(" WHERE LOGMESSAGE_ID IN ");
+        prepareStatement.append("DELETE LOW_PRIORITY FROM ").append(partitionName).append(" WHERE ID IN ");
         return prepareStatement;
     }
 
