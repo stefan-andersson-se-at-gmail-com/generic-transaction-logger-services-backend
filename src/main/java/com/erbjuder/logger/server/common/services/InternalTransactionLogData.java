@@ -22,6 +22,7 @@ import com.erbjuder.logger.server.common.helper.DatabasePartitionHelper;
 import com.erbjuder.logger.server.common.helper.TimeStampUtils;
 import com.generic.global.transactionlogger.Transactions;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Base64;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -54,7 +55,7 @@ public class InternalTransactionLogData implements Serializable {
             Boolean modified,
             Boolean searchable,
             Transactions.Transaction.TransactionLogData transactionLogData,
-            java.sql.Date expiredDate) {
+            java.sql.Date expiredDate) throws UnsupportedEncodingException {
         this.primaryKey = primaryKey;
         this.foreignKey = foreignKey;
         this.expiredDate = expiredDate;
@@ -134,27 +135,28 @@ public class InternalTransactionLogData implements Serializable {
 
     }
 
-    private void processTransactionLogData(Transactions.Transaction.TransactionLogData transactionLogData) {
+    private void processTransactionLogData(Transactions.Transaction.TransactionLogData transactionLogData) throws UnsupportedEncodingException {
 
         this.utcServerTimestamp = TimeStampUtils.createSystemNanoTimeStamp();
         this.partitionId = DatabasePartitionHelper.calculatePartitionId(this.utcServerTimestamp);
-
-        this.label = StringEscapeUtils.unescapeXml(transactionLogData.getContentLabel().trim());
-        this.mimeType = transactionLogData.getContentMimeType().trim();
+        this.label = new String(StringEscapeUtils.unescapeXml(transactionLogData.getContentLabel().trim()).getBytes(), "UTF-8");
+        this.mimeType = new String(transactionLogData.getContentMimeType().trim().getBytes(), "UTF-8");
+        
+        // This MUST be in base64 so no need for UTF-8 test!
         this.content = transactionLogData.getContent();
         this.contentSize = 0L;
 
         // 
         // Decode all messages
         try {
-            content = new String(Base64.getDecoder().decode(content.getBytes()));
+            content = new String(Base64.getDecoder().decode(content.getBytes()), "UTF-8");
             contentSize = new Long(content.getBytes().length);
         } catch (Exception e) {
 
             content = StringEscapeUtils.unescapeXml(content);
             contentSize = new Long(content.getBytes().length);
         }
-
+        
         this.logMessageDataPartitionNameFromContentSize = DataBase.logMessageDataPartitionNameFromContentSize(contentSize);
     }
 

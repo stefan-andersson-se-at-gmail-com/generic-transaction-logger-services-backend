@@ -121,7 +121,9 @@ public class RestServiceNotification_V1 {
             @QueryParam("notificationEmail") String notificationEmail,
             @QueryParam("applicationName") String applicationName,
             @QueryParam("flowName") String flowName,
-            @QueryParam("flowPointName") String flowPointName) {
+            @QueryParam("flowPointName") String flowPointName,
+            @QueryParam("maxNotifications") String maxNotifications,
+            @QueryParam("maxNotificationsUnit") String maxNotificationsUnit) {
 
         // System.out.println("json/remove request");
         // System.out.println("id = " + id);
@@ -134,6 +136,8 @@ public class RestServiceNotification_V1 {
             emailNotification.setApplicationName(applicationName);
             emailNotification.setFlowName(flowName);
             emailNotification.setFlowPointName(flowPointName);
+            emailNotification.setFlowPointName(maxNotifications);
+            emailNotification.setFlowPointName(maxNotificationsUnit);
 
             com.generic.global.transactionlogger.Response serviceResponse
                     = new EmailNotificationServiceBase().remove(emailNotification);
@@ -169,6 +173,55 @@ public class RestServiceNotification_V1 {
                         pageSize,
                         converter
                 );
+                response = Response.ok(converter.getResult().toString()).build();
+            } else {
+                response = Response.serverError().build();
+            }
+
+        } catch (Exception e) {
+            response = Response.serverError().build();
+        }
+
+        return response;
+    }
+
+    @POST
+    @Path("json/persistAndReplyEmailNotifications")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response jsonPersistAndReplyEmailNotifications(
+            @QueryParam("notificationEmail") String notificationEmail,
+            @QueryParam("applicationName") String applicationName,
+            @QueryParam("flowName") String flowName,
+            @QueryParam("flowPointName") String flowPointName,
+            @QueryParam("maxNotification") Integer maxNotification,
+            @QueryParam("maxNotificationUnit") String maxNotificationUnit,
+            @QueryParam("page") Integer page,
+            @QueryParam("pageSize") Integer pageSize) {
+
+        // System.out.println("json/remove request");
+        // System.out.println("id = " + id);
+        // System.out.println("notificationEmail = " + notificationEmail);
+        Response response;
+        try {
+
+            // validation
+            if (!notificationEmail.isEmpty()) {
+                EmailNotification emailNotification = new EmailNotification();
+                emailNotification.setNotificationEmail(notificationEmail);
+                emailNotification.setApplicationName(applicationName);
+                emailNotification.setFlowName(flowName);
+                emailNotification.setFlowPointName(flowPointName);
+                emailNotification.setMaxNotifications(maxNotification);
+                emailNotification.setMaxNotificationsUnit(maxNotificationUnit);
+
+                ResultSetConverterJSONArray converter = new ResultSetConverterJSONArray();
+                new EmailNotificationServiceBase().persistAndReplyEmailConfigurations(
+                        emailNotification,
+                        page,
+                        pageSize,
+                        converter
+                );
+                 
                 response = Response.ok(converter.getResult().toString()).build();
             } else {
                 response = Response.serverError().build();

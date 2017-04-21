@@ -19,7 +19,9 @@ package com.erbjuder.logger.server.common.services;
 import com.erbjuder.logger.server.bean.EmailNotification;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,9 +31,9 @@ import java.util.logging.Logger;
  */
 public class ResultSetConverterEmailNotificationList implements ResultSetConverter {
 
-    private final List<EmailNotification> list = new ArrayList<>();
+    private final Set<EmailNotification> list = new HashSet<>();
 
-    public List<EmailNotification> getResult() {
+    public Set<EmailNotification> getResult() {
         return list;
     }
 
@@ -61,13 +63,22 @@ public class ResultSetConverterEmailNotificationList implements ResultSetConvert
                         obj.setNotificationEmail(rs.getNString(column_name));
                     } else if (column_name.equals("APPLICATIONNAME")) {
                         obj.setApplicationName(rs.getNString(column_name));
+                    } else if (column_name.equals("FLOWNAME")) {
+                        obj.setFlowName(rs.getNString(column_name));
+                    } else if (column_name.equals("FLOWPOINTNAME")) {
+                        obj.setFlowPointName(rs.getNString(column_name));
                     } else if (column_name.equals("REGISTRATIONDATE")) {
                         obj.setReqistrationDate(rs.getDate(column_name));
                     } else if (column_name.equals("NOTIFICATIONSENTDATE")) {
-                        obj.setNotificationSentDate(rs.getDate(column_name));
+                        obj.setNotificationSentTimestamp(rs.getTimestamp(column_name));
                     } else if (column_name.equals("NOTIFICATIONCOUNTER")) {
                         obj.setNotificationCounter(rs.getInt(column_name));
+                    } else if (column_name.equals("MAXNOTIFICATIONS")) {
+                        obj.setMaxNotifications(rs.getInt(column_name));
+                    } else if (column_name.equals("MAXNOTIFICATIONSUNIT")) {
+                        obj.setMaxNotificationsUnit(rs.getString(column_name));
                     }
+
                 }//end foreach
                 list.add(obj);
             }//end while

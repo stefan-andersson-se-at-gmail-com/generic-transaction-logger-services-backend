@@ -25,6 +25,8 @@ import java.util.Set;
  */
 public class PrepareStatementHelper {
 
+    public static final int LIST_MAX_SIZE = 1000;
+
     public static String toSQLStartsWithValue(String value) {
         return "'" + value + "%'";
     }
@@ -36,6 +38,8 @@ public class PrepareStatementHelper {
     public static String toSQLValue(String value) {
         return "'" + value + "'";
     }
+
+     
 
     public static String toSQLList(List<String> list) {
         StringBuilder builder = new StringBuilder();

@@ -35,9 +35,13 @@ public class MysqlConnection {
     private static final String persistenceUnitNameRead = "TransactionLoggerRead";
     private static final String persistenceUnitNameWrite = "TransactionLoggerWrite";
     private static DataSource dataSourceRead = null;
+    private static DataSource dataSourceReadNonTransaction = null;
     private static DataSource dataSourceWrite = null;
+    private static DataSource dataSourceWriteNonTransaction = null;
     private static Context contextRead = null;
+    private static Context contextReadNonTransaction = null;
     private static Context contextWrite = null;
+    private static Context contextWriteNonTransaction = null;
 
     private static DataSource DataSourceRead() throws Exception {
         /**
@@ -61,6 +65,30 @@ public class MysqlConnection {
             Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
         return dataSourceRead;
+    }
+
+    private static DataSource DataSourceReadNonTransaction() throws Exception {
+        /**
+         * check to see if the database object is already defined... if it is,
+         * then return the connection, no need to look it up again.
+         */
+        if (dataSourceReadNonTransaction != null) {
+            return dataSourceReadNonTransaction;
+        }
+        try {
+            /**
+             * This only needs to run one time to get the database object.
+             * context is used to lookup the database object
+             */
+            if (contextReadNonTransaction == null) {
+                contextReadNonTransaction = new InitialContext();
+            }
+            //System.err.println("Shoud be Read : " + new PersistenceUnitParser(persistenceUnitNameRead).getDataSourceString() + "NonTransaction");
+            dataSourceReadNonTransaction = (DataSource) contextReadNonTransaction.lookup(new PersistenceUnitParser(persistenceUnitNameRead).getDataSourceString() + "NonTransaction");
+        } catch (NamingException | ParserConfigurationException ex) {
+            Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return dataSourceReadNonTransaction;
     }
 
     private static DataSource DataSourceWrite() throws Exception {
@@ -88,10 +116,45 @@ public class MysqlConnection {
         return dataSourceWrite;
     }
 
+    private static DataSource DataSourceWriteNonTransaction() throws Exception {
+        /**
+         * check to see if the database object is already defined... if it is,
+         * then return the connection, no need to look it up again.
+         */
+        if (dataSourceWriteNonTransaction != null) {
+            return dataSourceWriteNonTransaction;
+        }
+        try {
+            /**
+             * This only needs to run one time to get the database object.
+             * context is used to lookup the database object
+             */
+            if (contextWriteNonTransaction == null) {
+                contextWriteNonTransaction = new InitialContext();
+            }
+
+            // System.err.println("Shoud be Write : " + new PersistenceUnitParser(persistenceUnitNameWrite).getDataSourceString() + "NOJTA");
+            dataSourceWriteNonTransaction = (DataSource) contextWriteNonTransaction.lookup(new PersistenceUnitParser(persistenceUnitNameWrite).getDataSourceString() + "NonTransaction");
+        } catch (NamingException | ParserConfigurationException ex) {
+            Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return dataSourceWriteNonTransaction;
+    }
+
     public static Connection getConnectionRead() {
         Connection conn = null;
         try {
             conn = MysqlConnection.DataSourceRead().getConnection();
+        } catch (Exception ex) {
+            Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return conn;
+    }
+
+    public static Connection getConnectionReadNonTransaction() {
+        Connection conn = null;
+        try {
+            conn = MysqlConnection.DataSourceReadNonTransaction().getConnection();
         } catch (Exception ex) {
             Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -108,4 +171,17 @@ public class MysqlConnection {
         return conn;
     }
 
+    public static Connection getConnectionWriteNonTransaction() {
+        Connection conn = null;
+        try {
+            conn = MysqlConnection.DataSourceWriteNonTransaction().getConnection();
+        } catch (Exception ex) {
+            Logger.getLogger(MysqlConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return conn;
+    }
+
+    
+    
+    
 }

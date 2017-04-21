@@ -16,7 +16,9 @@
  */
 package com.erbjuder.logger.server.common.helper;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,7 +26,6 @@ import java.util.Set;
  * @author Stefan Andersson
  */
 public class DataBase {
- 
 
     public static final long LOGMESSAGEDATA_CONTENT_MAX_SIZE_20B = 20;
     public static final long LOGMESSAGEDATA_CONTENT_MAX_SIZE_40B = 40;
@@ -101,6 +102,30 @@ public class DataBase {
         LOGMESSAGEDATA_CONTENT_MAX_SIZES.add(DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_10MB);
         LOGMESSAGEDATA_CONTENT_MAX_SIZES.add(DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_16MB);
         LOGMESSAGEDATA_CONTENT_MAX_SIZES.add(DataBase.LOGMESSAGEDATA_CONTENT_MAX_SIZE_4GB);
+
+    }
+
+    public static List<String> getAllDatabaseNames() {
+
+        List<String> databases = new ArrayList<>();
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_01_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_02_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_03_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_04_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_05_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_06_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_07_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_08_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_09_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_10_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_11_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_12_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_13_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_14_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_15_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_16_NAME);
+        databases.add(DataBase.LOGMESSAGEDATA_PARTITION_17_NAME);
+        return databases;
 
     }
 

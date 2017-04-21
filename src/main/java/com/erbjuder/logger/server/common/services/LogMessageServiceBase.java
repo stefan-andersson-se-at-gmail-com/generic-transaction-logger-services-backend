@@ -18,10 +18,12 @@ package com.erbjuder.logger.server.common.services;
 
 import com.erbjuder.logger.server.common.helper.MysqlConnection;
 import com.erbjuder.logger.server.common.helper.TransactionComparator;
-// import com.erbjuder.logger.server.queue.TopicQueueMessageSender;
+//import com.erbjuder.logger.server.queue.TopicQueueMessageSender;
+
 import com.generic.global.transactionlogger.Response;
 import com.generic.global.transactionlogger.Transactions;
 import com.generic.global.transactionlogger.Transactions.Transaction;
+import java.io.UnsupportedEncodingException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -49,9 +51,8 @@ import javax.xml.ws.WebServiceException;
 })
 public class LogMessageServiceBase {
 
-    // @EJB
-    // TopicQueueMessageSender messageSender;
-
+//    @EJB
+//    TopicQueueMessageSender messageSender;
     private static final Logger logger = Logger.getLogger(LogMessageServiceBase.class.getName());
     public static final int addNumberOfMonth = 12;
     public static final long mysql_max_allowed_packet = 16000000L;//16MB ( MAX LONG = 4294967296L );
@@ -61,11 +62,11 @@ public class LogMessageServiceBase {
         // Return 
         Response response = new Response();
         response.setReturn(true);
-
+        
         List<Transactions.Transaction> tmpTransactionList = transactions.getTransaction();
         Transactions.Transaction[] transactionArray = tmpTransactionList.toArray(new Transaction[tmpTransactionList.size()]);
         Arrays.sort(transactionArray, new TransactionComparator());
-
+        
         try (Connection connection = MysqlConnection.getConnectionWrite()) {
 
             // Build all objects that we need one time    
@@ -85,11 +86,11 @@ public class LogMessageServiceBase {
             connection.close();
 
             // Put message on buss / topic queue.
-            // messageSender.produceMessages(internalObjects.getInternalTransactionHeaders());
-       
+//            messageSender.produceMessages(internalObjects.getInternalTransactionHeaders());
+//       
             internalObjects.getDbContentSizeMap().clear();
             internalObjects.setDbContentSizeMap(null);
-
+            
         } catch (SQLException sqlError) {
             logger.log(Level.SEVERE, sqlError.getMessage());
             return response;
@@ -97,12 +98,12 @@ public class LogMessageServiceBase {
             logger.log(Level.SEVERE, ex.getMessage());
             response.setReturn(false);
             return response;
-
-        }
-
+            
+        }  
+        
         return response;
     }
-
+    
     private void persistLogMessage(
             Connection connection,
             InternalObjects internalObjects
@@ -113,10 +114,10 @@ public class LogMessageServiceBase {
         connection.setAutoCommit(false);
         String prepareStatementString = getLogMessagePrepaterStatementMysql_Insert();
         try (PreparedStatement preparedStatement = connection.prepareStatement(prepareStatementString)) {
-
+            
             int batch_counter = 0;
             int MAX_HEADER_BATCH_SIZE = 1000;
-
+            
             InternalTransactionHeaders internalTransactionHeaders = internalObjects.getInternalTransactionHeaders();
             for (InternalTransactionHeader internalTransactionHeader : internalTransactionHeaders.getInternalTransactionHeaders()) {
 
@@ -138,18 +139,19 @@ public class LogMessageServiceBase {
                 preparedStatement.setBoolean(8, internalTransactionHeader.getIsError());
                 preparedStatement.setString(9, internalTransactionHeader.getFlowName());
                 preparedStatement.setString(10, internalTransactionHeader.getFlowPointName());
-
+                preparedStatement.setLong(11, internalTransactionHeader.getPayloadSize());
+                
                 preparedStatement.addBatch();
-
+                
             }
 
             // persist the last one to
             preparedStatement.executeBatch();
             preparedStatement.clearBatch();
         }
-
+        
     }
-
+    
     private void persistLogMessageData(
             Connection connection,
             InternalObjects internalObjects
@@ -180,7 +182,8 @@ public class LogMessageServiceBase {
                         preparedStatement.clearBatch();
                         accumulated_batch_size = 0L;
                     }
-
+                    
+ 
                     preparedStatement.setLong(1, internalTransactionLogData.getPrimaryKey());
                     preparedStatement.setInt(2, internalTransactionLogData.getPartitionId());
                     preparedStatement.setString(3, internalTransactionLogData.getContentLabel());
@@ -193,9 +196,9 @@ public class LogMessageServiceBase {
                     preparedStatement.setTimestamp(10, internalTransactionLogData.getUtcServerTimestamp());
                     preparedStatement.setDate(11, internalTransactionLogData.getExpiredDate());
                     preparedStatement.setLong(12, internalTransactionLogData.getForeignKey());
-
+                    
                     preparedStatement.addBatch();
-
+                    
                 }
 
                 // Some prepare statements in buffer ==> execute before next run
@@ -203,15 +206,15 @@ public class LogMessageServiceBase {
                 preparedStatement.clearBatch();
             }
         }
-
+        
     }
-
+    
     private String getPrimaryKeySequencePrepareStatement_Fetch() {
         return "{? = call seq_generator_fetch(?,?)}";
     }
-
+    
     private String getLogMessagePrepaterStatementMysql_Insert() {
-
+        
         String mysqlLogMessagePrepareStatement
                 = "INSERT INTO LogMessage ("
                 + "ID, "
@@ -223,14 +226,15 @@ public class LogMessageServiceBase {
                 + "APPLICATIONNAME, "
                 + "ISERROR, "
                 + "FLOWNAME, "
-                + "FLOWPOINTNAME) "
-                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
-
+                + "FLOWPOINTNAME,"
+                + "PAYLOADSIZE) "
+                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+        
         return mysqlLogMessagePrepareStatement;
     }
-
+    
     private String getLogMessageDataPrepaterStatementMysql_Insert(String logMessageDataSizePartitionName) {
-
+        
         String mysqlLogMessageDataSizePrepareStatement = "INSERT INTO " + logMessageDataSizePartitionName + " ("
                 + "ID, "
                 + "PARTITION_ID, "
@@ -245,10 +249,10 @@ public class LogMessageServiceBase {
                 + "EXPIREDDATE, "
                 + "LOGMESSAGE_ID ) "
                 + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
-
+        
         return mysqlLogMessageDataSizePrepareStatement;
     }
-
+    
     private PrimaryKeySequence fetchPrimaryKeySequence(
             Connection connection,
             Transactions.Transaction[] transactionArray)
@@ -270,10 +274,10 @@ public class LogMessageServiceBase {
         Long endPK = primaryKeySequencePrepareStatement.getLong(1);
         Long startPK = endPK - numOfPrimaryKeys;
         return new PrimaryKeySequence(startPK, endPK);
-
+        
     }
-
-    private InternalObjects buildInternalObjects(Connection connection, Transactions.Transaction[] transactionArray) throws SQLException {
+    
+    private InternalObjects buildInternalObjects(Connection connection, Transactions.Transaction[] transactionArray) throws SQLException, UnsupportedEncodingException {
 
         // Optimization, loop just one time over input data
         // Result
@@ -287,7 +291,7 @@ public class LogMessageServiceBase {
                 = new PrimaryKeySequence(
                         primaryKeySequence.getStartPK(),
                         primaryKeySequence.getEndPK());
-
+        
         Map<Transactions.Transaction, InternalTransactionHeader> hederPrimaryKeyMappning = new HashMap<>(transactionArray.length);
         for (Transactions.Transaction transactionHeader : transactionArray) {
 
@@ -307,7 +311,7 @@ public class LogMessageServiceBase {
             //
             // Prepare data for batch load, organized by which database they belongs to
             for (Transactions.Transaction.TransactionLogData transactionLogData : transactionHeader.getTransactionLogData()) {
-
+                
                 InternalTransactionLogData internalTransactionLogData
                         = new InternalTransactionLogData(
                                 childDataKeySequence.next(), // Inc heder PK up to child length
@@ -320,6 +324,8 @@ public class LogMessageServiceBase {
 
                 // Add meta data to header 
                 internalHeader.getInternalTransactionLogData().add(internalTransactionLogData);
+                internalHeader.incPayloadSize(internalTransactionLogData.getContentSize());
+                
 
                 // Optimization Calculate dbContentSizeMap in this step to
                 String databaseName = internalTransactionLogData.getDatabaseName();
@@ -331,7 +337,7 @@ public class LogMessageServiceBase {
                     list.add(internalTransactionLogData);
                     dbContentSizeMap.put(databaseName, list);
                 }
-
+                
             }
 
             // If some marked as error --> save contains error.
@@ -340,37 +346,37 @@ public class LogMessageServiceBase {
             }
             // Save to result
             internalTransactionHeaders.addInternalTransactionHeader(internalHeader);
-
+            
         }
-
+        
         internalObjects.setInternalTransactionHeaders(internalTransactionHeaders);
         return internalObjects;
-
+        
     }
-
+    
     private class InternalObjects {
-
+        
         private InternalTransactionHeaders internalTransactionHeaders = new InternalTransactionHeaders();
         private Map<String, ArrayList<InternalTransactionLogData>> dbContentSizeMap = new HashMap();
-
+        
         ;
 
         public InternalTransactionHeaders getInternalTransactionHeaders() {
             return internalTransactionHeaders;
         }
-
+        
         public void setInternalTransactionHeaders(InternalTransactionHeaders internalTransactionHeaders) {
             this.internalTransactionHeaders = internalTransactionHeaders;
         }
-
+        
         public Map<String, ArrayList<InternalTransactionLogData>> getDbContentSizeMap() {
             return dbContentSizeMap;
         }
-
+        
         public void setDbContentSizeMap(Map<String, ArrayList<InternalTransactionLogData>> dbContentSizeMap) {
             this.dbContentSizeMap = dbContentSizeMap;
         }
-
+        
     }
-
+    
 }

@@ -16,10 +16,9 @@
  */
 package com.erbjuder.logger.server.queue;
 
-import com.erbjuder.logger.server.bean.EmailService;
 import com.erbjuder.logger.server.common.services.InternalTransactionHeader;
 import com.erbjuder.logger.server.common.services.InternalTransactionHeaders;
-import com.erbjuder.logger.server.rest.services.EmailNotificationPrepareToSendBase;
+import com.erbjuder.logger.server.rest.services.EmailNotificationLogMessageBase;
 import com.erbjuder.logger.server.rest.services.EmailNotificationServiceBase;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,41 +34,34 @@ import javax.jms.ObjectMessage;
  *
  * @author Stefan Andersson
  */
-/*
-@MessageDriven(mappedName = "jms/transactionLoggerQueueTopic",
-        activationConfig = {
-            @ActivationConfigProperty(propertyName = "acknowledgeMode",
-                    propertyValue = "Auto-acknowledge")
-            ,
-            @ActivationConfigProperty(propertyName = "destinationType",
-                    propertyValue = "javax.jms.Topic")
-        })
-public class EmailNotificationServiceMessageListener extends EmailNotificationServiceBase implements MessageListener {
-
-    private static final Logger logger = Logger.getLogger(EmailNotificationServiceMessageListener.class.getName());
-
-    @EJB
-    protected EmailNotificationPrepareToSendBase emailNotificationPrepareToSendBase;
-
-    @Override
-    public void onMessage(Message message) {
-
-        try {
-
-            ObjectMessage objectMessage = (ObjectMessage) message;
-            InternalTransactionHeaders internalHeaders = (InternalTransactionHeaders) objectMessage.getObject();
-            if (internalHeaders.getSomeMarkedAsError()) {
-
-                InternalTransactionHeader header = internalHeaders.getInternalTransactionHeaders().get(0);
-                emailNotificationPrepareToSendBase.persist(
-                        header.getApplicationName(),
-                        header.getTransactionReferenceID()
-                );
-            }
-
-        } catch (JMSException | ClassCastException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-        }
-    }
-}
-*/
+//@MessageDriven(mappedName = "jms/transactionLoggerQueueTopic",
+//        activationConfig = {
+//            @ActivationConfigProperty(propertyName = "acknowledgeMode",
+//                    propertyValue = "Auto-acknowledge")
+//            ,
+//            @ActivationConfigProperty(propertyName = "destinationType",
+//                    propertyValue = "javax.jms.Topic")
+//        })
+//public class EmailNotificationServiceMessageListener extends EmailNotificationServiceBase implements MessageListener {
+//
+//    private static final Logger logger = Logger.getLogger(EmailNotificationServiceMessageListener.class.getName());
+//
+//    @EJB
+//    protected EmailNotificationLogMessageBase emailNotificationPrepareToSendBase;
+//
+//    @Override
+//    public void onMessage(Message message) {
+//
+//        try {
+//
+//            ObjectMessage objectMessage = (ObjectMessage) message;
+//            InternalTransactionHeaders internalHeaders = (InternalTransactionHeaders) objectMessage.getObject();
+//            if (internalHeaders.getSomeMarkedAsError()) {
+//                emailNotificationPrepareToSendBase.persist(internalHeaders);
+//            }
+//
+//        } catch (JMSException | ClassCastException e) {
+//            logger.log(Level.SEVERE, e.getMessage());
+//        }
+//    }
+//}

@@ -16,7 +16,7 @@
  */
 package com.erbjuder.logger.server.common.services;
 
-import com.erbjuder.logger.server.bean.EmailNotificationPrepareToSend;
+import com.erbjuder.logger.server.bean.EmailNotificationLogMessage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,9 +30,9 @@ import java.util.logging.Logger;
  */
 public class ResultSetConverterEmailNotificationPrepareToSendList implements ResultSetConverter {
 
-    private final List<EmailNotificationPrepareToSend> list = new ArrayList<>();
+    private final List<EmailNotificationLogMessage> list = new ArrayList<>();
 
-    public List<EmailNotificationPrepareToSend> getResult() {
+    public List<EmailNotificationLogMessage> getResult() {
         return list;
     }
 
@@ -50,22 +50,40 @@ public class ResultSetConverterEmailNotificationPrepareToSendList implements Res
                 int numColumns = rsmd.getColumnCount();
 
                 //each row in the ResultSet will be converted to a Object
-                EmailNotificationPrepareToSend obj = new EmailNotificationPrepareToSend();
+                EmailNotificationLogMessage obj = new EmailNotificationLogMessage();
 
+                // loop through all the columns 
                 // loop through all the columns 
                 for (int i = 1; i < numColumns + 1; i++) {
                     String column_name = rsmd.getColumnName(i);
 
                     if (column_name.equals("ID")) {
                         obj.setId(rs.getBigDecimal(column_name).longValueExact());
-                    } else if (column_name.equals("LOGMESSAGE_APPLICATIONNAME")) {
-                        obj.setLogmessageApplicationName(rs.getString(column_name));
-                    } else if (column_name.equals("LOGMESSAGE_TRANSACTIONREFERENCEID")) {
-                        obj.setLogmessageTransactionReferenceId(rs.getString(column_name));
-                    } else if (column_name.equals("SENT")) {
+                    } else if (column_name.equals("LOGMESSAGE_ID")) {
+                        obj.setPartitionId(rs.getInt(column_name));
+                    } else if (column_name.equals("PARTITION_ID")) {
+                        obj.setPartitionId(rs.getInt(column_name));
+                    } else if (column_name.equals("APPLICATIONNAME")) {
+                        obj.setApplicationName(rs.getNString(column_name));
+                    } else if (column_name.equals("FLOWNAME")) {
+                        obj.setFlowName(rs.getNString(column_name));
+                    } else if (column_name.equals("FLOWPOINTNAME")) {
+                        obj.setFlowPointName(rs.getNString(column_name));
+                    } else if (column_name.equals("EXPIREDDATE")) {
+                        obj.setExpiredDate(rs.getDate(column_name));
+                    } else if (column_name.equals("ISERROR")) {
+                        obj.setIsError(rs.getBoolean(column_name));
+                    } else if (column_name.equals("TRANSACTIONREFERENCEID")) {
+                        obj.setTransactionReferenceID(rs.getNString(column_name));
+                    } else if (column_name.equals("UTCLOCALTIMESTAMP")) {
+                        obj.setUtcLocalTimestamp(rs.getTimestamp(column_name));
+                    } else if (column_name.equals("UTCSERVERTIMESTAMP")) {
+                        obj.setUtcServerTimestamp(rs.getTimestamp(column_name));
+                    } else if (column_name.equals("SEND")) {
                         obj.setSent(rs.getBoolean(column_name));
                     }
                 }//end foreach
+
                 list.add(obj);
             }//end while
 
@@ -73,5 +91,17 @@ public class ResultSetConverterEmailNotificationPrepareToSendList implements Res
             Logger.getLogger(ResultSetConverterEmailNotificationPrepareToSendList.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
 
+//            + "ID, "
+//                + "LOGMESSAGE_ID, "
+//                + "PARTITION_ID, "
+//                + "UTCLOCALTIMESTAMP, "
+//                + "UTCSERVERTIMESTAMP, "
+//                + "EXPIREDDATE, "
+//                + "TRANSACTIONREFERENCEID, "
+//                + "APPLICATIONNAME, "
+//                + "ISERROR, "
+//                + "FLOWNAME, "
+//                + "FLOWPOINTNAME,"
+//                + "SENT"
     }
 }

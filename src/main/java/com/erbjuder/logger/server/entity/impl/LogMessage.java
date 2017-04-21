@@ -59,6 +59,8 @@ public class LogMessage implements Serializable {
     private String flowName;
     @Column(name = "FLOWPOINTNAME")
     private String flowPointName;
+    @Column(name = "PAYLOADSIZE")
+    private Long payloadSize;
 
     public Long getId() {
         return id;
@@ -138,6 +140,14 @@ public class LogMessage implements Serializable {
 
     public void setFlowPointName(String flowPointName) {
         this.flowPointName = flowPointName;
+    }
+
+    public Long getPayloadSize() {
+        return payloadSize;
+    }
+
+    public void setPayloadSize(Long payloadSize) {
+        this.payloadSize = payloadSize;
     }
 
     @Override

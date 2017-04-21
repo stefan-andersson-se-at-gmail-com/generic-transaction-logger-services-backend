@@ -16,7 +16,6 @@ package com.erbjuder.logger.server.common.services;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import com.erbjuder.logger.server.common.helper.DatabasePartitionHelper;
 import com.erbjuder.logger.server.common.helper.TimeStampUtils;
 import com.generic.global.transactionlogger.Transactions;
@@ -43,7 +42,10 @@ public class InternalTransactionHeader implements Serializable {
     private String transactionReferenceID = null;
     private java.sql.Date expiredDate = null;
     private Integer partitionId = null;
+    private Long payloadSize = 0L;
+
     private ArrayList<InternalTransactionLogData> internalTransactionLogData = new ArrayList();
+    private Long L0;
 
     public InternalTransactionHeader(Long primaryKey, Transactions.Transaction transactionHeader) {
         // Mandatory fields
@@ -114,11 +116,20 @@ public class InternalTransactionHeader implements Serializable {
         return internalTransactionLogData;
     }
 
+    public Long getPayloadSize() {
+        return payloadSize;
+    }
+
+    public void setPayloadSize(Long payloadSize) {
+        this.payloadSize = payloadSize;
+    }
+
+    public void incPayloadSize(Long payloadSize) {
+        this.payloadSize = this.payloadSize + payloadSize;
+    }
+
     private Date calculateExpiredDate(Transactions.Transaction transaction) {
 
-        
-        
-        
         // Optional
         try {
 

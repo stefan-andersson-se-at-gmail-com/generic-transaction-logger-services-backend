@@ -94,6 +94,9 @@ public class ResultSetConverterLogMessageList implements ResultSetConverter {
                     else if (column_name.equals("UTCSERVERTIMESTAMP")) {
                         obj.setUtcServerTimeStamp(rs.getTimestamp(column_name));
                     }
+                    else if (column_name.equals("PAYLOADSIZE")) {
+                        obj.setPayloadSize(rs.getLong(column_name));
+                    }
                 }//end foreach
                 list.add(obj);
             }//end while

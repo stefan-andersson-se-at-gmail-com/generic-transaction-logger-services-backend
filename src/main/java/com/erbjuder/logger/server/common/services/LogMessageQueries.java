@@ -16,7 +16,6 @@
  */
 package com.erbjuder.logger.server.common.services;
 
-import com.erbjuder.logger.server.common.helper.DataBase;
 import com.erbjuder.logger.server.common.helper.DatabasePartitionHelper;
 import com.erbjuder.logger.server.common.helper.MysqlConnection;
 import java.sql.CallableStatement;
@@ -26,12 +25,16 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Stefan Andersson
  */
 public class LogMessageQueries {
+
+    private static final Logger logger = Logger.getLogger(LogMessageQueries.class.getName());
 
     public ResultSetConverter fetch_labelContent(
             Long id,
@@ -53,12 +56,12 @@ public class LogMessageQueries {
             ResultSetConverter converter
     ) {
 
+        StringBuilder prepareStatement = new StringBuilder();
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
-            StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
             prepareStatement.append("ID, PARTITION_ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
-            prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
+            prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, PAYLOADSIZE ");
             prepareStatement.append("FROM ").append("LogMessage ");
 
             // PartitionId
@@ -151,7 +154,7 @@ public class LogMessageQueries {
             }
             prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
 
-            // System.err.println(prepareStatement.toString());
+            //System.err.println(prepareStatement.toString());
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             ResultSet rs = stmt.executeQuery();
             converter.convert(rs);
@@ -160,10 +163,12 @@ public class LogMessageQueries {
             conn.close();
 
         } catch (SQLException sqlError) {
-            sqlError.printStackTrace();
+            logger.log(Level.SEVERE, sqlError.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
 
         }
@@ -192,9 +197,9 @@ public class LogMessageQueries {
             List<String> dataSizePartitionList,
             ResultSetConverter converter) {
 
+        StringBuilder prepareStatement = new StringBuilder();
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
-            StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
             prepareStatement.append("DISTINCT APPLICATIONNAME ");
             prepareStatement.append("FROM ").append("LogMessage ");
@@ -207,7 +212,7 @@ public class LogMessageQueries {
             // Between date
             prepareStatement.append("WHERE ");
             prepareStatement.append("APPLICATIONNAME IS NOT NULL ").append("AND ");
-            
+
             appendBetweenDate(fromDate, toDate, prepareStatement);
 
             // Transaction ref ID
@@ -243,27 +248,34 @@ public class LogMessageQueries {
                     && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
 
                 prepareStatement.append("AND ( ");
-                int size = dataSizePartitionList.size();
-                for (int i = 0; i < size; i++) {
+                int dataSizePartitionSize = dataSizePartitionList.size();
+                for (int i = 0; i < dataSizePartitionSize; i++) {
 
-                    String logMessageDataPartition = dataSizePartitionList.get(i);
+                    int freeTextSearchSize = freeTextSearchList.size();
+                    prepareStatement.append("( ");
+                    for (int j = 0; j < freeTextSearchSize; j++) {
 
-                    StringBuilder partitionBuilder;
-                    partitionBuilder = fetch_LogMessageIdsFromPartition_IdVariable(
-                            fromDate,
-                            toDate,
-                            "ID",
-                            viewLables,
-                            viewMimeTypes,
-                            notViewLables,
-                            notViewMimeTypes,
-                            logMessageDataPartition,
-                            freeTextSearchList
-                    );
+                        StringBuilder partitionBuilder = fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                dataSizePartitionList.get(i),
+                                freeTextSearchList.get(j)
+                        );
 
-                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
 
-                    if (i < size - 1) {
+                        if (j < freeTextSearchSize - 1) {
+                            prepareStatement.append("AND ");
+                        }
+                    }
+
+                    prepareStatement.append(") ");
+                    if (i < dataSizePartitionSize - 1) {
                         prepareStatement.append("OR ");
                     }
 
@@ -273,7 +285,6 @@ public class LogMessageQueries {
             }
 
             // System.err.println("APP_NAME : " + prepareStatement.toString());
-
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             ResultSet rs = stmt.executeQuery();
             converter.convert(rs);
@@ -282,10 +293,12 @@ public class LogMessageQueries {
             conn.close();
 
         } catch (SQLException sqlError) {
-            sqlError.printStackTrace();
+            logger.log(Level.SEVERE, sqlError.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
 
         }
@@ -314,9 +327,9 @@ public class LogMessageQueries {
             List<String> dataSizePartitionList,
             ResultSetConverter converter) {
 
+        StringBuilder prepareStatement = new StringBuilder();
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
-            StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
             prepareStatement.append("DISTINCT FLOWNAME ");
             prepareStatement.append("FROM ").append("LogMessage ");
@@ -329,7 +342,7 @@ public class LogMessageQueries {
             // Between date
             prepareStatement.append("WHERE ");
             prepareStatement.append("FLOWNAME IS NOT NULL ").append("AND ");
-            
+
             appendBetweenDate(fromDate, toDate, prepareStatement);
 
             // Transaction ref ID
@@ -365,27 +378,33 @@ public class LogMessageQueries {
                     && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
 
                 prepareStatement.append("AND ( ");
-                int size = dataSizePartitionList.size();
-                for (int i = 0; i < size; i++) {
+                int dataSizePartitionSize = dataSizePartitionList.size();
+                for (int i = 0; i < dataSizePartitionSize; i++) {
 
-                    String logMessageDataPartition = dataSizePartitionList.get(i);
+                    int freeTextSearchSize = freeTextSearchList.size();
+                    prepareStatement.append("( ");
+                    for (int j = 0; j < freeTextSearchSize; j++) {
+                        StringBuilder partitionBuilder = fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                dataSizePartitionList.get(i),
+                                freeTextSearchList.get(j)
+                        );
 
-                    StringBuilder partitionBuilder;
-                    partitionBuilder = fetch_LogMessageIdsFromPartition_IdVariable(
-                            fromDate,
-                            toDate,
-                            "ID",
-                            viewLables,
-                            viewMimeTypes,
-                            notViewLables,
-                            notViewMimeTypes,
-                            logMessageDataPartition,
-                            freeTextSearchList
-                    );
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
 
-                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+                        if (j < freeTextSearchSize - 1) {
+                            prepareStatement.append("AND ");
+                        }
+                    }
 
-                    if (i < size - 1) {
+                    prepareStatement.append(") ");
+                    if (i < dataSizePartitionSize - 1) {
                         prepareStatement.append("OR ");
                     }
 
@@ -395,7 +414,6 @@ public class LogMessageQueries {
             }
 
             // System.err.println("FLOW_NAME : " + prepareStatement.toString());
-
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             ResultSet rs = stmt.executeQuery();
             converter.convert(rs);
@@ -404,10 +422,12 @@ public class LogMessageQueries {
             conn.close();
 
         } catch (SQLException sqlError) {
-            sqlError.printStackTrace();
+            logger.log(Level.SEVERE, sqlError.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
 
         }
@@ -436,9 +456,9 @@ public class LogMessageQueries {
             List<String> dataSizePartitionList,
             ResultSetConverter converter) {
 
+        StringBuilder prepareStatement = new StringBuilder();
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
-            StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
             prepareStatement.append("DISTINCT FLOWPOINTNAME ");
             prepareStatement.append("FROM ").append("LogMessage ");
@@ -451,8 +471,7 @@ public class LogMessageQueries {
             // Between date
             prepareStatement.append("WHERE ");
             prepareStatement.append("FLOWPOINTNAME IS NOT NULL ").append("AND ");
-            
-            
+
             appendBetweenDate(fromDate, toDate, prepareStatement);
 
             // Transaction ref ID
@@ -488,27 +507,35 @@ public class LogMessageQueries {
                     && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
 
                 prepareStatement.append("AND ( ");
-                int size = dataSizePartitionList.size();
-                for (int i = 0; i < size; i++) {
+                int dataSizePartitionSize = dataSizePartitionList.size();
+                for (int i = 0; i < dataSizePartitionSize; i++) {
 
-                    String logMessageDataPartition = dataSizePartitionList.get(i);
+                    int freeTextSearchSize = freeTextSearchList.size();
+                    prepareStatement.append("( ");
+                    for (int j = 0; j < freeTextSearchSize; j++) {
 
-                    StringBuilder partitionBuilder;
-                    partitionBuilder = fetch_LogMessageIdsFromPartition_IdVariable(
-                            fromDate,
-                            toDate,
-                            "ID",
-                            viewLables,
-                            viewMimeTypes,
-                            notViewLables,
-                            notViewMimeTypes,
-                            logMessageDataPartition,
-                            freeTextSearchList
-                    );
+                        StringBuilder partitionBuilder = fetch_LogMessageIdsFromPartition_IdVariable(
+                                fromDate,
+                                toDate,
+                                "ID",
+                                viewLables,
+                                viewMimeTypes,
+                                notViewLables,
+                                notViewMimeTypes,
+                                dataSizePartitionList.get(i),
+                                freeTextSearchList.get(j)
+                        );
 
-                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+                        prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
 
-                    if (i < size - 1) {
+                        if (j < freeTextSearchSize - 1) {
+                            prepareStatement.append("AND ");
+                        }
+
+                    }
+
+                    prepareStatement.append(") ");
+                    if (i < dataSizePartitionSize - 1) {
                         prepareStatement.append("OR ");
                     }
 
@@ -518,7 +545,6 @@ public class LogMessageQueries {
             }
 
             // System.err.println("FLOW_POINT_NAME : " + prepareStatement.toString());
-
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             ResultSet rs = stmt.executeQuery();
             converter.convert(rs);
@@ -527,10 +553,12 @@ public class LogMessageQueries {
             conn.close();
 
         } catch (SQLException sqlError) {
-            sqlError.printStackTrace();
+            logger.log(Level.SEVERE, sqlError.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
 
         }
@@ -561,12 +589,12 @@ public class LogMessageQueries {
             List<String> dataSizePartitionList,
             ResultSetConverter converter) throws Exception {
 
+        StringBuilder prepareStatement = new StringBuilder();
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
-            StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
             prepareStatement.append("ID, PARTITION_ID, APPLICATIONNAME, EXPIREDDATE, FLOWNAME, FLOWPOINTNAME, ");
-            prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP ");
+            prepareStatement.append("ISERROR, TRANSACTIONREFERENCEID, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, PAYLOADSIZE ");
             prepareStatement.append("FROM ").append("LogMessage ");
 
             // PartitionId
@@ -613,43 +641,53 @@ public class LogMessageQueries {
                     && dataSizePartitionList != null && !dataSizePartitionList.isEmpty()) {
 
                 prepareStatement.append("AND ( ");
-                int size = dataSizePartitionList.size();
-                for (int i = 0; i < size; i++) {
+                int dataSizePartitionSize = dataSizePartitionList.size();
+                for (int i = 0; i < dataSizePartitionSize; i++) {
 
-                    String logMessageDataPartition = dataSizePartitionList.get(i);
+                    int freeTextSearchSize = freeTextSearchList.size();
+                    prepareStatement.append("( ");
+                    for (int j = 0; j < freeTextSearchSize; j++) {
 
-                    StringBuilder partitionBuilder;
-                    if (id != null) {
+                        StringBuilder partitionBuilder;
+                        if (id != null) {
 
-                        partitionBuilder = fetch_LogMessageIdsFromPartition_IdValue(
-                                fromDate,
-                                toDate,
-                                id,
-                                viewLables,
-                                viewMimeTypes,
-                                notViewLables,
-                                notViewMimeTypes,
-                                logMessageDataPartition,
-                                freeTextSearchList
-                        );
+                            partitionBuilder = fetch_LogMessageIdsFromPartition_IdValue(
+                                    fromDate,
+                                    toDate,
+                                    id,
+                                    viewLables,
+                                    viewMimeTypes,
+                                    notViewLables,
+                                    notViewMimeTypes,
+                                    dataSizePartitionList.get(i),
+                                    freeTextSearchList.get(j)
+                            );
 
-                    } else {
-                        partitionBuilder = fetch_LogMessageIdsFromPartition_IdVariable(
-                                fromDate,
-                                toDate,
-                                "ID",
-                                viewLables,
-                                viewMimeTypes,
-                                notViewLables,
-                                notViewMimeTypes,
-                                logMessageDataPartition,
-                                freeTextSearchList
-                        );
+                            prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+
+                        } else {
+                            partitionBuilder = fetch_LogMessageIdsFromPartition_IdVariable(
+                                    fromDate,
+                                    toDate,
+                                    "ID",
+                                    viewLables,
+                                    viewMimeTypes,
+                                    notViewLables,
+                                    notViewMimeTypes,
+                                    dataSizePartitionList.get(i),
+                                    freeTextSearchList.get(j)
+                            );
+
+                            prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
+                        }
+
+                        if (j < freeTextSearchSize - 1) {
+                            prepareStatement.append("AND ");
+                        }
                     }
 
-                    prepareStatement.append("ID = ").append(" ( ").append(partitionBuilder.toString()).append(" ) ");
-
-                    if (i < size - 1) {
+                    prepareStatement.append(") ");
+                    if (i < dataSizePartitionSize - 1) {
                         prepareStatement.append("OR ");
                     }
 
@@ -678,7 +716,6 @@ public class LogMessageQueries {
             prepareStatement.append("LIMIT ").append(pageSize).append(" OFFSET ").append(pageOffset).append(" ");
 
             // System.err.println("MSG LIST : " + prepareStatement.toString());
-
             CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
             ResultSet rs = stmt.executeQuery();
             converter.convert(rs);
@@ -687,10 +724,12 @@ public class LogMessageQueries {
             conn.close();
 
         } catch (SQLException sqlError) {
-            sqlError.printStackTrace();
+            logger.log(Level.SEVERE, sqlError.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
 
         }
@@ -709,12 +748,12 @@ public class LogMessageQueries {
 
             List<String> sqlPartitionSyntaxList = new ArrayList();
             if (logMessageUtcServerTimestamp != null && !logMessageUtcServerTimestamp.isEmpty()) {
-                
+
                 // Prefered way!
                 sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(logMessageUtcServerTimestamp);
 
             } else {
-                
+
                 // Backward compatibility stuff
                 sqlPartitionSyntaxList.add(DatabasePartitionHelper.getPartitionSyntax(partitionId - 1));
                 sqlPartitionSyntaxList.add(DatabasePartitionHelper.getPartitionSyntax(partitionId));
@@ -733,8 +772,7 @@ public class LogMessageQueries {
                 prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" ");
                 prepareStatement.append("WHERE LOGMESSAGE_ID = ").append(logMessageId.toString());
 
-               // System.err.println("DATA_VIEW : " + prepareStatement.toString());
-                
+                // System.err.println("DATA_VIEW : " + prepareStatement.toString());
                 CallableStatement stmt = conn.prepareCall(prepareStatement.toString());
                 ResultSet rs = stmt.executeQuery();
 
@@ -749,10 +787,10 @@ public class LogMessageQueries {
 
             conn.close();
         } catch (SQLException sqlError) {
-            sqlError.printStackTrace();
+            logger.log(Level.SEVERE, sqlError.getMessage());
             return converter;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
             return converter;
 
         }
@@ -768,9 +806,9 @@ public class LogMessageQueries {
             ResultSetConverter converter
     ) throws Exception {
 
+        StringBuilder prepareStatement = new StringBuilder();
         try (Connection conn = MysqlConnection.getConnectionRead()) {
 
-            StringBuilder prepareStatement = new StringBuilder();
             prepareStatement.append("SELECT ");
             prepareStatement.append("ID, PARTITION_ID, LABEL, CONTENT, MIMETYPE, CONTENTSIZE, MODIFIED, ");
             prepareStatement.append("SEARCHABLE, UTCLOCALTIMESTAMP, UTCSERVERTIMESTAMP, LOGMESSAGE_ID ");
@@ -815,10 +853,12 @@ public class LogMessageQueries {
             conn.close();
 
         } catch (SQLException sqlError) {
-            sqlError.printStackTrace();
+            logger.log(Level.SEVERE, sqlError.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
+            logger.log(Level.SEVERE, prepareStatement.toString());
             return converter;
 
         }
@@ -835,21 +875,23 @@ public class LogMessageQueries {
             List<String> notViewLables,
             List<String> notViewMimeTypes,
             String logMessageDataSizePartition,
-            List<String> freeTextSearchList
+            String freeText
     ) throws ParseException {
+
+        // fetch partiotion(s)
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
         StringBuilder prepareStatement = new StringBuilder();
-        String partitionID = logMessageDataSizePartition + "_ID";
         prepareStatement.append("SELECT ");
-        prepareStatement.append("DISTINCT ( LOGMESSAGE_ID ) as ").append(partitionID).append(" ");
+        prepareStatement.append("DISTINCT ( A.LOGMESSAGE_ID ) ");
         prepareStatement.append("FROM ").append(logMessageDataSizePartition).append(" ");
 
-        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
+        // add partition
         if (sqlPartitionSyntaxList.size() < DatabasePartitionHelper.MAX_PARTITIONS) {
             prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" ");
         }
-
+        prepareStatement.append("AS A ");
         prepareStatement.append("WHERE ");
-        prepareStatement.append(logMessageDataSizePartition).append(".LOGMESSAGE_ID = ").append("LogMessage.").append(logMessageIdLabel).append(" ");
+        prepareStatement.append("A.LOGMESSAGE_ID = LogMessage.").append(logMessageIdLabel).append(" ");
 
         // viewLables
         appendViewLabels(viewLables, prepareStatement);
@@ -863,30 +905,12 @@ public class LogMessageQueries {
         // notViewMimeTypes
         appendNotViewMimentypes(notViewMimeTypes, prepareStatement);
 
-        if (freeTextSearchList != null && freeTextSearchList.size() > 0) {
-            int size = freeTextSearchList.size();
-            prepareStatement.append("AND ( ");
-            for (int i = 0; i < size; i++) {
-                String freeText = PrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
+        prepareStatement.append("AND ");
+        freeText = PrepareStatementHelper.toSQLContainsValue(freeText);
+        prepareStatement.append("( A.LABEL LIKE ").append(freeText).append(" ");
+        prepareStatement.append("OR ");
+        prepareStatement.append("A.CONTENT LIKE ").append(freeText).append(" ) ");
 
-                if (viewLables != null && !viewLables.isEmpty()) {
-
-                    prepareStatement.append("CONTENT = ").append(freeText).append(" ) ");
-                    if (i < size - 1) {
-                        prepareStatement.append("AND ");
-                    }
-
-                } else {
-                    prepareStatement.append("( LABEL LIKE ").append(freeText).append(" ");
-                    prepareStatement.append("OR ");
-                    prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ) ");
-                    if (i < size - 1) {
-                        prepareStatement.append("AND ");
-                    }
-                }
-            }
-            prepareStatement.append(" ) ");
-        }
         return prepareStatement;
     }
 
@@ -899,18 +923,23 @@ public class LogMessageQueries {
             List<String> notViewLables,
             List<String> notViewMimeTypes,
             String logMessageDataSizePartition,
-            List<String> freeTextSearchList
+            String freeText
     ) throws ParseException {
+
+        // fetch partiotion(s)
+        List<String> sqlPartitionSyntaxList = DatabasePartitionHelper.getPartitionId_SQL_SyntaxList(fromDate, toDate);
         StringBuilder prepareStatement = new StringBuilder();
-        String partitionID = logMessageDataSizePartition + "_ID";
         prepareStatement.append("SELECT ");
-        prepareStatement.append("DISTINCT ( LOGMESSAGE_ID ) as ").append(partitionID).append(" ");
+        prepareStatement.append("DISTINCT ( LOGMESSAGE_ID ) ");
         prepareStatement.append("FROM ").append(logMessageDataSizePartition).append(" ");
 
-        appendPartitionId(fromDate, toDate, prepareStatement);
-
+        // add partition
+        if (sqlPartitionSyntaxList.size() < DatabasePartitionHelper.MAX_PARTITIONS) {
+            prepareStatement.append("PARTITION ").append(PrepareStatementHelper.toSQL_Partition_List_Syntax(sqlPartitionSyntaxList)).append(" ");
+        }
+        prepareStatement.append("AS A ");
         prepareStatement.append("WHERE ");
-        prepareStatement.append(logMessageDataSizePartition).append(".LOGMESSAGE_ID = ").append(logMessageIdValue).append(" ");
+        prepareStatement.append("A.LOGMESSAGE_ID = ").append(logMessageIdValue).append(" ");
 
         // viewLables
         appendViewLabels(viewLables, prepareStatement);
@@ -924,20 +953,12 @@ public class LogMessageQueries {
         // notViewMimeTypes
         appendNotViewMimentypes(notViewMimeTypes, prepareStatement);
 
-        if (freeTextSearchList != null && freeTextSearchList.size() > 0) {
-            int size = freeTextSearchList.size();
-            prepareStatement.append("AND ( ");
-            for (int i = 0; i < size; i++) {
-                String freeText = PrepareStatementHelper.toSQLContainsValue(freeTextSearchList.get(i));
-                prepareStatement.append("( LABEL LIKE ").append(freeText).append(" ");
-                prepareStatement.append("OR ");
-                prepareStatement.append("CONTENT LIKE ").append(freeText).append(" ) ");
-                if (i < size - 1) {
-                    prepareStatement.append("AND ");
-                }
-            }
-            prepareStatement.append(" ) ");
-        }
+        prepareStatement.append("AND ");
+        freeText = PrepareStatementHelper.toSQLContainsValue(freeText);
+        prepareStatement.append("( A.LABEL LIKE ").append(freeText).append(" ");
+        prepareStatement.append("OR ");
+        prepareStatement.append("A.CONTENT LIKE ").append(freeText).append(" ) ");
+
         return prepareStatement;
     }
 

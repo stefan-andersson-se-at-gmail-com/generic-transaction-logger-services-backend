@@ -32,8 +32,10 @@ public class EmailNotification implements Serializable {
     private String flowName = "";
     private String flowPointName = "";
     private java.sql.Date reqistrationDate;
-    private java.sql.Date notificationSentDate;
+    private java.sql.Timestamp notificationSentTimestamp;
     private Integer notificationCounter = 0;
+    private Integer maxNotifications = 3;
+    private String maxNotificationsUnit = "day";
 
     public Long getId() {
         return id;
@@ -83,12 +85,12 @@ public class EmailNotification implements Serializable {
         this.reqistrationDate = reqistrationDate;
     }
 
-    public java.sql.Date getNotificationSentDate() {
-        return notificationSentDate;
+    public java.sql.Timestamp getNotificationSentTimestamp() {
+        return notificationSentTimestamp;
     }
 
-    public void setNotificationSentDate(java.sql.Date notificationSentDate) {
-        this.notificationSentDate = notificationSentDate;
+    public void setNotificationSentTimestamp(java.sql.Timestamp notificationSentDate) {
+        this.notificationSentTimestamp = notificationSentDate;
     }
 
     public Integer getNotificationCounter() {
@@ -97,6 +99,36 @@ public class EmailNotification implements Serializable {
 
     public void setNotificationCounter(Integer notificationCounter) {
         this.notificationCounter = notificationCounter;
+    }
+
+    public Integer getMaxNotifications() {
+        return maxNotifications;
+    }
+
+    public void setMaxNotifications(Integer maxNotifications) {
+        this.maxNotifications = maxNotifications;
+    }
+
+    public String getMaxNotificationsUnit() {
+        return maxNotificationsUnit;
+    }
+
+    public void setMaxNotificationsUnit(String maxNotificationsUnit) {
+        this.maxNotificationsUnit = maxNotificationsUnit;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[ ");
+        builder.append(this.getApplicationName());
+        builder.append(",");
+        builder.append(this.getFlowName());
+        builder.append(",");
+        builder.append(this.getFlowPointName());
+        builder.append(" ]");
+        return builder.toString();
+
     }
 
     @Override

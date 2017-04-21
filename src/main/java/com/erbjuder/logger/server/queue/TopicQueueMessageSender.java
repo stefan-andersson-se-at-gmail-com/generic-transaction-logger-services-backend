@@ -36,60 +36,61 @@ import javax.jms.TopicSession;
  *
  * @author Stefan Andersson
  */
-/*
-@Stateless
-public class TopicQueueMessageSender {
-
-    @Resource(mappedName = "jms/transactionLoggerTopicConnectionFactory")
-    private TopicConnectionFactory topicConnectionFactory;
-
-    @Resource(mappedName = "jms/transactionLoggerQueueTopic")
-    private Topic topic;
-
-    private static final Logger logger = Logger.getLogger(TopicQueueMessageSender.class.getName());
-
-    public void produceMessages(InternalTransactionHeaders internalTransactionHeaders) {
-
-        TopicConnection connection = null;
-        try {
-            connection = topicConnectionFactory.createTopicConnection();
-        } catch (JMSException | NullPointerException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-
-        TopicSession session = null;
-        try {
-            session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
-        } catch (JMSException | NullPointerException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-
-        TopicPublisher messagePublisher = null;
-        try {
-            messagePublisher = session.createPublisher(topic);
-        } catch (JMSException | NullPointerException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-
-        ObjectMessage objectMessage = null;
-        try {
-            objectMessage = session.createObjectMessage();
-        } catch (JMSException | NullPointerException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-
-        try {
-            objectMessage.setObject((Serializable) internalTransactionHeaders);
-            messagePublisher.send(objectMessage);
-
-            messagePublisher.close();
-            connection.close();
-            session.close();
-        } catch (JMSException | NullPointerException ex) {
-            Logger.getLogger(TopicQueueMessageSender.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-
-}
-*/
+ 
+//@Stateless
+//public class TopicQueueMessageSender {
+//
+//    
+//    @Resource(mappedName = "jms/transactionLoggerTopicConnectionFactory")
+//    private TopicConnectionFactory topicConnectionFactory;
+//
+//    @Resource(mappedName = "jms/transactionLoggerQueueTopic")
+//    private Topic topic;
+//
+//    private static final Logger logger = Logger.getLogger(TopicQueueMessageSender.class.getName());
+//
+//    public void produceMessages(InternalTransactionHeaders internalTransactionHeaders) {
+//
+//        TopicConnection connection = null;
+//        try {
+//            connection = topicConnectionFactory.createTopicConnection();
+//        } catch (JMSException | NullPointerException ex) {
+//            logger.log(Level.SEVERE, null, ex);
+//        }
+//
+//        TopicSession session = null;
+//        try {
+//            session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+//        } catch (JMSException | NullPointerException ex) {
+//            logger.log(Level.SEVERE, null, ex);
+//        }
+//
+//        TopicPublisher messagePublisher = null;
+//        try {
+//            messagePublisher = session.createPublisher(topic);
+//        } catch (JMSException | NullPointerException ex) {
+//            logger.log(Level.SEVERE, null, ex);
+//        }
+//
+//        ObjectMessage objectMessage = null;
+//        try {
+//            objectMessage = session.createObjectMessage();
+//        } catch (JMSException | NullPointerException ex) {
+//            logger.log(Level.SEVERE, null, ex);
+//        }
+//
+//        try {
+//            objectMessage.setObject((Serializable) internalTransactionHeaders);
+//            messagePublisher.send(objectMessage);
+//
+//            messagePublisher.close();
+//            connection.close();
+//            session.close();
+//        } catch (JMSException | NullPointerException ex) {
+//            Logger.getLogger(TopicQueueMessageSender.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//    }
+//
+//}
+// 
